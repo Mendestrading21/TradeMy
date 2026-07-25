@@ -58,7 +58,7 @@ const ALL_SURFACES = [
 
 // Couleurs d'accent utilisées comme TEXTE/icône coloré (puces, statuts, légendes) —
 // elles apparaissent sur les surfaces de carte/écran (background/surface/surfaceElevated).
-const ACCENT_TEXT = ['primary', 'primaryBright', 'technical', 'warning', 'reward', 'neutral', 'advanced', 'bullish', 'bearish'] as const;
+const ACCENT_TEXT = ['primary', 'primaryBright', 'info', 'technical', 'warning', 'reward', 'neutral', 'advanced', 'bullish', 'bearish'] as const;
 const CARD_SURFACES = ['background', 'surface', 'surfaceElevated'] as const;
 
 describe('AA exhaustif — couleurs de texte neutres sur toutes les surfaces', () => {
