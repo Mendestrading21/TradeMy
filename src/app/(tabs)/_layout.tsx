@@ -1,43 +1,24 @@
 import { Tabs } from 'expo-router';
-import { type ColorValue } from 'react-native';
-import { theme, TrademyIcon, type TrademyIconName } from '@/design-system';
+import { theme } from '@/design-system';
 import { PRIMARY_SPACES, HIDDEN_TAB_ROUTES } from '@/lib/navigation';
+import { TrademyTabBar } from '@/components/TrademyTabBar';
 
-function tabIcon(name: TrademyIconName) {
-  function TabBarIcon({ color, focused }: { color: ColorValue; focused: boolean }) {
-    return (
-      <TrademyIcon
-        name={name}
-        color={typeof color === 'string' ? color : theme.colors.textMuted}
-        size={24}
-        strokeWidth={focused ? 2.4 : 2}
-      />
-    );
-  }
-  TabBarIcon.displayName = `TabBarIcon(${name})`;
-  return TabBarIcon;
-}
-
+/**
+ * Shell des cinq espaces principaux (LOT 4-H). La barre d'onglets par défaut est remplacée par
+ * `TrademyTabBar` (composition verticale lisible dès 320 px, capsule active, a11y, focus web). La
+ * source des libellés/icônes/routes reste `PRIMARY_SPACES` ; les écrans hors-barre gardent `href: null`.
+ */
 export default function TabsLayout() {
   return (
     <Tabs
+      tabBar={(props) => <TrademyTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textMuted,
         sceneStyle: { backgroundColor: theme.colors.background },
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.border,
-        },
       }}
     >
       {PRIMARY_SPACES.map((space) => (
-        <Tabs.Screen
-          key={space.name}
-          name={space.name}
-          options={{ title: space.title, tabBarIcon: tabIcon(space.icon) }}
-        />
+        <Tabs.Screen key={space.name} name={space.name} options={{ title: space.title }} />
       ))}
 
       {/* Écrans conservés, accessibles par navigation, hors barre d'onglets.
