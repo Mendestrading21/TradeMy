@@ -48,6 +48,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Application du canon à la Bibliothèque : recherche dominante, 5 états stricts, favoris canon, 500+, a11y (LOT 4-F) | [ADR-102](./ADR-102-trademy-lot4f-bibliotheque-canon.md) |
 | Application du canon au Laboratoire : une activité à la fois, essais (pas de maîtrise), analytics, a11y (LOT 4-G) | [ADR-103](./ADR-103-trademy-lot4g-laboratoire-canon.md) |
 | Shell global & navigation responsive : barre lisible dès 320 px, capsule active, liens réels, a11y (LOT 4-H) | [ADR-104](./ADR-104-trademy-lot4h-shell-navigation-canon.md) |
+| Application du canon à l'Onboarding : icônes (fin des emojis/lettres), disclaimer, a11y, logique préservée (LOT 4-I) | [ADR-105](./ADR-105-trademy-lot4i-onboarding-canon.md) |
 
 ## Fondations toujours actives
 

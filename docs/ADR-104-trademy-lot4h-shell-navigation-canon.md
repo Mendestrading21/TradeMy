@@ -1,8 +1,8 @@
 # ADR-104 — LOT 4-H : shell global et navigation responsive canonique
 
-- **Statut** : proposé — LOT 4-H, huitième application de la fondation LOT 4-A (ADR-097), après les six
+- **Statut** : accepté — LOT 4-H, huitième application de la fondation LOT 4-A (ADR-097), après les six
   écrans verticaux (ADR-098 → ADR-103). Premier lot dédié à l'**enveloppe** (shell) plutôt qu'à un écran.
-  **PR en BROUILLON**, en attente de validation humaine ; passera à « accepté » à la validation.
+  **PR #18 fusionnée** dans `main` (squash, commit `fd082be`) après validation humaine et CI verte.
 - **Contexte** : la barre d'onglets par défaut de react-navigation (via `expo-router` `Tabs`) tronquait
   les libellés longs (« Bibliothèque », « Laboratoire ») sous ~360 px, et sa présentation restait
   générique. Le LOT 4-H remplace **uniquement** la barre par un composant premium, lisible dès 320 px,
@@ -115,4 +115,4 @@ et la documentation.
   via le nom accessible et `selected` (le lien web n'accepte pas `aria-selected`).
 - Contrôles natifs iOS/Android **non exécutés** : seuls Chromium et les tests React Native/Jest l'ont été.
 
-**LOT suivant : non commencé.**
+**LOT suivant : LOT 4-I — Onboarding & prise en main au canon (voir ADR-105).**
