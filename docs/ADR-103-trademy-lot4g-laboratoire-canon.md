@@ -1,9 +1,9 @@
 # ADR-103 — LOT 4-G : application du canon au Laboratoire
 
-- **Statut** : proposé — LOT 4-G, septième application verticale de la fondation LOT 4-A (ADR-097), après
+- **Statut** : accepté — LOT 4-G, septième application verticale de la fondation LOT 4-A (ADR-097), après
   l'Accueil (ADR-098), Révisions (ADR-099), le Profil (ADR-100), Apprendre/Parcours (ADR-101) et la
-  Bibliothèque (ADR-102). **PR en BROUILLON**, en attente de validation humaine ; passera à « accepté » à
-  la validation.
+  Bibliothèque (ADR-102). **PR #17 fusionnée** dans `main` (squash, commit `0564e69`) après validation
+  humaine et CI verte.
 - **Contexte** : le LOT 4-G applique le canon **TradeMy Learning Glass** à l'espace **Laboratoire**
   (`src/app/(tabs)/laboratoire.tsx`, route historique `/laboratoire`, libellé d'onglet « Laboratoire »).
   Lot **présentationnel** : l'écran LIT des moteurs PURS et DÉTERMINISTES (tracé interactif, machine de
@@ -149,4 +149,4 @@ repositories, la taxonomie et les puits analytics, `navigation.ts`, `_layout.tsx
 - Le graphique de support est rendu **responsive depuis l'écran** (`onLayout` → `width` borné à 520), sans
   toucher au moteur `InteractiveChart` (qui accepte déjà `width?`).
 
-**LOT suivant : non commencé** — sera cadré séparément depuis le canon, après validation humaine.
+**LOT 4-H (shell & navigation) : en cours** — cadré séparément depuis le canon (voir ADR-104).
