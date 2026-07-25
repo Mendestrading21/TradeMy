@@ -42,6 +42,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Source de scénario canonique + unité pilote chandelier (LOT 3) | [ADR-096](./ADR-096-trademy-pilot-scenario-source.md) |
 | Fondation visuelle premium : tokens, icônes, widgets, états de marché (LOT 4) | [ADR-097](./ADR-097-trademy-lot4-visual-foundation.md) |
 | Application du canon à l'Accueil : icônes de la famille, a11y (LOT 4-B) | [ADR-098](./ADR-098-trademy-lot4b-accueil-canon.md) |
+| Application du canon à Révisions : hiérarchie, couleurs pédagogiques, a11y (LOT 4-C) | [ADR-099](./ADR-099-trademy-lot4c-revisions-canon.md) |
 
 ## Fondations toujours actives
 
