@@ -1,8 +1,8 @@
 # ADR-099 — LOT 4-C : application du canon à l'écran Révisions
 
-- **Statut** : proposé — LOT 4-C, troisième application verticale de la fondation LOT 4-A (ADR-097),
-  après l'Accueil (ADR-098). **PR en BROUILLON**, en attente de validation humaine ; passera à
-  « accepté » à la validation.
+- **Statut** : accepté — LOT 4-C, troisième application verticale de la fondation LOT 4-A (ADR-097),
+  après l'Accueil (ADR-098). **PR #13 fusionnée** dans `main` (squash, commit `9185491`) après validation
+  humaine et CI verte.
 - **Contexte** : le LOT 4-C applique le canon **TradeMy Learning Glass** à l'**écran Révisions**
   (`src/app/(tabs)/revisions.tsx`). Lot **présentationnel** : l'écran LIT le moteur de répétition
   espacée et de maîtrise, il ne le modifie pas.
