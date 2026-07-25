@@ -2,6 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { characterLine, type DialogueContext } from '@/characters/dialogue';
+import { findEmoji } from './emojiGuard';
 
 /**
  * Garde-fou LOT 4-A : AUCUN emoji système dans le parcours pilote. On contrôle le CONTENU RÉELLEMENT
@@ -11,14 +12,9 @@ import { characterLine, type DialogueContext } from '@/characters/dialogue';
  *   3. source des modules de contenu consommés par la session (dialogues, misconceptions) ;
  *   4. sortie RUNTIME de toutes les variantes de `characterLine` (répliques Toto/Bobo rendues).
  *
- * Portée : pictogrammes/emoji (plages emoji + dingbats + symboles). Les flèches TYPOGRAPHIQUES
- * (→, ↔, ◀, ▶) et les formes géométriques restent autorisées comme texte.
+ * Détection : la SOURCE UNIQUE `findEmoji` (`emojiGuard`), fondée sur les propriétés Unicode
+ * (plus de regex locale dupliquée). Les flèches TYPOGRAPHIQUES (→, ↔, ◀, ▶) restent autorisées.
  */
-// Emoji (1F000–1FAFF), symboles divers & dingbats (2600–27BF, inclut ✓ ✔ ✅ 🎉…),
-// symboles/étoiles (2B00–2BFF) et sélecteur de variation emoji (FE0F).
-// EXCLUS volontairement : flèches (2190–21FF) et formes géométriques (25xx).
-const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️]/u;
-
 const SCREENS = [
   join(process.cwd(), 'src', 'app', 'session', '[skillId].tsx'),
   join(process.cwd(), 'src', 'app', 'monde', '[id].tsx'),
@@ -40,8 +36,8 @@ function scan(file: string): string[] {
   readFileSync(file, 'utf8')
     .split('\n')
     .forEach((line, i) => {
-      const m = line.match(new RegExp(EMOJI, 'gu'));
-      if (m) offenders.push(`${file.replace(process.cwd(), '.')}:${i + 1} → ${m.join(' ')}`);
+      const m = findEmoji(line);
+      if (m.length) offenders.push(`${file.replace(process.cwd(), '.')}:${i + 1} → ${m.join(' ')}`);
     });
   return offenders;
 }
@@ -76,7 +72,7 @@ describe('LOT 4-A — aucun emoji système dans le parcours pilote', () => {
       // seeds 0..7 : couvrent toutes les entrées de chaque banque (≤ 4 variantes, cycle par modulo).
       for (let seed = 0; seed < 8; seed++) {
         const { text } = characterLine(ctx, seed);
-        if (EMOJI.test(text)) offenders.push(`${JSON.stringify(ctx)}#${seed} → ${text}`);
+        if (findEmoji(text).length) offenders.push(`${JSON.stringify(ctx)}#${seed} → ${text}`);
       }
     }
     expect(offenders).toEqual([]);

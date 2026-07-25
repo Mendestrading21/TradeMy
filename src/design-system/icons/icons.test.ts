@@ -40,6 +40,12 @@ describe('Système d’icônes Trademy', () => {
     }
   });
 
+  it('LOT 4-B — glyphes Accueil du canon (timer, coin)', () => {
+    for (const name of ['timer', 'coin'] as const) {
+      expect(TRADEMY_ICON_NAMES).toContain(name);
+    }
+  });
+
   it('LOT 4-A — la direction de marché n’emprunte pas l’icône de progression pédagogique', () => {
     // `progression` reste un glyphe d'APPRENTISSAGE ; les directions ont leurs propres flèches neutres.
     expect(TRADEMY_ICON_NAMES).toContain('progression');

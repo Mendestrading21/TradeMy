@@ -56,7 +56,10 @@ export type TrademyIconName =
   | 'invalidation'
   | 'false-signal'
   | 'risk'
-  | 'psychology';
+  | 'psychology'
+  // LOT 4-B — application Accueil (canon TradeMy Learning Glass, géométrie originale)
+  | 'timer'
+  | 'coin';
 
 type Parts = { color: string; sw: number };
 
@@ -368,6 +371,26 @@ const ICONS: Record<TrademyIconName, (p: Parts) => ReactNode> = {
       <Circle cx="11" cy="11" r="6.8" {...stroke(color, sw)} />
       <Path d="M11 7.6a2.5 2.5 0 0 1 1.7 4.4c-.8.6-1.2 1-1.2 2" {...stroke(color, sw)} />
       <Circle cx="11" cy="16.2" r="0.7" fill={color} stroke={color} />
+    </>
+  ),
+
+  // ── LOT 4-B — Accueil ──
+  timer: ({ color, sw }) => (
+    // Minuteur : cadran + aiguille + poussoir (durée de la mission du jour).
+    <>
+      <Circle cx="12" cy="13.5" r="7" {...stroke(color, sw)} />
+      <Line x1="12" y1="13.5" x2="12" y2="9.5" {...stroke(color, sw)} />
+      <Line x1="12" y1="13.5" x2="14.5" y2="15" {...stroke(color, sw)} />
+      <Line x1="9.5" y1="3.5" x2="14.5" y2="3.5" {...stroke(color, sw)} />
+      <Line x1="12" y1="3.5" x2="12" y2="6.5" {...stroke(color, sw)} />
+    </>
+  ),
+  coin: ({ color, sw }) => (
+    // Jeton (pièce d'apprentissage) : disque + anneau intérieur + marque centrale.
+    <>
+      <Circle cx="12" cy="12" r="8" {...stroke(color, sw)} />
+      <Circle cx="12" cy="12" r="4.6" {...stroke(color, sw)} />
+      <Line x1="12" y1="9.6" x2="12" y2="14.4" {...stroke(color, sw)} />
     </>
   ),
 };
