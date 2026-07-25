@@ -3,6 +3,7 @@ import { theme } from '../theme';
 import { Text } from './Text';
 import { Button } from './Button';
 import { Skeleton } from './Skeleton';
+import { TrademyIcon, type TrademyIconName } from '../icons/TrademyIcon';
 
 export type StateVariant = 'loading' | 'empty' | 'error' | 'offline' | 'locked';
 
@@ -12,6 +13,11 @@ export type StateViewProps = {
   message?: string;
   /** Émoji d'illustration (ignoré en `loading`). Sobre par défaut, override possible. */
   icon?: string;
+  /**
+   * Icône de la FAMILLE Trademy (préférée à `icon`). Décorative (masquée aux lecteurs d'écran :
+   * l'état entier est déjà annoncé via `accessibilityLabel`). Ignorée en `loading`.
+   */
+  iconName?: TrademyIconName;
   /** Action principale unique (ex. Réessayer). Un seul CTA par état. */
   action?: { label: string; onPress: () => void };
 };
@@ -28,7 +34,7 @@ const DEFAULTS: Record<StateVariant, { icon: string; title: string; tone: string
  * État transversal : loading / empty / error / offline / locked.
  * Une seule priorité visuelle par état, un seul CTA. Annoncé aux lecteurs d'écran.
  */
-export function StateView({ variant = 'empty', title, message, icon, action }: StateViewProps) {
+export function StateView({ variant = 'empty', title, message, icon, iconName, action }: StateViewProps) {
   const d = DEFAULTS[variant];
   const heading = title ?? d.title;
   const label = message ? `${heading}. ${message}` : heading;
@@ -55,9 +61,13 @@ export function StateView({ variant = 'empty', title, message, icon, action }: S
 
   return (
     <View style={styles.wrap} accessible accessibilityRole="summary" accessibilityLabel={label}>
-      <Text variant="display" center>
-        {icon ?? d.icon}
-      </Text>
+      {iconName ? (
+        <TrademyIcon name={iconName} size={40} color={d.tone} strokeWidth={2} />
+      ) : (
+        <Text variant="display" center>
+          {icon ?? d.icon}
+        </Text>
+      )}
       <Text variant="h2" center color={d.tone}>
         {heading}
       </Text>

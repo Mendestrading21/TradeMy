@@ -1,7 +1,7 @@
 # ADR-098 — LOT 4-B : application du canon à l'Accueil (icônes, couleurs, a11y, captures déterministes)
 
-- **Statut** : proposé — LOT 4-B, deuxième application verticale de la fondation LOT 4-A (ADR-097).
-  **PR #12 en BROUILLON**, en attente de validation humaine ; sera passé à « accepté » à la validation.
+- **Statut** : accepté — LOT 4-B, deuxième application verticale de la fondation LOT 4-A (ADR-097).
+  **PR #12 fusionnée dans `main`** (squash). Mise à jour de statut portée par le lot suivant (LOT 4-C).
 - **Contexte** : LOT 4-A (ADR-097) a posé la fondation visuelle et l'a appliquée au parcours pilote. Le
   LOT 4-B étend cette application à l'**onglet Accueil** (`src/app/(tabs)/index.tsx`), depuis le canon
   initial **TradeMy Learning Glass** — sans 3D, sans référence externe, sans toucher aux moteurs, aux
