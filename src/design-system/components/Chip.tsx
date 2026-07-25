@@ -13,10 +13,18 @@ export type ChipProps = {
   accessibilityLabel?: string;
 };
 
-/** Petite pastille pour XP, série (streak), pièces, niveau, statut… */
+/**
+ * Petite pastille pour XP, série (streak), pièces, niveau, statut…
+ *
+ * A11y : le conteneur est un ÉLÉMENT accessible unique (`accessible`), ce qui rend la prop
+ * `accessibilityLabel` réellement opérationnelle et regroupe l'annonce (pas de double lecture
+ * icône + texte). L'icône reste décorative (masquée par `TrademyIcon`). Quand le libellé visible
+ * n'a pas de sens seul (ex. un nombre nu comme un compteur), passez un `accessibilityLabel` explicite.
+ */
 export function Chip({ iconName, icon, label, color, accessibilityLabel }: ChipProps) {
   return (
     <View
+      accessible
       accessibilityLabel={accessibilityLabel ?? label}
       style={[styles.chip, color ? { borderColor: color } : null]}
     >

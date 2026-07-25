@@ -1,12 +1,12 @@
 import { describe, it, expect } from '@jest/globals';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { EMOJI_PICTOGRAPH } from './emojiGuard';
+import { findEmoji } from './emojiGuard';
 
 /**
  * Garde-fou LOT 4-B : l'écran d'Accueil (`(tabs)/index.tsx`) n'utilise AUCUN emoji système en
  * substitut d'icône. La famille `TrademyIcon` (ou du texte) porte tout signe visuel. On réutilise
- * le garde-fou emoji GÉNÉRIQUE du projet (`emojiGuard`), pas une liste ad hoc. Portée :
+ * la SOURCE UNIQUE `findEmoji` (`emojiGuard`), pas une liste ni une regex ad hoc. Portée :
  * pictogrammes/emoji uniquement ; les flèches typographiques (→, ›) restent autorisées.
  */
 const ACCUEIL = join(process.cwd(), 'src', 'app', '(tabs)', 'index.tsx');
@@ -17,8 +17,8 @@ describe('LOT 4-B — Accueil sans emoji système', () => {
     readFileSync(ACCUEIL, 'utf8')
       .split('\n')
       .forEach((line, i) => {
-        const m = line.match(new RegExp(EMOJI_PICTOGRAPH, 'gu'));
-        if (m) offenders.push(`${i + 1} → ${m.join(' ')}`);
+        const m = findEmoji(line);
+        if (m.length) offenders.push(`${i + 1} → ${m.join(' ')}`);
       });
     expect(offenders).toEqual([]);
   });

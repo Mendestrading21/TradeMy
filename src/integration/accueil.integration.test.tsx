@@ -178,6 +178,26 @@ describe('Accueil de production — icônes de la famille + couleurs + action pr
       expect(svg.props.accessibilityElementsHidden).toBe(true);
     }
 
+    // (7) Compteur de jetons : nom accessible EXPLICITE, porté par un CONTENEUR accessible
+    //     (`accessible === true`) rattaché à l'icône `coin` (r=4.6) — jamais un « 0 » nu.
+    const jeton = root
+      .findAll(
+        (n) =>
+          n.props?.accessible === true &&
+          typeof n.props?.accessibilityLabel === 'string' &&
+          /jeton/i.test(n.props.accessibilityLabel as string),
+        { deep: true },
+      )
+      .find((n) => n.findAll((m) => String(m.props?.r ?? '') === '4.6').length > 0);
+    if (!jeton) throw new Error('Conteneur accessible du compteur de jetons (icône coin) introuvable');
+    expect(jeton.props.accessibilityLabel).toBe('0 jeton d’apprentissage');
+    // Aucun nom accessible de l'Accueil n'est un NOMBRE ISOLÉ (le compteur ne laisse pas un « 0 » nu).
+    const loneNumberNames = root.findAll(
+      (n) => typeof n.props?.accessibilityLabel === 'string' && /^\s*\d+\s*$/.test(n.props.accessibilityLabel as string),
+      { deep: true },
+    );
+    expect(loneNumberNames).toHaveLength(0);
+
     // (5) Aucun emoji système dans TOUT le rendu réel (garde-fou générique du projet).
     expect(findEmoji(json)).toEqual([]);
 

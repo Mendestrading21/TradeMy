@@ -1,18 +1,28 @@
 /**
  * Captures visuelles de l'écran d'ACCUEIL (onglet Accueil) — LOT 4-B.
  *
+ * DÉTERMINISME (ce script) :
+ *  - `FIXED_NOW` unique + horloge FIGÉE (Date.now() et new Date()) AVANT le chargement de l'app ;
+ *  - fuseau fixé à `Europe/Zurich` ;
+ *  - donc MÊME date, mission, salutation et notion du jour pour les quatre viewports — vérifié en
+ *    comparant une SIGNATURE (texte visible normalisé) identique sur les quatre.
+ *
  * PARCOURS RÉEL côté client (jamais un deep-link vers `/(tabs)`) :
- *   1. on prépare un état local déterministe « déjà onboardé » (seed AsyncStorage/localStorage) ;
- *   2. on ouvre la route RACINE `/` (l'écran d'accueil racine s'hydrate correctement) ;
- *   3. on actionne « Reprendre » (navigation CLIENT vers l'onglet Accueil) ;
- *   4. on attend le marqueur STABLE « MISSION DU JOUR » ;
- *   5. on VÉRIFIE la route réellement résolue par Expo Router (`…/(tabs)`) ;
- *   6. on capture l'écran.
- * Ce chemin n'introduit AUCUNE divergence d'hydratation (l'app boote à `/`, puis route côté client).
+ *  1. état local déterministe « déjà onboardé » (seed localStorage) ;
+ *  2. route RACINE `/` (l'écran d'accueil racine s'hydrate correctement) ;
+ *  3. bouton « Reprendre » (par son RÔLE + nom exact) → navigation CLIENT vers l'onglet Accueil ;
+ *  4. marqueur STABLE « MISSION DU JOUR » EXACT et visible ;
+ *  5. route résolue par Expo Router = racine `/TradeMy` (le groupe `(tabs)` n'apparaît pas dans
+ *     l'URL) — donc une simple occurrence textuelle ne prouve RIEN ; on vérifie le VRAI onglet
+ *     Accueil par sa SÉMANTIQUE accessible (role="tab" + aria-selected) et un autre onglet réel
+ *     par rôle (pas le mot « Bibliothèque » de la carte Favoris) ;
+ *  6. on vérifie le NOUVEAU nom accessible du compteur de jetons (un ancien `dist` ne peut donc pas
+ *     produire une fausse preuve) ;
+ *  7. capture.
  *
  * Manifeste SÉPARÉ des 22 captures pilote (jamais modifié ici). Le script ÉCHOUE (code 1) sur :
- * erreur console, pageerror, débordement horizontal > 0, mauvais écran (route/ marqueur), capture
- * manquante ou inattendue. Production isolée puis publication atomique des seuls PNG gérés.
+ * erreur console, pageerror, débordement horizontal, mauvais écran/route/onglet, signature non
+ * déterministe, capture manquante ou inattendue. Production isolée puis publication atomique.
  *
  * Repro : `npm run build:web` puis `node scripts/capture-accueil.mjs [dossierSortie]`.
  */
@@ -29,6 +39,12 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 mkdirSync(OUT, { recursive: true });
+
+// ── Instant FIGÉ, unique et documenté : 15 janvier 2026, 08:30 UTC = 09:30 Europe/Zurich
+//    (→ salutation « Bonjour »). Toutes les captures partagent cet instant + ce fuseau. ──
+const FIXED_NOW = Date.UTC(2026, 0, 15, 8, 30, 0);
+const TIMEZONE = 'Europe/Zurich';
+const JETON_LABEL = '0 jeton d’apprentissage'; // nom accessible attendu (seed : 0 jeton)
 
 // ── Manifeste EXACT des captures Accueil (sans extension) ──
 const MANIFEST = ['accueil-320', 'accueil-390', 'accueil-web', 'accueil-reduced'];
@@ -67,8 +83,6 @@ const browser = await chromium.launch({ args: ['--no-sandbox'] });
 const RUN_OUT = mkdtempSync(join(OUT, '.capture-run-'));
 
 const consoleErrors = [];
-
-/** État persistant déterministe : onboardé (schéma v8), aucune compétence terminée. */
 const SEED = JSON.stringify({ onboarded: true, schemaVersion: 8 });
 
 async function overflow(p) {
@@ -89,8 +103,23 @@ async function shot(p, name) {
 }
 
 async function ctx(w, h, opts = {}) {
-  const c = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, ...opts });
-  // Seed AVANT tout script de page (sur chaque navigation) → l'accueil racine lit `onboarded=true`.
+  const c = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, timezoneId: TIMEZONE, ...opts });
+  // (a) FIGE l'horloge AVANT tout script de page : Date.now() et new Date() renvoient FIXED_NOW ;
+  //     `new Date(x)` (avec argument) garde son comportement (rotation/notion déterministes).
+  await c.addInitScript((fixed) => {
+    const RealDate = Date;
+    function FrozenDate(...args) {
+      if (!(this instanceof FrozenDate)) return new RealDate(fixed).toString();
+      return args.length ? new RealDate(...args) : new RealDate(fixed);
+    }
+    FrozenDate.prototype = RealDate.prototype;
+    FrozenDate.now = () => fixed;
+    FrozenDate.UTC = RealDate.UTC;
+    FrozenDate.parse = RealDate.parse;
+    // @ts-ignore — override global Date pour la page
+    window.Date = FrozenDate;
+  }, FIXED_NOW);
+  // (b) État onboardé déterministe.
   await c.addInitScript((seed) => {
     try { window.localStorage.setItem('patternlab.progress.v1', seed); } catch { /* stockage indisponible */ }
   }, SEED);
@@ -100,51 +129,45 @@ async function ctx(w, h, opts = {}) {
   return { c, p };
 }
 
-const MISSION = /MISSION DU JOUR/;
-const RESUME = /Reprendre/;
+const pathnameOf = async (p) => new URL(p.url()).pathname.replace(/\/$/, '');
 
-async function pathnameOf(p) {
-  return new URL(p.url()).pathname.replace(/\/$/, '');
+/** Signature déterministe = texte visible normalisé (mêmes date/mission/salutation/notion). */
+async function signature(p) {
+  return await p.evaluate(() =>
+    document.body.innerText.split('\n').map((s) => s.trim()).filter(Boolean).join(' | '),
+  );
 }
 
-/** Ouvre `/`, actionne « Reprendre », atteint l'Accueil, vérifie la route résolue, capture. */
+/** Parcours réel → Accueil, vérifications sémantiques réelles, capture. Renvoie la signature. */
 async function reachAccueilAndShot(p, name) {
   // 2) Route racine — l'écran d'accueil racine s'hydrate proprement.
   await p.goto(`${base}/`, { waitUntil: 'networkidle' });
   if ((await pathnameOf(p)) !== BASE_PATH) {
     throw new Error(`Route racine inattendue: ${await pathnameOf(p)} (attendu ${BASE_PATH}) [${name}]`);
   }
-  // L'état onboardé est bien lu → l'action « Reprendre » est présente (pas « Commencer »).
-  try {
-    await p.getByText(RESUME).first().waitFor({ timeout: 9000 });
-  } catch {
-    throw new Error(`Landing « Reprendre » absent (état onboardé non lu) [${name}]`);
-  }
-  // 3) Navigation CLIENT vers l'onglet Accueil.
-  await p.getByText(RESUME).first().click({ timeout: 2000 });
-  // 4) Marqueur STABLE de l'Accueil.
-  try {
-    await p.getByText(MISSION).first().waitFor({ timeout: 9000 });
-  } catch {
-    throw new Error(`Accueil non rendu: marqueur « MISSION DU JOUR » absent [${name}]`);
-  }
-  // 5) Route réellement résolue par Expo Router. Le groupe `(tabs)` N'APPARAÎT PAS dans l'URL :
-  //    l'onglet Accueil vit à la racine de l'app (`/TradeMy`). On vérifie donc (a) le chemin racine
-  //    résolu, ET (b) que l'on est bien DANS le navigateur d'onglets (barre d'onglets rendue —
-  //    « Bibliothèque » et « Laboratoire » n'existent PAS sur la landing), pas juste un même chemin.
+  // 3) « Reprendre » par son RÔLE de bouton + nom EXACT → navigation client.
+  await p.getByRole('button', { name: 'Reprendre', exact: true }).click({ timeout: 4000 });
+  // 4) Marqueur STABLE de l'Accueil, EXACT et visible.
+  await p.getByText('MISSION DU JOUR', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
+  // 5) Route résolue = racine (le groupe (tabs) n'est pas dans l'URL) ; le VRAI onglet est prouvé
+  //    par la sémantique accessible, pas par une occurrence textuelle.
   const resolved = await pathnameOf(p);
-  if (resolved !== BASE_PATH) {
-    throw new Error(`Route résolue inattendue: obtenu ${resolved}, attendu ${BASE_PATH} [${name}]`);
+  if (resolved !== BASE_PATH) throw new Error(`Route résolue inattendue: ${resolved} (attendu ${BASE_PATH}) [${name}]`);
+  const accueilActif = await p.getByRole('tab', { name: 'Accueil', selected: true }).count();
+  if (accueilActif !== 1) throw new Error(`Onglet « Accueil » actif (role=tab, aria-selected) absent [${name}]`);
+  const autreOnglet = await p.getByRole('tab', { name: 'Laboratoire' }).count();
+  if (autreOnglet < 1) throw new Error(`Onglet « Laboratoire » (role=tab) absent — navigateur (tabs) non résolu [${name}]`);
+  // 6) Nom accessible du compteur de jetons (un ancien dist ne peut pas produire de fausse preuve).
+  const jeton = p.locator(`[aria-label="${JETON_LABEL}"]`);
+  if ((await jeton.count()) < 1) {
+    throw new Error(`Nom accessible du compteur de jetons « ${JETON_LABEL} » absent (dist obsolète ?) [${name}]`);
   }
-  for (const tab of [/Bibliothèque/, /Laboratoire/]) {
-    if (!((await p.getByText(tab).count().catch(() => 0)) > 0)) {
-      throw new Error(`Onglet ${tab} absent — navigateur (tabs) non résolu [${name}]`);
-    }
-  }
-  // 6) Capture.
+  // 7) Capture + signature déterministe.
   await shot(p, name);
+  return signature(p);
 }
 
+const sigs = [];
 async function run() {
   for (const [w, h, tag, opts] of [
     [320, 720, '320', {}],
@@ -153,8 +176,12 @@ async function run() {
     [390, 844, 'reduced', { reducedMotion: 'reduce' }],
   ]) {
     const { c, p } = await ctx(w, h, opts);
-    await reachAccueilAndShot(p, `accueil-${tag}`);
+    sigs.push(await reachAccueilAndShot(p, `accueil-${tag}`));
     await c.close();
+  }
+  // Déterminisme : même date/mission/salutation/notion du jour sur les quatre viewports.
+  if (new Set(sigs).size !== 1) {
+    throw new Error(`Contenu NON déterministe entre viewports :\n${sigs.join('\n---\n')}`);
   }
 }
 
@@ -179,6 +206,7 @@ const foreignExisting = [...existingPngs].filter((n) => !MANIFEST_SET.has(n));
 console.log(`\nCaptures produites : ${produced.size}/${MANIFEST.length}`);
 console.log('Erreurs console/pageerror :', consoleErrors.length);
 consoleErrors.slice(0, 8).forEach((e) => console.log('   !', e));
+if (!failure && sigs.length) console.log('Signature déterministe (identique ×4) :\n  ', sigs[0].slice(0, 180), '…');
 
 let ok = true;
 if (failure) { console.error('✗ ÉCHEC :', failure.message); ok = false; }
@@ -207,4 +235,4 @@ if (missingFinal.length || unexpectedFinal.length) {
   console.error('✗ Publication finale incohérente.', { missingFinal, unexpectedFinal });
   process.exit(1);
 }
-console.log('✓ Manifeste Accueil exact ; 0 erreur console ; 0 débordement. Captures dans', OUT);
+console.log('✓ Manifeste Accueil exact ; horloge/fuseau figés ; onglet actif prouvé ; 0 erreur console ; 0 débordement. Captures dans', OUT);

@@ -92,7 +92,12 @@ export default function Home() {
           <View style={styles.chips}>
             <Chip iconName="star" label={`Niv. ${state.level}`} color={theme.colors.primary} />
             <Chip iconName="flame" label={`${state.streakDays} j`} color={theme.colors.warning} />
-            <Chip iconName="coin" label={`${state.coins}`} color={theme.colors.reward} />
+            <Chip
+              iconName="coin"
+              label={`${state.coins}`}
+              color={theme.colors.reward}
+              accessibilityLabel={`${state.coins} jeton${state.coins > 1 ? 's' : ''} d’apprentissage`}
+            />
           </View>
           <ProgressBar value={xpInLevel / 100} accessibilityLabel={`${xpInLevel} sur 100 XP`} />
           <Text variant="caption" color={theme.colors.textMuted}>
