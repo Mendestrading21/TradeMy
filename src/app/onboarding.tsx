@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Pressable, StyleSheet } from 'react-native';
-import { Screen, Text, Button, Card, Chip, ProgressBar, TrademyIcon, theme } from '@/design-system';
+import { Screen, Text, Button, Card, Chip, ProgressBar, TrademyIcon, theme, type TrademyIconName } from '@/design-system';
 import { CharacterScene, MascotFigure, GuideSelectionCard, type CharacterId } from '@/characters';
 import { MiniVisual } from '@/engines/visual';
 import {
@@ -23,8 +23,34 @@ import {
   type VisualSpec,
 } from '@/data';
 import { analytics } from '@/analytics';
+import { Disclaimer } from '@/components/Disclaimer';
 
 const STEPS = ['Bienvenue', 'Objectif', 'Niveau', 'Temps', 'Sujets', 'Diagnostic', 'Ton parcours'] as const;
+
+/**
+ * Mappings PRÉSENTATIONNELS option vers icône canonique `TrademyIcon` (LOT 4-I). Fondés sur les `value`
+ * STABLES des datasets (jamais modifiés) : on ignore les champs `.emoji` de la donnée et on ne rend
+ * plus aucun emoji système ni lettre décorative. Aucune icône sémantique n'est détournée de son sens.
+ */
+const OBJECTIVE_ICON: Record<Objective, TrademyIconName> = {
+  debuter: 'learn',
+  comprendre_graphiques: 'chart',
+  reviser: 'review',
+  gerer_risque: 'risk',
+};
+const LEVEL_ICON: Record<DeclaredLevel, TrademyIconName> = {
+  debutant: 'hint',
+  initie: 'book',
+  intermediaire: 'progression',
+};
+const TOPIC_ICON: Record<Topic, TrademyIconName> = {
+  actions: 'book',
+  tendance: 'chart',
+  chandeliers: 'lab',
+  figures: 'target',
+};
+// Durée : une seule icône de temps pour toutes les options (différenciées par le libellé 3/5/10 min).
+const DURATION_ICON: TrademyIconName = 'timer';
 
 type DiagQuestion = { prompt: string; options: string[]; correct: number; visual?: VisualSpec };
 
@@ -129,7 +155,7 @@ export default function Onboarding() {
   return (
     <Screen>
       <View style={styles.progress}>
-        <ProgressBar value={(step + 1) / STEPS.length} accessibilityLabel={`Étape ${step + 1} sur ${STEPS.length}`} />
+        <ProgressBar value={(step + 1) / STEPS.length} accessibilityLabel={`Étape ${step + 1} sur ${STEPS.length} : ${STEPS[step]}`} />
         <Text variant="caption" color={theme.colors.textMuted}>
           Étape {step + 1} / {STEPS.length} · {STEPS[step]}
         </Text>
@@ -137,7 +163,7 @@ export default function Onboarding() {
 
       {step === 0 && (
         <View style={styles.stepGap}>
-          <Text variant="h1">Bienvenue 👋</Text>
+          <Text variant="h1">Bienvenue sur TradeMy</Text>
           <Text variant="body" color={theme.colors.textSecondary}>
             Apprends à lire un graphique en cinq minutes par jour. On personnalise ton
             parcours en quelques questions — aucun compte requis.
@@ -153,16 +179,20 @@ export default function Onboarding() {
               analytics.track('goal_selected', { objective: `guide:${id}` });
             }}
           />
+          <Disclaimer />
         </View>
       )}
 
       {step === 1 && (
         <View style={styles.stepGap}>
           <Text variant="h1">Ton objectif principal ?</Text>
+          <Text variant="body" color={theme.colors.textSecondary}>
+            On personnalise tes premières leçons selon ce que tu veux d’abord obtenir.
+          </Text>
           {OBJECTIVES.map((o) => (
             <OptionCard
               key={o.value}
-              emoji={o.emoji}
+              iconName={OBJECTIVE_ICON[o.value]}
               label={o.label}
               selected={objective === o.value}
               onPress={() => {
@@ -177,8 +207,11 @@ export default function Onboarding() {
       {step === 2 && (
         <View style={styles.stepGap}>
           <Text variant="h1">Où en es-tu ?</Text>
+          <Text variant="body" color={theme.colors.textSecondary}>
+            Pour caler le bon point de départ — tu pourras tout débloquer ensuite.
+          </Text>
           {LEVELS.map((l) => (
-            <OptionCard key={l.value} emoji={l.emoji} label={l.label} hint={l.hint} selected={level === l.value} onPress={() => setLevel(l.value)} />
+            <OptionCard key={l.value} iconName={LEVEL_ICON[l.value]} label={l.label} hint={l.hint} selected={level === l.value} onPress={() => setLevel(l.value)} />
           ))}
         </View>
       )}
@@ -186,8 +219,11 @@ export default function Onboarding() {
       {step === 3 && (
         <View style={styles.stepGap}>
           <Text variant="h1">Combien de temps par jour ?</Text>
+          <Text variant="body" color={theme.colors.textSecondary}>
+            Une petite session régulière vaut mieux qu’une longue de temps en temps.
+          </Text>
           {DAILY_OPTIONS.map((d) => (
-            <OptionCard key={d.value} emoji="⏱️" label={d.label} hint={d.hint} selected={minutes === d.value} onPress={() => setMinutes(d.value)} />
+            <OptionCard key={d.value} iconName={DURATION_ICON} label={d.label} hint={d.hint} selected={minutes === d.value} onPress={() => setMinutes(d.value)} />
           ))}
         </View>
       )}
@@ -199,7 +235,7 @@ export default function Onboarding() {
             Facultatif — on ajuste ton point de départ. Tu pourras tout débloquer ensuite.
           </Text>
           {TOPICS.map((t) => (
-            <OptionCard key={t.value} emoji={t.emoji} label={t.label} selected={topics.includes(t.value)} onPress={() => toggleTopic(t.value)} />
+            <OptionCard key={t.value} iconName={TOPIC_ICON[t.value]} label={t.label} selected={topics.includes(t.value)} onPress={() => toggleTopic(t.value)} />
           ))}
         </View>
       )}
@@ -229,27 +265,27 @@ export default function Onboarding() {
                 </View>
               ) : null}
               {currentDiag.options.map((opt, i) => (
-                <OptionCard key={opt} emoji={String.fromCharCode(65 + i)} label={opt} onPress={() => answerDiag(i)} />
+                <OptionCard key={opt} label={opt} onPress={() => answerDiag(i)} />
               ))}
             </>
           )}
           {diag === 'done' && (
-            <>
-              <Text variant="display" center>🎯</Text>
+            <View style={styles.diagDone}>
+              <TrademyIcon name="success" size={44} color={theme.colors.success} />
               <Text variant="h2" center>
                 {diagCorrect} / {DIAGNOSTIC.length} bonnes réponses
               </Text>
               <Text variant="body" color={theme.colors.textSecondary} center>
                 Parfait — on cale ton parcours en conséquence.
               </Text>
-            </>
+            </View>
           )}
         </View>
       )}
 
       {step === 6 && (
         <View style={styles.stepGap}>
-          <Text variant="h1">Ton parcours 🎉</Text>
+          <Text variant="h1">Ton parcours</Text>
           <Card elevated>
             <Text variant="label" color={theme.colors.primaryBright}>ON COMMENCE PAR</Text>
             <Text variant="h2">{startSkillName}</Text>
@@ -261,14 +297,15 @@ export default function Onboarding() {
               {topics.length ? ' et tes sujets favoris.' : '.'}
             </Text>
             <View style={styles.recapChips}>
-              <Chip icon="⏱️" label={`${minutes} min/j`} color={theme.colors.technical} />
-              {diag === 'done' ? <Chip icon="🎯" label={`Diag. ${diagCorrect}/${DIAGNOSTIC.length}`} color={theme.colors.reward} /> : null}
+              <Chip iconName={DURATION_ICON} label={`${minutes} min/j`} color={theme.colors.info} />
+              {diag === 'done' ? <Chip iconName="checkpoint" label={`Diag. ${diagCorrect}/${DIAGNOSTIC.length}`} color={theme.colors.info} /> : null}
               {topics.slice(0, 2).map((t) => (
-                <Chip key={t} label={TOPICS.find((x) => x.value === t)?.label ?? t} color={theme.colors.neutral} />
+                <Chip key={t} iconName={TOPIC_ICON[t]} label={TOPICS.find((x) => x.value === t)?.label ?? t} color={theme.colors.neutral} />
               ))}
             </View>
           </Card>
           <Button label="Commencer ma première leçon" onPress={finish} accessibilityHint="Lancer la première session" />
+          <Disclaimer />
         </View>
       )}
 
@@ -289,24 +326,37 @@ export default function Onboarding() {
   );
 }
 
+/**
+ * Carte de choix canonique de l'onboarding : icône `TrademyIcon` DÉCORATIVE (jamais un emoji ni une
+ * lettre), libellé + indice, et état sélectionné exposé par la FORME (contour), l'ICÔNE `check` et
+ * l'état accessible — jamais par la seule couleur. Toute la carte est cliquable et nommée.
+ */
 function OptionCard({
-  emoji,
+  iconName,
   label,
   hint,
   selected,
   onPress,
 }: {
-  emoji: string;
+  iconName?: TrademyIconName;
   label: string;
   hint?: string;
   selected?: boolean;
   onPress: () => void;
 }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ selected: !!selected }} onPress={onPress}>
+    <Pressable
+      accessible
+      accessibilityRole="button"
+      accessibilityState={{ selected: !!selected }}
+      accessibilityLabel={hint ? `${label}. ${hint}` : label}
+      onPress={onPress}
+    >
       <Card style={selected ? styles.selected : undefined}>
         <View style={styles.optionRow}>
-          <Text variant="h2">{emoji}</Text>
+          {iconName ? (
+            <TrademyIcon name={iconName} size={24} color={selected ? theme.colors.primaryBright : theme.colors.textSecondary} strokeWidth={selected ? 2.4 : 2} />
+          ) : null}
           <View style={styles.flex1}>
             <Text variant="title">{label}</Text>
             {hint ? (
@@ -326,9 +376,10 @@ const styles = StyleSheet.create({
   progress: { gap: theme.spacing.xs },
   stepGap: { gap: theme.spacing.md },
   selected: { borderColor: theme.colors.primary, borderWidth: 1.5 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
+  optionRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, minHeight: 44 },
   flex1: { flex: 1 },
   diagVisual: { alignItems: 'center', marginVertical: theme.spacing.xs },
+  diagDone: { alignItems: 'center', gap: theme.spacing.sm },
   recapMascot: { alignItems: 'center', marginVertical: theme.spacing.sm },
   recapChips: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, marginTop: theme.spacing.sm },
   nav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: theme.spacing.sm },
