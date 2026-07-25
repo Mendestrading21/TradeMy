@@ -44,6 +44,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Application du canon à l'Accueil : icônes de la famille, a11y (LOT 4-B) | [ADR-098](./ADR-098-trademy-lot4b-accueil-canon.md) |
 | Application du canon à Révisions : hiérarchie, couleurs pédagogiques, a11y (LOT 4-C) | [ADR-099](./ADR-099-trademy-lot4c-revisions-canon.md) |
 | Application du canon au Profil : identité, progression, action unique, a11y (LOT 4-D) | [ADR-100](./ADR-100-trademy-lot4d-profil-canon.md) |
+| Application du canon à Apprendre / Parcours : roadmap, action unique, exploré≠terminé, a11y (LOT 4-E) | [ADR-101](./ADR-101-trademy-lot4e-parcours-canon.md) |
 
 ## Fondations toujours actives
 
