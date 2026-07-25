@@ -1,8 +1,8 @@
 # ADR-102 — LOT 4-F : application du canon à la Bibliothèque
 
-- **Statut** : proposé — LOT 4-F, sixième application verticale de la fondation LOT 4-A (ADR-097), après
-  l'Accueil (ADR-098), Révisions (ADR-099), le Profil (ADR-100) et Apprendre/Parcours (ADR-101). **PR en
-  BROUILLON**, en attente de validation humaine ; passera à « accepté » à la validation.
+- **Statut** : accepté — LOT 4-F, sixième application verticale de la fondation LOT 4-A (ADR-097), après
+  l'Accueil (ADR-098), Révisions (ADR-099), le Profil (ADR-100) et Apprendre/Parcours (ADR-101). **PR #16
+  fusionnée** dans `main` (squash, commit `2e10c6b`) après validation humaine et CI verte.
 - **Contexte** : le LOT 4-F applique le canon **TradeMy Learning Glass** à l'espace **Bibliothèque**
   (`src/app/(tabs)/apprendre.tsx`, route historique `/apprendre`, fiche `/concept/{slug}`, libellé
   d'onglet « Bibliothèque »). Lot **présentationnel** : l'écran LIT `V5_CONCEPTS`, la recherche/filtres
@@ -145,4 +145,4 @@ quiz, leçons). Le diff ne touche **aucun** fichier de `src/engines/`. Le seul c
   difficulté reste visible sur chaque carte). Décision documentée, réversible.
 - Tous les concepts sont `needsReview` : aucun badge de maturité éditoriale n'est affiché (honnêteté).
 
-**LOT 4-G (Laboratoire) : non commencé** — sera cadré séparément depuis le canon, après validation humaine.
+**LOT 4-G (Laboratoire) : en cours** — cadré séparément depuis le canon (voir ADR-103).
