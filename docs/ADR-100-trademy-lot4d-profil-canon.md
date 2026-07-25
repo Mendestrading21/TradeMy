@@ -1,8 +1,8 @@
 # ADR-100 — LOT 4-D : application du canon à l'écran Profil
 
-- **Statut** : proposé — LOT 4-D, quatrième application verticale de la fondation LOT 4-A (ADR-097),
-  après l'Accueil (ADR-098) et Révisions (ADR-099). **PR en BROUILLON**, en attente de validation
-  humaine ; passera à « accepté » à la validation.
+- **Statut** : accepté — LOT 4-D, quatrième application verticale de la fondation LOT 4-A (ADR-097),
+  après l'Accueil (ADR-098) et Révisions (ADR-099). **PR #14 fusionnée** dans `main` (squash, commit
+  `08b2672`) après validation humaine et CI verte.
 - **Contexte** : le LOT 4-D applique le canon **TradeMy Learning Glass** à l'**écran Profil**
   (`src/app/(tabs)/profil.tsx`). Lot **présentationnel** : l'écran LIT les providers (progression,
   profil d'onboarding, premium, consentement) et n'expose que des **préférences réelles** (consentement
