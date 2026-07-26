@@ -1,9 +1,9 @@
 # ADR-105 — LOT 4-I : application du canon à l'Onboarding & prise en main
 
-- **Statut** : proposé — LOT 4-I, neuvième application de la fondation LOT 4-A (ADR-097), après les six
+- **Statut** : accepté — LOT 4-I, neuvième application de la fondation LOT 4-A (ADR-097), après les six
   écrans verticaux (ADR-098 → ADR-103) et le shell de navigation (ADR-104). Premier lot dédié au **premier
-  contact** (flux de prise en main hors des cinq onglets). **PR en BROUILLON**, en attente de validation
-  humaine ; passera à « accepté » à la validation.
+  contact** (flux de prise en main hors des cinq onglets). **PR #19 fusionnée** dans `main` (squash, commit
+  `644425f`) après validation humaine et CI verte.
 - **Contexte** : le LOT 4-I applique le canon **TradeMy Learning Glass** à l'**onboarding**
   (`src/app/onboarding.tsx`, route `/onboarding`, flux de sept étapes du premier lancement). L'écran
   restait la dernière surface à utiliser des **emojis système** (👋🎯🎉⏱️) et des **lettres décoratives**
