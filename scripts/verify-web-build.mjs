@@ -63,4 +63,38 @@ if (stale.length > 0 || missing.size > 0 || checkedReferences === 0) {
   process.exit(1);
 }
 
+// ── LOT 4-K — Liens directs de contenu : un HTML CONCRET par slug connu (pas de repli #418) ──────
+// Prouve que l'export a émis un fichier par entrée `generateStaticParams` (dérivé des registres
+// canoniques V5_CONCEPTS / GLOSSARY_TERMS). Échoue si `generateStaticParams` disparaît d'une route,
+// si seul le template `[slug].html` existe, ou si un slug canonique témoin n'a pas son HTML.
+// La complétude EXHAUSTIVE (chaque slug du registre) est verrouillée côté tests par
+// `src/integration/staticParams.test.ts` ; ici on garantit l'ÉMISSION réelle au build.
+const DIRECT_ROUTES = [
+  { name: 'concept', source: 'src/app/concept/[slug].tsx', registry: 'V5_CONCEPTS', sentinels: ['marteau', 'doji'] },
+  { name: 'glossaire', source: 'src/app/glossaire/[slug].tsx', registry: 'GLOSSARY_TERMS', sentinels: ['bull-bear', 'volatilite'] },
+];
+const routeProblems = [];
+const routeCounts = [];
+for (const route of DIRECT_ROUTES) {
+  const sourcePath = join(root, route.source);
+  const source = existsSync(sourcePath) ? readFileSync(sourcePath, 'utf8') : '';
+  if (!/generateStaticParams/.test(source)) routeProblems.push(`${route.name} : generateStaticParams absent de ${route.source}`);
+  if (!new RegExp(`\\b${route.registry}\\b`).test(source)) routeProblems.push(`${route.name} : generateStaticParams ne dérive pas de ${route.registry}`);
+  const dir = join(dist, route.name);
+  if (!existsSync(join(dir, '[slug].html'))) routeProblems.push(`${route.name} : template [slug].html absent`);
+  const concrete = existsSync(dir)
+    ? readdirSync(dir).filter((f) => f.endsWith('.html') && f !== '[slug].html' && f !== 'index.html')
+    : [];
+  if (concrete.length === 0) routeProblems.push(`${route.name} : aucun HTML concret par slug (seul le template → #418 sur lien direct)`);
+  for (const sentinel of route.sentinels) {
+    if (!existsSync(join(dir, `${sentinel}.html`))) routeProblems.push(`${route.name} : slug canonique « ${sentinel} » sans HTML concret`);
+  }
+  routeCounts.push(`${route.name} ${concrete.length}`);
+}
+if (routeProblems.length > 0) {
+  for (const problem of routeProblems) console.error(`✗ ${problem}`);
+  process.exit(1);
+}
+
 console.log(`✓ ${htmlFiles.length} pages HTML et ${checkedReferences} références vérifiées sous ${basePath}/`);
+console.log(`✓ Liens directs : ${routeCounts.join(' · ')} HTML concrets (generateStaticParams dérivé des registres canoniques)`);

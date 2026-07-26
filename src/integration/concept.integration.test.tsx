@@ -47,21 +47,21 @@ jest.mock('expo-router', () => {
   };
 });
 // `useProgress` mocké pour capturer marquages/favoris ; tout le reste de `@/data` reste RÉEL.
+// IMPORTANT (LOT 4-K) : les fonctions sont des références STABLES (définies une seule fois), comme le
+// vrai `ProgressProvider` qui les mémoïse (`useCallback`). Sans cela, le re-rendu du garde-fou
+// d'hydratation changerait les dépendances de l'effet de marquage et le doublerait — artefact de mock.
 jest.mock('@/data', () => {
   const actual = jest.requireActual('@/data') as Record<string, unknown>;
   const calls: { recent: string[]; explored: string[][]; favToggles: string[] } = { recent: [], explored: [], favToggles: [] };
   const favorites = new Set<string>();
   const progressState = { learning: { conceptsExplored: [] as string[] }, skills: {}, completedSkills: [] as string[], targets: {} };
+  const toggleFavorite = (s: string) => calls.favToggles.push(s);
+  const markRecentlyViewed = (s: string) => calls.recent.push(s);
+  const markConceptExplored = (s: string, w: string) => calls.explored.push([s, w]);
+  const progress = { favorites, toggleFavorite, markRecentlyViewed, markConceptExplored, ready: true, state: progressState };
   return {
     __esModule: true, ...actual, __calls: calls, __favorites: favorites, __progressState: progressState,
-    useProgress: () => ({
-      favorites,
-      toggleFavorite: (s: string) => calls.favToggles.push(s),
-      markRecentlyViewed: (s: string) => calls.recent.push(s),
-      markConceptExplored: (s: string, w: string) => calls.explored.push([s, w]),
-      ready: true,
-      state: progressState,
-    }),
+    useProgress: () => progress,
   };
 });
 
@@ -102,10 +102,22 @@ const hasTextIncluding = (root: ReactTestInstance, sub: string) =>
   root.findAll((n) => typeof n.props?.children === 'string' && (n.props.children as string).includes(sub), { deep: true }).length > 0;
 const iconNames = (root: ReactTestInstance) => root.findAllByType(TrademyIcon).map((n) => String(n.props.name));
 
-function mount(slug: string): ReactTestRenderer {
+// LOT 4-K — Premier PAINT synchrone (avant flush de la microtâche) : la route affiche le chargement,
+// indépendamment du slug (garde-fou d'hydratation). Les effets métier s'exécutent déjà à ce paint.
+function firstPaint(slug: string): ReactTestRenderer {
   routerState.params = { slug };
   let r!: ReactTestRenderer;
   act(() => { r = create(createElement(ConceptFiche)); });
+  return r;
+}
+// Flush de la microtâche → `mounted` bascule → contenu réel (hydratation terminée).
+async function flush(): Promise<void> {
+  await act(async () => { await Promise.resolve(); });
+}
+// Montage COMPLET (paint + hydratation) : renvoie la fiche réelle rendue.
+async function mount(slug: string): Promise<ReactTestRenderer> {
+  const r = firstPaint(slug);
+  await flush();
   return r;
 }
 
@@ -116,8 +128,8 @@ beforeEach(() => {
 });
 
 describe('Fiche concept de production — canon, logique préservée (LOT 4-J)', () => {
-  it('rend une fiche réelle : titre, sections clés, VisualCard, icônes Trademy, aucun emoji', () => {
-    const r = mount(RICH.slug);
+  it('rend une fiche réelle : titre, sections clés, VisualCard, icônes Trademy, aucun emoji', async () => {
+    const r = await mount(RICH.slug);
     expect(hasText(r.root, RICH.title)).toBe(true);
     expect(hasText(r.root, 'En bref')).toBe(true);
     expect(hasText(r.root, 'Définition')).toBe(true);
@@ -131,8 +143,8 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('état « concept introuvable » : StateView, aucun plantage, aucune VisualCard', () => {
-    const r = mount('__slug-inexistant-xyz__');
+  it('état « concept introuvable » : StateView, aucun plantage, aucune VisualCard', async () => {
+    const r = await mount('__slug-inexistant-xyz__');
     expect(hasText(r.root, 'Concept introuvable')).toBe(true);
     expect(r.root.findAllByType(VisualCard)).toHaveLength(0);
     // L'icône de l'état vide est une TrademyIcon (search), pas un emoji.
@@ -140,8 +152,42 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('analytics INCHANGÉS : concept_viewed une fois, payload exact, aucun autre évènement', () => {
-    const r = mount(RICH.slug);
+  // ── LOT 4-K — Hydratation déterministe (robustesse des liens directs) ─────────────────────────
+  it('LOT 4-K — 1er paint = chargement STABLE (ni titre ni introuvable), fiche après hydratation', async () => {
+    const r = firstPaint(RICH.slug);
+    // Premier paint : uniquement le chargement, INDÉPENDANT du slug (identique au HTML pré-rendu).
+    expect(hasText(r.root, 'On prépare la fiche…')).toBe(true);
+    expect(hasText(r.root, RICH.title)).toBe(false);
+    expect(hasText(r.root, 'Concept introuvable')).toBe(false);
+    expect(r.root.findAllByType(VisualCard)).toHaveLength(0);
+    // Après flush des microtâches : la fiche réelle apparaît.
+    await flush();
+    expect(hasText(r.root, RICH.title)).toBe(true);
+    expect(r.root.findAllByType(VisualCard)).toHaveLength(1);
+    act(() => r.unmount());
+  });
+
+  it('LOT 4-K — effets métier EXACTEMENT une fois ; un rendu supplémentaire ne les double pas', async () => {
+    const r = firstPaint(RICH.slug);
+    await flush();
+    await flush(); // rendu supplémentaire (hydratation déjà faite) → ne doit rien redéclencher
+    expect(recentEvents().filter((e) => e.event === 'concept_viewed')).toHaveLength(1);
+    expect(calls.recent.filter((s) => s === RICH.slug)).toHaveLength(1);
+    expect(calls.explored.filter(([s]) => s === RICH.slug)).toHaveLength(1);
+    act(() => r.unmount());
+  });
+
+  it('LOT 4-K — slug invalide : introuvable après hydratation, AUCUN effet métier', async () => {
+    const r = await mount('__slug-inexistant-k__');
+    expect(hasText(r.root, 'Concept introuvable')).toBe(true);
+    expect(recentEvents().filter((e) => e.event === 'concept_viewed')).toHaveLength(0);
+    expect(calls.recent).toHaveLength(0);
+    expect(calls.explored).toHaveLength(0);
+    act(() => r.unmount());
+  });
+
+  it('analytics INCHANGÉS : concept_viewed une fois, payload exact, aucun autre évènement', async () => {
+    const r = await mount(RICH.slug);
     const cv = recentEvents().filter((e) => e.event === 'concept_viewed');
     expect(cv).toHaveLength(1);
     expect(cv[0].props).toMatchObject({ categoryId: RICH.categoryId, hasVisual: Boolean(RICH.visualSpec) });
@@ -149,16 +195,16 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('marquage exploration/récent appelé UNE seule fois après ready (aucun double effet)', () => {
-    const r = mount(RICH.slug);
+  it('marquage exploration/récent appelé UNE seule fois après ready (aucun double effet)', async () => {
+    const r = await mount(RICH.slug);
     expect(calls.recent.filter((s) => s === RICH.slug)).toHaveLength(1);
     expect(calls.explored.filter(([s]) => s === RICH.slug)).toHaveLength(1);
     expect(calls.explored[0]).toEqual([RICH.slug, RICH.worldId]);
     act(() => r.unmount());
   });
 
-  it('favoris : bouton nommé ; bascule via toggleFavorite avec le slug', () => {
-    const r = mount(RICH.slug);
+  it('favoris : bouton nommé ; bascule via toggleFavorite avec le slug', async () => {
+    const r = await mount(RICH.slug);
     const favBtn = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').toLowerCase().includes('favori'));
     expect(favBtn).toBeDefined();
     act(() => (favBtn!.props.onPress as () => void)());
@@ -166,8 +212,8 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('concepts liés : chips actionnables nommées + navigation /concept/[slug]', () => {
-    const r = mount(RICH.slug);
+  it('concepts liés : chips actionnables nommées + navigation /concept/[slug]', async () => {
+    const r = await mount(RICH.slug);
     const chip = byLabel(r.root, `Ouvrir ${FIRST_RELATED.title}`);
     expect(chip).toBeDefined();
     expect(chip!.props.accessibilityRole).toBe('button');
@@ -177,23 +223,23 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('avis de relecture éditoriale conservé (needsEditorialReview)', () => {
+  it('avis de relecture éditoriale conservé (needsEditorialReview)', async () => {
     expect(needsEditorialReview(RICH)).toBe(true); // corpus V5 : statut needsReview
-    const r = mount(RICH.slug);
+    const r = await mount(RICH.slug);
     expect(hasText(r.root, 'À relire')).toBe(true);
     expect(hasTextIncluding(r.root, EDITORIAL_REVIEW_NOTICE.slice(0, 24))).toBe(true);
     act(() => r.unmount());
   });
 
-  it('disclaimer : disclaimer du concept + disclaimer éducatif canonique présents', () => {
-    const r = mount(RICH.slug);
+  it('disclaimer : disclaimer du concept + disclaimer éducatif canonique présents', async () => {
+    const r = await mount(RICH.slug);
     expect(hasText(r.root, RICH.disclaimer)).toBe(true);
     expect(hasTextIncluding(r.root, 'risque de perte')).toBe(true); // Disclaimer canonique
     act(() => r.unmount());
   });
 
-  it('maîtrise exposée par ICÔNE + LIBELLÉ, jamais la seule couleur', () => {
-    const r = mount(RICH.slug);
+  it('maîtrise exposée par ICÔNE + LIBELLÉ, jamais la seule couleur', async () => {
+    const r = await mount(RICH.slug);
     const st = conceptMasteryStatus(RICH, { exploredSlugs: [], skills: {}, completedSkills: [], targets: {} });
     expect(hasText(r.root, st.stateLabel)).toBe(true); // libellé texte présent
     // L'icône d'état (book pour « new ») fait partie du système Trademy, jamais un aplat de couleur seul.
@@ -201,32 +247,32 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
-  it('puce de difficulté : couleur EFFECTIVE stricte, jamais technical/cyan (bug corrigé)', () => {
+  it('puce de difficulté : couleur EFFECTIVE stricte, jamais technical/cyan (bug corrigé)', async () => {
     // Découverte (1–2) → neutral — et surtout PAS technical (difficultyTone renverrait technical ici).
-    const easy = mount(DIFF(2).slug);
+    const easy = await mount(DIFF(2).slug);
     expect(difficultyChipColor(easy.root)).toBe(theme.colors.neutral);
     expect(difficultyChipColor(easy.root)).not.toBe(theme.colors.technical);
     act(() => easy.unmount());
     // Intermédiaire (3) → warning.
-    const mid = mount(DIFF(3).slug);
+    const mid = await mount(DIFF(3).slug);
     expect(difficultyChipColor(mid.root)).toBe(theme.colors.warning);
     expect(difficultyChipColor(mid.root)).not.toBe(theme.colors.technical);
     act(() => mid.unmount());
     // Avancé (4–5) → advanced.
-    const hard = mount(DIFF(4).slug);
+    const hard = await mount(DIFF(4).slug);
     expect(difficultyChipColor(hard.root)).toBe(theme.colors.advanced);
     expect(difficultyChipColor(hard.root)).not.toBe(theme.colors.technical);
     act(() => hard.unmount());
   });
 
-  it('robustesse : aucune valeur invalide, remontage déterministe', () => {
-    const first = mount(RICH.slug);
+  it('robustesse : aucune valeur invalide, remontage déterministe', async () => {
+    const first = await mount(RICH.slug);
     const json1 = JSON.stringify(first.toJSON());
     expect(json1).not.toMatch(/NaN|undefined|Infinity|Invalid Date/);
     act(() => first.unmount());
     // Réinitialise les marquages puis remonte : rendu identique.
     calls.recent.length = 0; calls.explored.length = 0;
-    const second = mount(RICH.slug);
+    const second = await mount(RICH.slug);
     expect(JSON.stringify(second.toJSON())).toBe(json1);
     // Un seul marquage par montage (pas de double effet).
     expect(calls.explored.filter(([s]) => s === RICH.slug)).toHaveLength(1);

@@ -1,9 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Pressable, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, EmptyState, FavoriteButton, theme, hitSlopFor } from '@/design-system';
+import { Screen, Text, Card, Button, EmptyState, StateView, FavoriteButton, theme, hitSlopFor } from '@/design-system';
 import { GLOSSARY_TERMS, GLOSSARY_CATEGORIES, skillById, useProgress } from '@/data';
 import { analytics } from '@/analytics';
+
+/**
+ * LOT 4-K — Pré-génère un fichier HTML CONCRET par terme de glossaire connu, servi directement par
+ * GitHub Pages (`glossaire/<slug>.html` au lieu du repli `404.html` = accueil), supprimant la divergence
+ * d'hydratation #418 sur un lien direct/rechargement. Dérivé de la source canonique `GLOSSARY_TERMS`
+ * (JAMAIS `UNIFIED_GLOSSARY` : ses entrées V5 sont routées vers `/concept/[slug]`) ; aucune liste
+ * recopiée, tout terme ajouté produit automatiquement son HTML au prochain build.
+ */
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return GLOSSARY_TERMS.map((t) => ({ slug: t.slug }));
+}
 
 export default function GlossaryDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -11,6 +22,20 @@ export default function GlossaryDetail() {
   const { favorites, toggleFavorite, markRecentlyViewed, markConceptExplored, ready } = useProgress();
   const term = GLOSSARY_TERMS.find((t) => t.slug === slug);
   const fav = term ? favorites.has(term.slug) : false;
+
+  // LOT 4-K — Premier rendu STABLE, indépendant du slug (voir concept/[slug]) : évite la divergence
+  // d'hydratation #418 sur un lien direct. Bascule différée par microtâche, annulée au démontage. On
+  // NE détourne PAS `ready` (persistance) : `mounted` décrit uniquement le montage de la route.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) setMounted(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (term) analytics.track('concept_viewed', { category: term.category, hasRelatedSkill: Boolean(term.relatedSkillId) });
@@ -22,6 +47,14 @@ export default function GlossaryDetail() {
       markConceptExplored(term.slug);
     }
   }, [ready, term, markRecentlyViewed, markConceptExplored]);
+
+  if (!mounted) {
+    return (
+      <Screen>
+        <StateView variant="loading" title="On prépare le terme…" />
+      </Screen>
+    );
+  }
 
   if (!term) {
     return (

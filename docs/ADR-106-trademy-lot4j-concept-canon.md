@@ -1,9 +1,10 @@
 # ADR-106 — LOT 4-J : refonte canonique de la fiche concept visuelle
 
-- **Statut** : proposé — LOT 4-J, dixième application de la fondation LOT 4-A (ADR-097), après les six
+- **Statut** : accepté — LOT 4-J, dixième application de la fondation LOT 4-A (ADR-097), après les six
   écrans d'onglet (ADR-098 → ADR-103), le shell de navigation (ADR-104) et l'onboarding (ADR-105).
-  Premier lot dédié à un **écran de profondeur** (hors des cinq onglets). **PR en BROUILLON**, en attente
-  de validation humaine ; passera à « accepté » à la validation.
+  Premier lot dédié à un **écran de profondeur** (hors des cinq onglets). **PR #20 fusionnée** dans `main`
+  (squash, commit `c9bbfb5`) après validation humaine et CI verte. La limite « React #418 sur deep-link
+  direct » listée plus bas est **résolue** par le LOT 4-K ([ADR-107](./ADR-107-trademy-lot4k-direct-links.md)).
 - **Contexte** : le LOT 4-J applique le canon **TradeMy Learning Glass** à la **fiche concept**
   (`src/app/concept/[slug].tsx`, route `/concept/[slug]`). C'est la surface centrale de lecture d'un
   concept, pensée pour croître vers 500+ entrées, atteinte depuis la Bibliothèque (LOT 4-F), le glossaire,
@@ -120,7 +121,9 @@ bord.
 - **React #418 sur deep-link direct** de `/concept/[slug]` (route dynamique non pré-rendue, sans garde
   d'hydratation) : inchangé par ce lot (correction de route hors périmètre ; même traitement que
   `lesson/[id]` à prévoir dans un lot de robustesse). En usage réel (navigation in-app) et dans les
-  captures (parcours client), aucune erreur.
+  captures (parcours client), aucune erreur. **→ RÉSOLU par le LOT 4-K ([ADR-107](./ADR-107-trademy-lot4k-direct-links.md))** :
+  `generateStaticParams` dérivé de `V5_CONCEPTS` + rendu initial indépendant du slug ; l'accès direct et
+  le rechargement sur un slug connu n'émettent plus de #418 (vérifié par `scripts/verify-direct-links.mjs`).
 - **Fiche sans visuel non capturable** : les 67 concepts V5 portent tous un `visualSpec` ; l'état « sans
   visuel » est géré (rendu conditionnel) mais non illustrable avec les données réelles.
 - Contrôles natifs iOS/Android **non exécutés** : seuls Chromium et les tests React Native/Jest l'ont été.

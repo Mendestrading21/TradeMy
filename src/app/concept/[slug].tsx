@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Pressable, StyleSheet } from 'react-native';
 import {
@@ -44,6 +44,16 @@ import { analytics } from '@/analytics';
  * maîtrise emploie ses tokens dédiés (identiques à la Bibliothèque, LOT 4-F), jamais le cyan
  * d'annotation ; l'état de maîtrise est porté par l'icône + le libellé, jamais par la seule couleur.
  */
+
+/**
+ * LOT 4-K — Pré-génère un fichier HTML CONCRET par concept connu, servi directement par GitHub Pages
+ * (`concept/<slug>.html` au lieu du repli `404.html` = accueil), supprimant la divergence
+ * d'hydratation #418 sur un lien direct/rechargement. Dérivé de la source canonique `V5_CONCEPTS`
+ * (aucune liste recopiée) : tout concept ajouté produit automatiquement son HTML au prochain build.
+ */
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return V5_CONCEPTS.map((c) => ({ slug: c.slug }));
+}
 
 /** État strict vers couleur (token dédié) + icône + libellé — MÊME canon que la Bibliothèque (LOT 4-F). */
 const STATE_META: Record<ConceptState, { color: string; icon: TrademyIconName }> = {
@@ -92,6 +102,21 @@ export default function ConceptFiche() {
   const concept = conceptBySlug(V5_CONCEPTS, slug ?? '');
   const fav = concept ? favorites.has(concept.slug) : false;
 
+  // LOT 4-K — Premier rendu STABLE, indépendant du slug : l'export statique pré-rend la route SANS
+  // slug résolu ; sans ce garde-fou le HTML serveur diverge du 1er rendu client, d'où React #418. La
+  // bascule est différée par une microtâche (hors chemin synchrone) et annulée au démontage. On NE
+  // détourne PAS `ready` (persistance) : `mounted` décrit uniquement le montage de la route.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) setMounted(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     if (concept) analytics.track('concept_viewed', { categoryId: concept.categoryId, hasVisual: Boolean(concept.visualSpec) });
   }, [concept]);
@@ -104,6 +129,14 @@ export default function ConceptFiche() {
       markConceptExplored(concept.slug, concept.worldId);
     }
   }, [ready, concept, markRecentlyViewed, markConceptExplored]);
+
+  if (!mounted) {
+    return (
+      <Screen>
+        <StateView variant="loading" title="On prépare la fiche…" />
+      </Screen>
+    );
+  }
 
   if (!concept) {
     return (

@@ -4,9 +4,11 @@
  * DÉTERMINISME : `FIXED_NOW` unique + horloge FIGÉE (Date.now/new Date) AVANT chargement + fuseau
  * `Europe/Zurich` + stockage seedé (`onboarded`, v8). Parcours RÉEL côté client : racine → « Reprendre »
  * → Accueil → onglet « Bibliothèque » (lien) → recherche → clic sur la fiche (router.push CLIENT, sans
- * rechargement) — ce qui évite la divergence d'hydratation #418 propre au deep-link direct de la route
- * dynamique `/concept/[slug]` (non pré-rendue ; limite documentée). L'état « introuvable » est atteint
- * par une navigation d'historique DANS le SPA déjà monté (aucun rechargement, aucune erreur).
+ * rechargement) — parcours utilisateur naturel qui exerce l'écran monté dans le SPA. Depuis le LOT 4-K
+ * (ADR-107), la route `/concept/[slug]` est PRÉ-RENDUE (`generateStaticParams` dérivé de `V5_CONCEPTS`)
+ * et l'accès direct/rechargement n'émet plus de divergence d'hydratation #418 (vérifié par
+ * `scripts/verify-direct-links.mjs`). L'état « introuvable » est atteint ici par une navigation
+ * d'historique DANS le SPA déjà monté (aucun rechargement, aucune erreur).
  *
  * Contrôles à chaque capture : aucun emoji/glyphe de commande, aucune valeur invalide (NaN/undefined),
  * aucun débordement horizontal ; la capture clavier vérifie un focus VISIBLE (anneau `:focus-visible`).
