@@ -162,7 +162,12 @@ async function run() {
     await reachConcept(p, concept, name);
     if (opts.notFound) await goNotFound(p);
     if (opts.keyboard) await focusInteractive(p, name);
-    if (opts.region === 'top') await p.evaluate(() => window.scrollTo(0, 0));
+    // Réinitialise le ScrollView en HAUT pour un cadrage déterministe (sauf capture clavier — on garde
+    // l'élément focalisé visible — et sauf capture d'une région précise, gérée juste après).
+    if (!opts.keyboard && (!opts.region || opts.region === 'top')) {
+      await p.evaluate(() => window.scrollTo(0, 0));
+      await p.waitForTimeout(120);
+    }
     if (opts.region && opts.region !== 'top') {
       await p.evaluate((label) => {
         const el = [...document.querySelectorAll('*')].find((e) => (e.textContent || '').trim() === label);

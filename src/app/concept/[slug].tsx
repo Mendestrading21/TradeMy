@@ -61,6 +61,18 @@ const SCENARIO_META: { key: 'bullish' | 'bearish' | 'neutral'; label: string; ic
   { key: 'neutral', label: 'Scénario neutre', icon: 'chart', color: theme.colors.neutral },
 ];
 
+/**
+ * Couleur de la puce de difficulté — mapping local STRICT. `difficultyTone` reste employé pour son
+ * LIBELLÉ (Découverte / Intermédiaire / Avancé), mais sa couleur renvoie `technical` (cyan d'annotation)
+ * pour les difficultés 1–2 : on ne l'utilise donc PAS pour la couleur. Aucun chemin d'exécution de cet
+ * écran ne produit `technical` (réservé au `VisualCard` partagé).
+ */
+const DIFFICULTY_COLOR: Record<string, string> = {
+  'Découverte': theme.colors.neutral,
+  'Intermédiaire': theme.colors.warning,
+  'Avancé': theme.colors.advanced,
+};
+
 /** Titre de section : icône fonctionnelle `TrademyIcon` (décorative) + libellé. Aucune décoration inutile. */
 function SectionHead({ iconName, title, color }: { iconName: TrademyIconName; title: string; color?: string }) {
   return (
@@ -137,7 +149,7 @@ export default function ConceptFiche() {
       <View style={styles.metaRow}>
         {/* Maîtrise : icône + libellé + couleur dédiée (jamais la couleur seule, jamais le cyan). */}
         <Chip iconName={masteryMeta.icon} label={mastery.stateLabel} color={masteryMeta.color} />
-        <Chip iconName="target" label={`${tone.label} · ${concept.difficulty}/5`} color={tone.color} />
+        <Chip iconName="target" label={`${tone.label} · ${concept.difficulty}/5`} color={DIFFICULTY_COLOR[tone.label] ?? theme.colors.neutral} />
         {concept.estimatedMinutes ? <Chip iconName="timer" label={`${concept.estimatedMinutes} min`} color={theme.colors.neutral} /> : null}
         {concept.aliases[0] ? <Chip label={concept.aliases[0]} color={theme.colors.textMuted} /> : null}
       </View>

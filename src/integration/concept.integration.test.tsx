@@ -66,7 +66,7 @@ jest.mock('@/data', () => {
 });
 
 import ConceptFiche from '@/app/concept/[slug]';
-import { TrademyIcon } from '@/design-system';
+import { TrademyIcon, Chip, theme } from '@/design-system';
 import { VisualCard } from '@/engines/visual';
 import { V5_CONCEPTS, relatedConcepts, needsEditorialReview, conceptMasteryStatus, EDITORIAL_REVIEW_NOTICE } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
@@ -82,6 +82,11 @@ const RICH = V5_CONCEPTS.find(
   (c) => c.visualSpec && c.dialogue && c.bullishScenario && c.falseSignals.length && c.flashcards.length && relatedConcepts(V5_CONCEPTS, c).length,
 )!;
 const FIRST_RELATED = relatedConcepts(V5_CONCEPTS, RICH)[0];
+// Concepts réels par difficulté (Découverte 1–2 · Intermédiaire 3 · Avancé 4–5) pour les couleurs.
+const DIFF = (n: number) => V5_CONCEPTS.find((c) => c.difficulty === n)!;
+// La puce de difficulté est la SEULE avec l'icône `target` ; on lit sa couleur EFFECTIVE.
+const difficultyChipColor = (root: ReactTestInstance): string | undefined =>
+  root.findAllByType(Chip).find((c) => c.props.iconName === 'target')?.props.color as string | undefined;
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -194,6 +199,24 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     // L'icône d'état (book pour « new ») fait partie du système Trademy, jamais un aplat de couleur seul.
     expect(iconNames(r.root)).toContain('book');
     act(() => r.unmount());
+  });
+
+  it('puce de difficulté : couleur EFFECTIVE stricte, jamais technical/cyan (bug corrigé)', () => {
+    // Découverte (1–2) → neutral — et surtout PAS technical (difficultyTone renverrait technical ici).
+    const easy = mount(DIFF(2).slug);
+    expect(difficultyChipColor(easy.root)).toBe(theme.colors.neutral);
+    expect(difficultyChipColor(easy.root)).not.toBe(theme.colors.technical);
+    act(() => easy.unmount());
+    // Intermédiaire (3) → warning.
+    const mid = mount(DIFF(3).slug);
+    expect(difficultyChipColor(mid.root)).toBe(theme.colors.warning);
+    expect(difficultyChipColor(mid.root)).not.toBe(theme.colors.technical);
+    act(() => mid.unmount());
+    // Avancé (4–5) → advanced.
+    const hard = mount(DIFF(4).slug);
+    expect(difficultyChipColor(hard.root)).toBe(theme.colors.advanced);
+    expect(difficultyChipColor(hard.root)).not.toBe(theme.colors.technical);
+    act(() => hard.unmount());
   });
 
   it('robustesse : aucune valeur invalide, remontage déterministe', () => {

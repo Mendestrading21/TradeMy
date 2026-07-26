@@ -14,7 +14,9 @@
 - **Glyphe de commande** `›` détourné en navigation dans les chips « concepts liés » (`{rc.title} ›`).
 - **Zéro `TrademyIcon`** : aucune iconographie fonctionnelle de la famille.
 - **Couleur `technical`/cyan (annotation) détournée** hors de son rôle : état de **maîtrise**, libellé
-  d'en-tête (monde/catégorie) et chips de **navigation** « concepts liés » (bordure + texte cyan).
+  d'en-tête (monde/catégorie), chips de **navigation** « concepts liés » (bordure + texte cyan), et —
+  **indirectement** — la puce de **difficulté** via `difficultyTone`, qui renvoie `colors.technical` pour
+  les difficultés 1–2 (majorité du corpus). Un simple garde-fou de source ne détecte pas ce dernier cas.
 - **Maîtrise portée surtout par la couleur**, sans icône dédiée cohérente avec la Bibliothèque.
 - **Aucun test ni capture** propres à cette route.
 
@@ -38,10 +40,14 @@ route, analytics ni persistance n'est modifiée.
 | Maîtrise (5 états) | `textMuted`/`info`/`primaryBright`/`success`/`mastery` | **MÊME mapping que la Bibliothèque** (LOT 4-F) : `STATE_META` local identique — cohérence liste ↔ fiche. Icône + libellé + couleur (jamais la couleur seule). |
 | Direction de scénario | `bullish` / `bearish` / `neutral` | RÉSERVÉS au sens marché ; déclarés dans `SCENARIO_META`. |
 | Faux signaux, invalidation, À relire | `warning` | AVERTISSEMENT — jamais `bearish` (un faux signal n'est pas une direction de marché). |
+| **Difficulté de la puce** | **Découverte (1–2) → `neutral` · Intermédiaire (3) → `warning` · Avancé (4–5) → `advanced`** | Mapping local strict `DIFFICULTY_COLOR`. `difficultyTone` reste employé pour son **libellé** seulement : sa **couleur** renverrait `technical` pour les difficultés 1–2 (cyan d'annotation détourné), donc la puce **n'utilise plus `tone.color`**. |
 | Flashcard, accent de marque | `primaryBright` | Marque. |
 | En-tête monde/catégorie, alias, puces d'observation | `textMuted` | Neutre — plus de cyan d'annotation détourné. |
 
-`technical`/cyan **disparaît entièrement** de l'écran.
+`technical`/cyan est **absent de tout chemin d'exécution de cet écran** (hors du `VisualCard` partagé) : ni
+en accès direct dans la source, ni **indirectement** via la couleur de `difficultyTone` (retirée de la puce).
+C'est **prouvé au RUNTIME** — `concept.integration.test.tsx` vérifie que la couleur EFFECTIVE de la puce
+de difficulté vaut `neutral`/`warning`/`advanced` selon la difficulté et **jamais** `technical`.
 
 ## Alternatives considérées
 1. **Ajouter un garde-fou d'hydratation** (comme `lesson/[id]` : `generateStaticParams` + rendu différé)
@@ -74,12 +80,16 @@ Récupération par slug ; état « introuvable » ; `relatedConcepts` ; `concept
 - `concept.integration.test.tsx` (rendu RÉEL, `useProgress` mocké) : fiche riche, état introuvable,
   `VisualCard` conservée, `concept_viewed` une fois avec payload exact + aucun autre évènement, marquage
   récent/exploré une seule fois après `ready`, favoris, concepts liés actionnables + navigation, avis de
-  relecture, disclaimers, maîtrise par icône + libellé, remontage déterministe.
+  relecture, disclaimers, maîtrise par icône + libellé, remontage déterministe, et — verrou RUNTIME du
+  correctif — **couleur EFFECTIVE de la puce de difficulté** = `neutral` (1–2, jamais `technical`) /
+  `warning` (3) / `advanced` (4–5).
 - `conceptNoEmoji.test.ts` : aucun emoji, aucun glyphe de commande (dont `‹ ›`), plus de
   `String.fromCharCode`/`emoji=`/`icon="…"`, `TrademyIcon`/`iconName` employés.
 - `conceptSemanticColors.test.ts` : `technical` absent ; `bullish`/`bearish` confinés à `SCENARIO_META` ;
-  maîtrise sur tokens dédiés (canon Bibliothèque) sans marché ni cyan ; un seul système d'icônes ;
-  mappings déclarés ; taxonomie analytics = `concept_viewed` seul ; aucune mutation de dataset.
+  maîtrise sur tokens dédiés (canon Bibliothèque) sans marché ni cyan ; **la puce de difficulté n'emploie
+  plus `tone.color`** et `DIFFICULTY_COLOR` mappe sur `neutral`/`warning`/`advanced` (jamais `technical`) ;
+  un seul système d'icônes ; mappings déclarés ; taxonomie analytics = `concept_viewed` seul ; aucune
+  mutation de dataset.
 
 ## Captures (déterministes, script séparé)
 `scripts/capture-concept.mjs` → `docs/lot4j-captures/` (manifeste séparé). Horloge/fuseau figés

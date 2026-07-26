@@ -30,6 +30,24 @@ describe('LOT 4-J — couleurs sémantiques, icônes et analytics de la fiche co
     expect(SRC).not.toMatch(/theme\.colors\.technical\b/);
   });
 
+  it('n’emploie plus la COULEUR de difficultyTone (qui renvoie technical en 1–2)', () => {
+    // `difficultyTone` reste utilisé pour son LIBELLÉ, mais jamais pour la couleur affichée.
+    expect(SRC).not.toMatch(/color=\{\s*tone\.color\s*\}/);
+    expect(SRC).toMatch(/tone\.label/);
+    expect(SRC).toMatch(/difficultyTone/);
+  });
+
+  it('mappe la difficulté sur des tokens STRICTS (neutral/warning/advanced, jamais technical/marché)', () => {
+    const diff = block('DIFFICULTY_COLOR');
+    expect(diff).toMatch(/Découverte/);
+    for (const token of ['neutral', 'warning', 'advanced']) {
+      expect(diff).toMatch(new RegExp(`theme\\.colors\\.${token}\\b`));
+    }
+    for (const forbidden of ['technical', 'bullish', 'bearish']) {
+      expect(diff).not.toMatch(new RegExp(`theme\\.colors\\.${forbidden}\\b`));
+    }
+  });
+
   it('réserve bullish/bearish à la direction de marché des scénarios (bloc SCENARIO_META)', () => {
     const scenario = block('SCENARIO_META');
     expect(scenario).toMatch(/theme\.colors\.bullish\b/);
