@@ -52,8 +52,9 @@ raisonnement conditionnel, repérage de faux signal — **5 types d'exercice** (
 ### Signature visuelle et couleurs (canon respecté, aucun ajout redondant)
 La signature du monde est sa **figure réelle** (`sampleSpec` = `candlestick-pattern`/`marteau`, rendu par
 `MiniVisual` sur le héros du parcours et de la fiche), conforme au canon « graphiques originaux plutôt
-qu'icônes génériques » — **aucune icône générique ajoutée**. Les icônes de statut restent sémantiques ;
-l'**or** reste réservé au checkpoint / à la récompense (icône `trophy`/`checkpoint`, couleur `reward`).
+qu'icônes génériques » — **aucune icône générique ajoutée**. Les icônes de statut restent sémantiques :
+l'**orange** signale la vigilance / révision (`warning`), tandis que l'**or** identifie le checkpoint,
+la récompense ou une zone importante (`reward`).
 
 ### Compteurs honnêtes et routes pré-générées
 - `repoTruth` et `offlineCapabilities` couvrent désormais **tous** les modules guidés : `skills` 4 → 8,
@@ -128,24 +129,33 @@ dans le dépôt** (garde-fou exécutable dans `candleVisualDirection.test.ts`).
   de statut icône+libellé, trail, prochaine étape), jamais par la seule couleur de la signature.
 - **Usage exact des couleurs** : violet = marque / CTA / progression (signature, boutons, barre) ; vert
   et rouge = marché (bougies, « hausse/baisse » toujours accompagnés d'un libellé) ; cyan = annotation
-  (cadre « SI… » du scénario de contexte) ; **or = uniquement le checkpoint** (accessible ou réussi) ;
-  aucune couleur codée en dur dans le module (tokens seulement, vérifié par test).
+  (cadre « SI… » du scénario de contexte) ; orange `warning` = vigilance / révision due ; **or =
+  checkpoint, récompense ou zone importante**, jamais état « à réviser » ; aucune couleur codée en
+  dur dans le module (tokens seulement, vérifié par test).
 - **Reduced motion** : réutilise le système d'animation existant ; sous `prefers-reduced-motion` les
   translations/oscillations/zooms décoratifs sont supprimés, l'état final s'affiche immédiatement, et
   toute l'information (sélection, annotations, figures) reste présente (capture `candle-fiche-reduced-390`).
 - **Assets et licences** : aucune image raster, aucune URL distante, aucune police ajoutée, aucun emoji
   fonctionnel dans le module (garde-fous `candleVisualDirection.test.ts` + `icons.test.ts` + garde emoji
   unique du projet). Les captures QA (`docs/lot4m-captures/`) sont des PNG générés, jamais embarqués.
-- **Captures inspectées (12)** : `candle-fiche-390` (signature + module), `candle-fiche-320`,
-  `candle-fiche-web`, `candle-fiche-reduced-390`, `candle-checkpoint-available-390` (or réservé au
-  checkpoint), `candle-review-390` (« à réviser »), `candle-lesson-anatomy-390` (leçon), `candle-context-390`
+- **Captures inspectées (12, régénérées après correction)** : `candle-fiche-390` (signature + module), `candle-fiche-320`,
+  `candle-fiche-web`, `candle-fiche-reduced-390`, `candle-checkpoint-available-390` (checkpoint doré,
+  distinct de la révision orange), `candle-review-390` (« à réviser »), `candle-lesson-anatomy-390` (leçon), `candle-context-390`
   (scénario, cadre cyan « SI… »), `candle-feedback-correct-390`, `candle-feedback-bobo-390` (misconception
   Bobo, réponse marquée par icône+couleur), `candle-reconstruct-place-390` (placement d'extrême OHLC,
   clavier ↑/↓), `candle-checkpoint-390` (revue en pratique). Zéro erreur console/page, zéro débordement
   horizontal, OHLC exacts, focus/CTA lisibles.
-- **Défaut trouvé puis corrigé** : le pilotage Chromium des sessions échouait à franchir l'étape
-  « résumé » de la leçon (sélection par texte ambiguë en RN-web) ; corrigé en ciblant le bouton
-  accessible (`getByRole('button')`), rendant les 12 captures déterministes.
+- **Défauts trouvés puis corrigés** :
+  - le pilotage Chromium des sessions échouait à franchir l'étape « résumé » de la leçon (sélection
+    par texte ambiguë en RN-web) ; corrigé en ciblant le bouton accessible (`getByRole('button')`) ;
+  - la rangée « Retour + Suivant » donnait au CTA principal une largeur de 100 %, créant un
+    débordement interne puis un décalage horizontal du `ScrollView` après le clic ; le CTA est
+    désormais flexible dans la largeur restante (`flex: 1`, `minWidth: 0`) ;
+  - `warning` et `reward` résolvaient vers le même or ; `warning` emploie désormais un orange AA
+    distinct, tandis que le checkpoint, la récompense et les zones importantes conservent l'or ;
+  - le harnais remet les défilements horizontaux à zéro, attend deux mesures successives identiques,
+    contrôle les boîtes des textes/SVG/CTA et refuse tout conteneur horizontalement débordant. La
+    publication des PNG utilise une copie compatible avec des systèmes de fichiers distincts.
 
 ## Portée
 Aucune dépendance ajoutée ; `package.json` et le lockfile inchangés. Fondations et les 13 autres mondes

@@ -329,6 +329,8 @@ export default function Session() {
           {isLast ? (
             <Button
               label="Commencer les exercices"
+              fullWidth={false}
+              style={styles.stepNavPrimary}
               onPress={() => {
                 analytics.track('lesson_started', { skillId: resolvedId });
                 emit({ type: 'chart_revealed' }); // le graphique/les exercices apparaissent → le guide observe.
@@ -336,7 +338,12 @@ export default function Session() {
               }}
             />
           ) : (
-            <Button label="Suivant ▶" onPress={() => setLearnStep((s) => s + 1)} />
+            <Button
+              label="Suivant ▶"
+              fullWidth={false}
+              style={styles.stepNavPrimary}
+              onPress={() => setLearnStep((s) => s + 1)}
+            />
           )}
         </View>
       </Screen>
@@ -586,7 +593,8 @@ const RESULT_ICON: Record<string, TrademyIconName> = { perfect: 'trophy', pass: 
 const styles = StyleSheet.create({
   header: { gap: theme.spacing.sm },
   headRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.sm },
-  stepNav: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.md, alignItems: 'center' },
+  stepNav: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.md, alignItems: 'center', width: '100%' },
+  stepNavPrimary: { flex: 1, minWidth: 0 },
   results: { alignItems: 'center', gap: theme.spacing.md },
   accuracyWrap: { width: '100%' },
   statTiles: { flexDirection: 'row', gap: theme.spacing.sm, width: '100%' },
