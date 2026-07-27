@@ -81,7 +81,7 @@ jest.mock('expo-router', () => {
 });
 
 import Session, { remediationVariant } from '@/app/session/[skillId]';
-import { ProgressProvider, getExercises, rotateExercises, limitCount, CHECKPOINT_ID, checkpointExercises } from '@/data';
+import { ProgressProvider, getExercises, rotateExercises, limitCount, CHECKPOINT_ID, CANDLE_CHECKPOINT_ID, checkpointExercises } from '@/data';
 import { objectiveId } from '@/data/learningTarget';
 import { isObjectiveProven } from '@/data/targetProgress';
 import { PILOT_CANDLE_CONCEPT_ID } from '@/data/pilotScenarios';
@@ -173,6 +173,7 @@ async function answerCorrect(root: ReactTestInstance, ex: Exercise): Promise<voi
     case 'identify_pattern':
     case 'label_chart':
     case 'identify_figure':
+    case 'scenario':
     case 'mcq':
       await tapText(root, ex.options[ex.validation.correctIndex]);
       return;
@@ -213,6 +214,7 @@ async function answerWrong(root: ReactTestInstance, ex: Exercise): Promise<void>
     case 'identify_pattern':
     case 'label_chart':
     case 'identify_figure':
+    case 'scenario':
     case 'mcq':
       await tapText(root, ex.options[(ex.validation.correctIndex + 1) % ex.options.length]);
       return;
@@ -544,5 +546,96 @@ describe('Écran de session RÉEL — parcours pilote de production', () => {
     await flush();
     expect(JSON.stringify(renderer.toJSON())).toContain('Chandeliers');
     act(() => renderer.unmount());
+  });
+});
+
+// ── LOT 4-M — 2e module guidé RÉEL (world.candles) sur le MÊME écran de production ──
+const CANDLE_SKILL = 'skill.candle.indecision'; // types : identify_figure, order, scenario, find_error
+const DOJI = 'concept.doji';
+const CANDLE_LIST = () =>
+  rotateExercises(getExercises(CANDLE_SKILL), limitCount(getExercises(CANDLE_SKILL).length, null), 0);
+
+describe('Écran de session RÉEL — module Chandeliers (world.candles)', () => {
+  it('session Chandeliers : leçon → pratique → erreur (Bobo) → réussite → 1 transition/cible, cible échouée due, aucune maîtrise prématurée', async () => {
+    routerState.params = { skillId: CANDLE_SKILL };
+    const { root, unmount } = await mount();
+    await reachPractice(root);
+    const list = CANDLE_LIST();
+    expect(textOf(root)).toMatch(new RegExp(`Exercice\\s+1\\s*/\\s*${list.length}`));
+
+    // ex1 = reconnaissance (identify_figure) : ERREUR cliquée → le guide prudent (Bobo) réagit.
+    const ex1 = list[0];
+    if (ex1.type !== 'identify_figure') throw new Error('ex1 ≠ identify_figure');
+    await tapText(root, ex1.options[(ex1.validation.correctIndex + 1) % ex1.options.length]);
+    expect(a11yLabels(root).some((l) => l.includes('Bobo'))).toBe(true);
+    expect(pressables(root).some((n) => textOf(n).includes('Continuer'))).toBe(true);
+    await tapText(root, 'Continuer');
+
+    // Le reste de l'unité est réussi via les VRAIS contrôles (order, scenario, find_error).
+    for (let i = 1; i < list.length; i++) {
+      await answerCorrect(root, list[i]);
+      await tapText(root, i + 1 >= list.length ? 'Voir mon résultat' : 'Continuer');
+    }
+    expect(textOf(root)).toMatch(new RegExp(`/\\s*${list.length}`));
+
+    const saved = await progressRepository.load();
+    const now = Date.now();
+    // recognize (échoué, 1 seul exercice) → remis à zéro, dû immédiatement, AUCUNE maîtrise.
+    const recognize = saved!.targets![objectiveId(DOJI, 'recognize')];
+    expect(recognize.review.repetitions).toBe(0);
+    expect(recognize.review.dueAt).toBeLessThanOrEqual(now + 2000);
+    expect(isObjectiveProven(recognize)).toBe(false);
+    // interpret / confirm / avoid-false-signal réussis → UNE transition chacun, jamais « maîtrisé ».
+    for (const kind of ['interpret', 'confirm', 'avoid-false-signal'] as const) {
+      const t = saved!.targets![objectiveId(DOJI, kind)];
+      expect(t.review.repetitions).toBe(1);
+      expect(isObjectiveProven(t)).toBe(false); // reps < 2 → pas de maîtrise prématurée
+    }
+    expect(saved!.skills[CANDLE_SKILL]).toBeDefined();
+    expect(saved!.rotation?.[CANDLE_SKILL]).toBe(1); // completeSession a avancé la rotation (persisté)
+    unmount();
+  });
+
+  it('checkpoint Chandeliers RÉEL : PROPRE (skills du module), tournant, réussi → célébration', async () => {
+    // Checkpoint indépendant : sa fenêtre tourne, et il n'agrège QUE les compétences Chandeliers.
+    expect(checkpointExercises(CANDLE_CHECKPOINT_ID, 0, 2)).not.toEqual(checkpointExercises(CANDLE_CHECKPOINT_ID, 1, 2));
+    const cp = checkpointExercises(CANDLE_CHECKPOINT_ID, 0, 2);
+    expect(new Set(cp.map((e) => e.skillId)).size).toBeGreaterThan(1);
+    expect(cp.every((e) => e.skillId.startsWith('skill.candle.'))).toBe(true);
+
+    await AsyncStorage.clear();
+    routerState.params = { skillId: CANDLE_CHECKPOINT_ID };
+    const s = await mount();
+    expect(textOf(s.root)).toMatch(new RegExp(`Exercice\\s+1\\s*/\\s*${cp.length}`));
+    for (let i = 0; i < cp.length; i++) {
+      await answerCorrect(s.root, cp[i]);
+      await tapText(s.root, i + 1 >= cp.length ? 'Voir mon résultat' : 'Continuer');
+    }
+    expect(hasCelebration(s.root)).toBe(true); // réussite → célébration rendue
+    s.unmount();
+  });
+
+  it('reprise EXACTE (stockage réel) : réponse Chandeliers restaurée jamais recomptée', async () => {
+    routerState.params = { skillId: CANDLE_SKILL };
+    const list = CANDLE_LIST();
+    // 1re instance : répondre correctement à l'exercice 1, Continuer (index → 2), fermer SANS terminer.
+    let s = await mount();
+    await reachPractice(s.root);
+    await answerCorrect(s.root, list[0]);
+    await tapText(s.root, 'Continuer');
+    expect(textOf(s.root)).toMatch(new RegExp(`Exercice\\s+2\\s*/\\s*${list.length}`));
+    s.unmount();
+
+    // 2e instance (même AsyncStorage) : reprise EXACTE de la position pratique/index.
+    s = await mount();
+    expect(textOf(s.root)).toMatch(new RegExp(`Exercice\\s+2\\s*/\\s*${list.length}`));
+    for (let i = 1; i < list.length; i++) {
+      await answerCorrect(s.root, list[i]);
+      await tapText(s.root, i + 1 >= list.length ? 'Voir mon résultat' : 'Continuer');
+    }
+    const saved = await progressRepository.load();
+    // recognize = 1 exercice, compté UNE seule fois malgré la reprise (jamais deux fois).
+    expect(saved!.targets![objectiveId(DOJI, 'recognize')].attempts).toBe(1);
+    s.unmount();
   });
 });
