@@ -51,6 +51,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Application du canon à l'Onboarding : icônes (fin des emojis/lettres), disclaimer, a11y, logique préservée (LOT 4-I) | [ADR-105](./ADR-105-trademy-lot4i-onboarding-canon.md) |
 | Refonte de la fiche concept visuelle : icônes (fin de 🔎/›), couleurs sémantiques strictes, maîtrise = canon Bibliothèque, a11y (LOT 4-J) | [ADR-106](./ADR-106-trademy-lot4j-concept-canon.md) |
 | Robustesse des liens directs : `generateStaticParams` (concept/glossaire) + rendu initial stable → suppression du React #418 sur accès direct/rechargement (LOT 4-K) | [ADR-107](./ADR-107-trademy-lot4k-direct-links.md) |
+| Fiche Monde canonique : héros + prochaine étape dérivée, trail guidé / collection de notions, états verrouillé/à réviser/terminé, vérité pédagogique, a11y (LOT 4-L) | [ADR-108](./ADR-108-trademy-lot4l-world-canon.md) |
 
 ## Fondations toujours actives
 
