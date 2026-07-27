@@ -50,6 +50,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Shell global & navigation responsive : barre lisible dès 320 px, capsule active, liens réels, a11y (LOT 4-H) | [ADR-104](./ADR-104-trademy-lot4h-shell-navigation-canon.md) |
 | Application du canon à l'Onboarding : icônes (fin des emojis/lettres), disclaimer, a11y, logique préservée (LOT 4-I) | [ADR-105](./ADR-105-trademy-lot4i-onboarding-canon.md) |
 | Refonte de la fiche concept visuelle : icônes (fin de 🔎/›), couleurs sémantiques strictes, maîtrise = canon Bibliothèque, a11y (LOT 4-J) | [ADR-106](./ADR-106-trademy-lot4j-concept-canon.md) |
+| Robustesse des liens directs : `generateStaticParams` (concept/glossaire) + rendu initial stable → suppression du React #418 sur accès direct/rechargement (LOT 4-K) | [ADR-107](./ADR-107-trademy-lot4k-direct-links.md) |
 
 ## Fondations toujours actives
 
