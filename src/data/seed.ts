@@ -520,13 +520,53 @@ export function pickVariant(objectiveId: string, round: number): Exercise | unde
   return vs[((Math.trunc(round) % vs.length) + vs.length) % vs.length];
 }
 
-// ─── Checkpoint (revue mixte du module) ──────────────────────────────
-// Nœud de fin de module : réunit quelques exercices de chaque compétence.
-// Les exercices gardent leur skillId réel → répondre met à jour la maîtrise réelle.
+// ─── Modules guidés (registre canonique) ─────────────────────────────
+// LOT 4-M — source UNIQUE décrivant chaque module guidé : ses compétences ordonnées et son
+// checkpoint PROPRE (jamais partagé). `GUIDED_MODULES` (learningMap) en dérive. Ajouter un module =
+// ajouter une entrée ici (+ ses LESSONS/EXERCISES) ; le moteur (checkpoint, résolution des
+// compétences, carte) est piloté par ce registre, sans dépendance au checkpoint Fondations global.
+// Le checkpoint réunit quelques exercices de chaque compétence de SON module ; les exercices gardent
+// leur skillId réel → répondre met à jour la maîtrise réelle.
 export const CHECKPOINT_ID = 'checkpoint.read-chart';
 export const CHECKPOINT_TITLE = 'Revue — Lire un graphique';
+
+export interface ModuleContent {
+  id: string;
+  title: string;
+  worldId: string;
+  /** Compétences ordonnées du module. */
+  skills: Skill[];
+  /** Checkpoint PROPRE au module (jamais partagé entre modules). */
+  checkpointId: string;
+  checkpointTitle: string;
+}
+
+/** Registre canonique des modules guidés (source unique ; `GUIDED_MODULES` en dérive). */
+export const CONTENT_MODULES: ModuleContent[] = [
+  {
+    id: 'module.foundations.read-chart',
+    title: 'Lire un graphique',
+    worldId: 'world.foundations',
+    skills: SKILLS,
+    checkpointId: CHECKPOINT_ID,
+    checkpointTitle: CHECKPOINT_TITLE,
+  },
+];
+
+/** Toutes les compétences, tous modules confondus (résolution du moteur). */
+const ALL_MODULE_SKILLS: Skill[] = CONTENT_MODULES.flatMap((m) => m.skills);
+const CHECKPOINT_IDS = new Set(CONTENT_MODULES.map((m) => m.checkpointId));
+/** Module dont l'id fourni est le checkpoint (sinon undefined). */
+function moduleByCheckpoint(id: string): ModuleContent | undefined {
+  return CONTENT_MODULES.find((m) => m.checkpointId === id);
+}
+/** Compétences d'un module par son id (fiche Monde / carte de parcours). */
+export function skillsForModule(moduleId: string): Skill[] {
+  return CONTENT_MODULES.find((m) => m.id === moduleId)?.skills ?? [];
+}
+/** Un id est-il un checkpoint (de N'IMPORTE quel module) ? */
 export function isCheckpoint(id: string): boolean {
-  return id === CHECKPOINT_ID;
+  return CHECKPOINT_IDS.has(id);
 }
 
 // ─── Helpers de contenu ──────────────────────────────────────────────
@@ -534,21 +574,21 @@ export function getLessons(skillId: string): Lesson[] {
   return LESSONS[skillId] ?? [];
 }
 export function getExercises(skillId: string): Exercise[] {
-  if (skillId === CHECKPOINT_ID) {
-    return SKILLS.flatMap((s) => (EXERCISES[s.id] ?? []).slice(0, 2));
-  }
+  const mod = moduleByCheckpoint(skillId);
+  if (mod) return mod.skills.flatMap((s) => (EXERCISES[s.id] ?? []).slice(0, 2));
   return EXERCISES[skillId] ?? [];
 }
 
 /**
- * Checkpoint tournant : `perSkill` exercices de chaque compétence, la fenêtre
- * tournant avec `round` → les 8 questions ne sont jamais figées d'un passage à
- * l'autre (round 0 = comportement historique). Plusieurs compétences, donc
- * plusieurs objectifs, sont couvertes à chaque passage.
+ * Checkpoint tournant d'UN module : `perSkill` exercices de chaque compétence du module, la fenêtre
+ * tournant avec `round` (round 0 = comportement historique). Chaque module a son propre checkpoint,
+ * donc plusieurs objectifs de CE module sont couverts à chaque passage.
  */
-export function checkpointExercises(round = 0, perSkill = 2): Exercise[] {
+export function checkpointExercises(checkpointId: string, round = 0, perSkill = 2): Exercise[] {
+  const mod = moduleByCheckpoint(checkpointId);
+  if (!mod) return [];
   return buildCheckpoint(
-    SKILLS.map((s) => EXERCISES[s.id] ?? []),
+    mod.skills.map((s) => EXERCISES[s.id] ?? []),
     perSkill,
     round,
   );
@@ -557,17 +597,20 @@ export function checkpointExercises(round = 0, perSkill = 2): Exercise[] {
 /**
  * Sélection tournante d'une session de compétence : au lieu des premiers `count`
  * figés, une page déterministe qui avance avec `round` (round 0 = historique).
+ * Un checkpoint est délégué à `checkpointExercises` du module correspondant.
  */
 export function rotatedExercises(skillId: string, count: number, round = 0): Exercise[] {
-  if (skillId === CHECKPOINT_ID) return checkpointExercises(round, Math.max(1, Math.floor(count / SKILLS.length) || 2));
+  const mod = moduleByCheckpoint(skillId);
+  if (mod) return checkpointExercises(skillId, round, Math.max(1, Math.floor(count / mod.skills.length) || 2));
   return rotateExercises(EXERCISES[skillId] ?? [], count, round);
 }
 export function skillById(id: string): Skill | undefined {
-  if (id === CHECKPOINT_ID) return { id: CHECKPOINT_ID, name: CHECKPOINT_TITLE };
-  return SKILLS.find((s) => s.id === id);
+  const mod = moduleByCheckpoint(id);
+  if (mod) return { id: mod.checkpointId, name: mod.checkpointTitle };
+  return ALL_MODULE_SKILLS.find((s) => s.id === id);
 }
 export function allLessons(): Lesson[] {
-  return SKILLS.flatMap((s) => getLessons(s.id));
+  return ALL_MODULE_SKILLS.flatMap((s) => getLessons(s.id));
 }
 
 // ─── Pont compétence → fiche concept V5 ──────────────────────────────
@@ -604,9 +647,9 @@ export const DEMO_SKILL: Skill = SKILLS[0];
 export const DEMO_LESSONS: Lesson[] = getLessons('skill.actions');
 export const DEMO_EXERCISES: Exercise[] = getExercises('skill.actions');
 
-/** Progression par défaut : une entrée par compétence du module. */
+/** Progression par défaut : une entrée par compétence de CHAQUE module guidé. */
 export function defaultProgress(now: number): ProgressState {
-  const skills = Object.fromEntries(SKILLS.map((s) => [s.id, initialProgress(s.id, now)]));
+  const skills = Object.fromEntries(ALL_MODULE_SKILLS.map((s) => [s.id, initialProgress(s.id, now)]));
   return {
     onboarded: false,
     level: 1,

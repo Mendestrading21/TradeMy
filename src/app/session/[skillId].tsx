@@ -91,7 +91,7 @@ export default function Session() {
   // la MÊME liste) et avançant entre sessions — même après un échec (variantes différentes).
   const round = state?.rotation?.[resolvedId] ?? 0;
   const list = isCheckpoint(resolvedId)
-    ? checkpointExercises(round, 2)
+    ? checkpointExercises(resolvedId, round, 2)
     : rotateExercises(all, limitCount(all.length, target), round);
   const skillName = skillById(resolvedId)?.name ?? 'Session';
   const lessons = known ? getLessons(resolvedId) : [];

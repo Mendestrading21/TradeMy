@@ -23,7 +23,7 @@ import {
   worldEntryById,
   guidedModulesForWorld,
   buildWorldMap,
-  SKILLS,
+  skillById,
   conceptSlugForSkill,
   useProgress,
   type World,
@@ -33,6 +33,7 @@ import {
   type NodeStatus,
   type LearningConcept,
 } from '@/data';
+import type { Skill } from '@/engines/learning';
 import { analytics } from '@/analytics';
 import { useNow } from '@/lib/useNow';
 
@@ -327,7 +328,20 @@ export default function WorldDetail() {
     );
   }
 
-  const guidedMap = isGuided ? buildWorldMap(state, SKILLS, guidedModules[0].title, now) : null;
+  // LOT 4-M — carte pilotée par le module (registre canonique) : compétences + checkpoint PROPRES au
+  // monde, résolus depuis son descripteur `GUIDED_MODULES` (aucune dépendance au checkpoint Fondations).
+  const guided = guidedModules[0];
+  const moduleSkills: Skill[] = guided
+    ? guided.skillIds.map((sid) => skillById(sid)).filter((s): s is Skill => Boolean(s))
+    : [];
+  const guidedMap =
+    isGuided && guided
+      ? buildWorldMap(state, moduleSkills, guided.title, now, {
+          checkpointId: guided.checkpointId,
+          checkpointTitle: skillById(guided.checkpointId)?.name,
+          worldTitle: `Monde ${world.order} · ${world.title}`,
+        })
+      : null;
   const exploredSet = new Set(state.learning?.conceptsExplored ?? []);
   const statusKey = entry ? heroStatusKey(entry) : 'unlocked';
   const statusMeta = HERO_STATUS[statusKey];
@@ -381,7 +395,7 @@ export default function WorldDetail() {
         <View style={styles.section}>
           <SectionTitle icon="target" label="Ce que tu vas savoir faire" />
           <Card style={styles.objectives}>
-            {SKILLS.map((s) => (
+            {moduleSkills.map((s) => (
               <View key={s.id} style={styles.objectiveRow}>
                 <TrademyIcon name="chevron-right" size={16} color={theme.colors.primaryBright} strokeWidth={2.4} />
                 <Text variant="body" style={styles.flex1}>{s.name}</Text>

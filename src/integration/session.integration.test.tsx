@@ -344,8 +344,8 @@ describe('Écran de session RÉEL — parcours pilote de production', () => {
 
   it('checkpoint RÉEL : réussi → célébration proportionnelle ; échoué → aucune célébration', async () => {
     // Indépendance : la fenêtre du checkpoint tourne indépendamment de l'entraînement.
-    expect(checkpointExercises(0, 2)).not.toEqual(checkpointExercises(1, 2));
-    const cp = checkpointExercises(0, 2);
+    expect(checkpointExercises(CHECKPOINT_ID, 0, 2)).not.toEqual(checkpointExercises(CHECKPOINT_ID, 1, 2));
+    const cp = checkpointExercises(CHECKPOINT_ID, 0, 2);
     expect(new Set(cp.map((e) => e.skillId)).size).toBeGreaterThan(1); // agrège plusieurs compétences
 
     // ── Échec : tout faux → tier « à revoir », AUCUNE célébration. ──
@@ -514,7 +514,7 @@ describe('Écran de session RÉEL — parcours pilote de production', () => {
 
   it('reprise d’un CHECKPOINT interrompu : position exacte restaurée', async () => {
     routerState.params = { skillId: CHECKPOINT_ID };
-    const cp = checkpointExercises(0, 2);
+    const cp = checkpointExercises(CHECKPOINT_ID, 0, 2);
     let s = await mount();
     await answerCorrect(s.root, cp[0]);
     await tapText(s.root, 'Continuer'); // index → 1
