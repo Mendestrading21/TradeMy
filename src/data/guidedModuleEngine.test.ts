@@ -19,6 +19,10 @@ import {
   skillsForModule,
   buildWorldMap,
   SKILLS,
+  CANDLE_MODULE_ID,
+  CANDLE_CHECKPOINT_ID,
+  CANDLE_CHECKPOINT_TITLE,
+  CANDLE_SKILLS,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -101,5 +105,20 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     expect(cpNode.id).toBe(CHECKPOINT_ID);
     expect(cpNode.title).toBe(CHECKPOINT_TITLE);
     expect(m.worldTitle).toBe('Monde 1 · Fondations');
+  });
+
+  it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
+    // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID]);
+    expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
+    expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
+    expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
+    // La revue Chandeliers agrège des exercices des compétences du module (skillId réel conservé).
+    const cp = checkpointExercises(CANDLE_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    expect(cp.every((e) => e.skillId.startsWith('skill.candle.'))).toBe(true);
+    expect(skillsForModule(CANDLE_MODULE_ID).map((s) => s.id)).toEqual(CANDLE_SKILLS.map((s) => s.id));
+    // Le checkpoint Fondations validé n'affecte PAS le module Chandeliers (indépendance).
+    expect(checkpointExercises(CHECKPOINT_ID, 0, 2).every((e) => e.skillId.startsWith('skill.candle.'))).toBe(false);
   });
 });

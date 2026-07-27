@@ -16,6 +16,7 @@ import {
 import { WORLDS, conceptsByWorld } from './learningConcept';
 import { V5_CONCEPTS } from './learningContent';
 import { SKILLS, CHECKPOINT_ID } from './seed';
+import { CANDLE_SKILLS, CANDLE_CHECKPOINT_ID } from './candleModuleScenarios';
 
 const EMPTY: LearningProgressInput = { completedSkills: [], exploredSlugs: [] };
 const WORLD1_DONE: LearningProgressInput = {
@@ -26,15 +27,25 @@ const WORLD1_DONE: LearningProgressInput = {
 const foundations = WORLDS.find((w) => w.id === 'world.foundations')!;
 
 describe('learningMap — hiérarchie unique', () => {
-  it('un seul module guidé : monde 1 = 4 compétences + checkpoint', () => {
-    expect(GUIDED_MODULES).toHaveLength(1);
-    const m = GUIDED_MODULES[0];
-    expect(m.worldId).toBe('world.foundations');
-    expect(m.skillIds).toEqual(SKILLS.map((s) => s.id));
-    expect(m.checkpointId).toBe(CHECKPOINT_ID);
+  it('deux modules guidés : monde 1 (Fondations) et monde 3 (Chandeliers), chacun son checkpoint propre', () => {
+    expect(GUIDED_MODULES).toHaveLength(2);
+    const foundationsModule = GUIDED_MODULES.find((m) => m.worldId === 'world.foundations')!;
+    expect(foundationsModule).toBeDefined();
+    expect(foundationsModule.skillIds).toEqual(SKILLS.map((s) => s.id));
+    expect(foundationsModule.checkpointId).toBe(CHECKPOINT_ID);
+    const candlesModule = GUIDED_MODULES.find((m) => m.worldId === 'world.candles')!;
+    expect(candlesModule).toBeDefined();
+    expect(candlesModule.skillIds).toEqual(CANDLE_SKILLS.map((s) => s.id));
+    expect(candlesModule.checkpointId).toBe(CANDLE_CHECKPOINT_ID);
+    // Chaque monde guidé est reconnu ; les checkpoints sont PROPRES (jamais partagés).
     expect(isGuidedWorld('world.foundations')).toBe(true);
-    expect(isGuidedWorld('world.candles')).toBe(false);
+    expect(isGuidedWorld('world.candles')).toBe(true);
     expect(guidedModulesForWorld('world.foundations')).toHaveLength(1);
+    expect(guidedModulesForWorld('world.candles')).toHaveLength(1);
+    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(2);
+    // Les 13 autres mondes restent des collections de notions (aucun module guidé).
+    const guidedWorldIds = new Set(GUIDED_MODULES.map((m) => m.worldId));
+    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(13);
   });
 
   it('nouvel utilisateur : seul le monde 1 est ouvert (en cours), le reste verrouillé', () => {

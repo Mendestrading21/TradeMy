@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { offlineCapabilities } from './offline';
-import { SKILLS } from './seed';
+import { ALL_MODULE_SKILLS } from './seed';
 import { GLOSSARY_TERMS } from './glossary';
 import { BADGES } from './badges';
 import { V5_CONCEPTS } from './learningContent';
@@ -12,7 +12,7 @@ describe('offlineCapabilities', () => {
   const cap = offlineCapabilities();
 
   it('reflète le contenu réellement embarqué', () => {
-    expect(cap.skills).toBe(SKILLS.length);
+    expect(cap.skills).toBe(ALL_MODULE_SKILLS.length);
     expect(cap.glossaryTerms).toBe(GLOSSARY_TERMS.length);
     expect(cap.badges).toBe(BADGES.length);
   });

@@ -22,6 +22,8 @@ import type {
   OrderExercise,
   FindErrorExercise,
   PlaceInvalidationExercise,
+  IdentifyFigureExercise,
+  ScenarioExercise,
 } from './types';
 import { buildDirectionExercise } from './semanticExercise';
 
@@ -45,7 +47,12 @@ export type ScenarioInteraction =
   | 'label-extreme' // label_chart — reconnaître l'élément marqué = le plus haut (graphique)
   | 'place-extreme' // place_invalidation — PLACER une ligne au plus haut atteint (manipulation continue)
   | 'read-order' // order — ordonner la lecture (structurel)
-  | 'spot-false-signal'; // find_error — repérer l'affirmation fausse (structurel)
+  | 'spot-false-signal' // find_error — repérer l'affirmation fausse (structurel)
+  // ── LOT 4-M : interactions natives « figure de chandelier » (mappées sur des players EXISTANTS,
+  //    aucun nouveau primitif d'interface — une figure prédit rien sans contexte/confirmation/invalidation).
+  | 'identify-candle' // identify_figure — reconnaître UNE figure de chandelier rendue (sa forme)
+  | 'place-invalidation' // place_invalidation — PLACER le niveau d'invalidation (sous le plus bas atteint)
+  | 'read-scenario'; // scenario — conclure un scénario conditionnel (SI contexte … ALORS …)
 
 interface ScenarioBase {
   id: string;
@@ -58,6 +65,12 @@ interface ScenarioBase {
   rule?: string;
   /** Mise en garde (faux signal), indépendante de la vérité dérivée. */
   whenItFails?: string;
+  /**
+   * Résumé accessible EXPLICITE, pour les interactions dont la vérité n'est pas dérivable d'une série
+   * (figure isolée, scénario conditionnel). Rédigé honnêtement, il décrit ce que le lecteur d'écran
+   * doit entendre. Ignoré par les interactions graphiques (dérivées de la série réelle).
+   */
+  a11y?: string;
 }
 
 export interface DirectionScenario extends ScenarioBase {
@@ -94,13 +107,51 @@ export interface FalseSignalScenario extends ScenarioBase {
   errorIndex: number;
 }
 
+/** Reconnaître UNE figure de chandelier rendue par le moteur de visuels (déterministe). */
+export interface IdentifyCandleScenario extends ScenarioBase {
+  interaction: 'identify-candle';
+  /** Clé du dataset OHLC déterministe de la figure (source : visualDatasets). */
+  datasetKey: string;
+  /** Variant (= id de figure) pour résoudre le rendu. */
+  variant: string;
+  /** Type de rendu du moteur de visuels. */
+  visualType: 'candle-anatomy' | 'candlestick-pattern' | 'chart-pattern' | 'market-structure' | 'indicator';
+  options: string[];
+  /** Index de la bonne réponse (le nom de la figure montrée). */
+  correctIndex: number;
+}
+
+/**
+ * PLACER le niveau d'invalidation d'un scénario (sous le plus bas atteint de la série). 5e mécanique
+ * de placement, distincte de `place-extreme` (qui vise le plus HAUT) : ici la cible est le plus BAS
+ * réel de la série rendue → cohérente par construction. Player de production `place_invalidation`.
+ */
+export interface PlaceInvalidationScenario extends ScenarioBase {
+  interaction: 'place-invalidation';
+  chartSeed: number;
+}
+
+/** Conclure un scénario conditionnel (SI contexte … ALORS …). Player de production `scenario`. */
+export interface ReadScenarioScenario extends ScenarioBase {
+  interaction: 'read-scenario';
+  /** Le « SI » : le setup/contexte à évaluer. */
+  context: string;
+  /** Les issues possibles (« ALORS »). */
+  options: string[];
+  /** Index de la conclusion correcte. */
+  correctIndex: number;
+}
+
 export type LearningScenario =
   | DirectionScenario
   | ExtremeZoneScenario
   | LabelExtremeScenario
   | PlaceExtremeScenario
   | ReadOrderScenario
-  | FalseSignalScenario;
+  | FalseSignalScenario
+  | IdentifyCandleScenario
+  | PlaceInvalidationScenario
+  | ReadScenarioScenario;
 
 /** Le tiers temporel (0..2) qui contient le plus haut de la série. Vérité unique de la zone. */
 export function highestThird(candles: Candle[], thirds = 3): number {
@@ -144,11 +195,17 @@ export function scenarioA11ySummary(scenario: LearningScenario): string {
     case 'touch-extreme-zone':
     case 'label-extreme':
     case 'place-extreme':
+    case 'place-invalidation':
       return describeCandles(generateCandles(scenario.chartSeed, SCENARIO_CANDLE_COUNT));
     case 'read-order':
       return `Étapes à ordonner : ${scenario.steps.join(' ; ')}.`;
     case 'spot-false-signal':
       return `Affirmations à évaluer : ${scenario.statements.join(' ; ')}.`;
+    case 'identify-candle':
+      // Figure isolée : le résumé décrit honnêtement la forme rendue (fourni par la donnée).
+      return scenario.a11y ?? `Figure de chandelier à reconnaître parmi : ${scenario.options.join(' ; ')}.`;
+    case 'read-scenario':
+      return scenario.a11y ?? `Contexte : ${scenario.context} Conclusions possibles : ${scenario.options.join(' ; ')}.`;
   }
 }
 
@@ -301,6 +358,83 @@ export function buildScenarioExercise(scenario: LearningScenario): Exercise {
       };
       return ex;
     }
+
+    case 'identify-candle': {
+      // Reconnaissance de figure : la bonne réponse est le nom de la figure réellement rendue
+      // (datasetKey + variant). Le feedback nomme cette figure ; l'a11y décrit sa forme.
+      const answer = scenario.options[scenario.correctIndex];
+      const ex: IdentifyFigureExercise = {
+        id: scenario.id,
+        type: 'identify_figure',
+        skillId: scenario.skillId,
+        target: scenario.target,
+        prompt: scenario.prompt,
+        datasetKey: scenario.datasetKey,
+        variant: scenario.variant,
+        visualType: scenario.visualType,
+        options: [...scenario.options],
+        validation: { correctIndex: scenario.correctIndex },
+        difficulty: scenario.difficulty ?? 'medium',
+        accessibilitySummary,
+        feedback: {
+          correct: `Exact : c’est « ${answer} », reconnu à sa forme.`,
+          incorrect: `La figure montrée est « ${answer} » : compare le corps, les mèches et leur position.`,
+          rule: scenario.rule ?? 'On reconnaît une figure à sa forme (corps, mèches, position), pas à ce qu’elle « annoncerait ».',
+          whenItFails: scenario.whenItFails ?? 'Reconnaître une figure ne prédit pas la suite : seuls le contexte et la confirmation décident.',
+        },
+      };
+      return ex;
+    }
+
+    case 'place-invalidation': {
+      // Niveau d'invalidation = le plus BAS réel de la série rendue (sous lequel le scénario tombe).
+      // Cohérent par construction ; tolérance = 8 % de l'amplitude. Distinct de `place-extreme` (haut).
+      const candles = generateCandles(scenario.chartSeed, SCENARIO_CANDLE_COUNT);
+      const targetPrice = lowestLow(candles);
+      const tolerance = (highestHigh(candles) - lowestLow(candles)) * 0.08;
+      const ex: PlaceInvalidationExercise = {
+        id: scenario.id,
+        type: 'place_invalidation',
+        skillId: scenario.skillId,
+        target: scenario.target,
+        prompt: scenario.prompt,
+        chartSeed: scenario.chartSeed,
+        hint: 'le plus bas atteint (le plancher de la période)',
+        validation: { targetPrice, tolerance },
+        difficulty: scenario.difficulty ?? 'medium',
+        accessibilitySummary,
+        feedback: {
+          correct: `Bien vu : l’invalidation se pose sous le plus bas atteint (le plancher). ${accessibilitySummary}`,
+          incorrect: `L’invalidation se situe sous le plus bas atteint (le plancher), pas au milieu : descends ta ligne jusque-là. ${accessibilitySummary}`,
+          rule: scenario.rule ?? 'L’invalidation est le niveau qui, franchi, annule le scénario : sous le plus bas de la figure.',
+          whenItFails: scenario.whenItFails ?? 'Une invalidation trop serrée saute au moindre bruit ; trop large, elle ne protège plus.',
+        },
+      };
+      return ex;
+    }
+
+    case 'read-scenario': {
+      const answer = scenario.options[scenario.correctIndex];
+      const ex: ScenarioExercise = {
+        id: scenario.id,
+        type: 'scenario',
+        skillId: scenario.skillId,
+        target: scenario.target,
+        prompt: scenario.prompt,
+        context: scenario.context,
+        options: [...scenario.options],
+        validation: { correctIndex: scenario.correctIndex },
+        difficulty: scenario.difficulty ?? 'medium',
+        accessibilitySummary,
+        feedback: {
+          correct: `Exact : ${answer}`,
+          incorrect: `Dans ce contexte, la bonne conclusion est : ${answer}`,
+          rule: scenario.rule ?? 'Un scénario se conclut sur une CONDITION vérifiée (confirmation), jamais sur une certitude.',
+          whenItFails: scenario.whenItFails ?? 'Sans la condition (confirmation ou invalidation), le scénario reste une hypothèse.',
+        },
+      };
+      return ex;
+    }
   }
 }
 
@@ -319,7 +453,12 @@ export const DIRECTION_INDEX_BY_TREND = DIRECTION_INDEX;
 
 /** Mêmes bougies que celles rendues par les players d'un scénario graphique (tests de cohérence). */
 export function scenarioCandles(
-  scenario: DirectionScenario | ExtremeZoneScenario | LabelExtremeScenario | PlaceExtremeScenario,
+  scenario:
+    | DirectionScenario
+    | ExtremeZoneScenario
+    | LabelExtremeScenario
+    | PlaceExtremeScenario
+    | PlaceInvalidationScenario,
 ): Candle[] {
   return generateCandles(scenario.chartSeed, SCENARIO_CANDLE_COUNT);
 }

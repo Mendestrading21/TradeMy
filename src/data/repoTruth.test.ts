@@ -7,7 +7,7 @@ import {
   allExercisesFlat,
   allLessonsFlat,
 } from './repoTruth';
-import { SKILLS, getLessons, getExercises, CONCEPT_BY_SKILL } from './seed';
+import { ALL_MODULE_SKILLS, getLessons, getExercises, CONCEPT_BY_SKILL } from './seed';
 import { V5_CONCEPTS } from './learningContent';
 import { BADGES } from './badges';
 import { WORLDS, CATEGORIES } from './learningConcept';
@@ -28,7 +28,8 @@ describe('repoTruth — vérité du dépôt', () => {
   it('les compteurs reflètent exactement les registres du code', () => {
     const t = repoTruth();
     expect(t.concepts).toBe(V5_CONCEPTS.length);
-    expect(t.skills).toBe(SKILLS.length);
+    // LOT 4-M : les compteurs couvrent TOUS les modules guidés (Fondations + Chandeliers).
+    expect(t.skills).toBe(ALL_MODULE_SKILLS.length);
     expect(t.lessons).toBe(allLessonsFlat().length);
     expect(t.exercises).toBe(allExercisesFlat().length);
     expect(t.glossaryTerms).toBe(GLOSSARY_TERMS.length);
@@ -41,7 +42,7 @@ describe('repoTruth — vérité du dépôt', () => {
 
   it('aucun doublon d’identifiant/slug (unicité)', () => {
     expect(dupes(V5_CONCEPTS.map((c) => c.slug))).toEqual([]);
-    expect(dupes(SKILLS.map((s) => s.id))).toEqual([]);
+    expect(dupes(ALL_MODULE_SKILLS.map((s) => s.id))).toEqual([]);
     expect(dupes(BADGES.map((b) => b.id))).toEqual([]);
     expect(dupes(GLOSSARY_TERMS.map((g) => g.slug))).toEqual([]);
     expect(dupes(WORLDS.map((w) => w.id))).toEqual([]);
@@ -62,19 +63,21 @@ describe('repoTruth — vérité du dépôt', () => {
 
   it('intégrité du parcours : chaque compétence a leçon + exercices ; les liens concept résolvent', () => {
     const slugs = new Set(V5_CONCEPTS.map((c) => c.slug));
-    for (const s of SKILLS) {
+    // Toutes les compétences des modules guidés (Fondations + Chandeliers) ont leçon + exercices.
+    for (const s of ALL_MODULE_SKILLS) {
       expect(getExercises(s.id).length).toBeGreaterThan(0);
       expect(getLessons(s.id).length).toBeGreaterThan(0);
     }
     for (const [skillId, slug] of Object.entries(CONCEPT_BY_SKILL)) {
-      expect(SKILLS.some((s) => s.id === skillId)).toBe(true);
+      expect(ALL_MODULE_SKILLS.some((s) => s.id === skillId)).toBe(true);
       expect(slugs.has(slug)).toBe(true);
     }
   });
 
   it('pins structurels (un changement = un lot dédié, pas une dérive)', () => {
     // Compteurs structurels stables : leur évolution passe par un lot explicite du programme.
-    expect(REPO_TRUTH.skills).toBe(4);
+    // LOT 4-M : 4 compétences Fondations + 4 compétences Chandeliers = 8 (2e module guidé réel).
+    expect(REPO_TRUTH.skills).toBe(8);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);
