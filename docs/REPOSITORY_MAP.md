@@ -10,6 +10,8 @@ comme historique jusqu’à preuve du contraire.
 | `src/characters/` | Toto/Bobo et motion | Utiliser seulement les assets runtime documentés |
 | `src/engines/` | Logique pure apprentissage/exercices/visuels | Tester avant câblage UI |
 | `src/data/learningContent.ts` | Composition canonique du contenu rendu | `V5_CONCEPTS` alimente l’app |
+| `src/data/seed.ts` | Registre canonique `CONTENT_MODULES` des modules guidés | Ajouter un module guidé = une entrée + son contenu |
+| `src/data/pilotScenarios.ts`, `src/data/candleModuleScenarios.ts` | Sources de scénario uniques des modules guidés | Un item = un `LearningScenario` (visuel = réponse = feedback = a11y) |
 | `src/data/repoTruth.ts` | Compteurs dérivés | Ne jamais recopier des nombres dans la doc |
 | `content/drafts/` | File éditoriale JSON | `needsReview`, jamais publiée automatiquement |
 | `content/published/` | Exemples/pipeline JSON historique | Pas le registre runtime actuel |

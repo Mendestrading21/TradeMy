@@ -185,6 +185,26 @@ Achève l'architecture par cible (ADR-094). Change le modèle **persisté** → 
 - **Preuve CI** ✅ : `ci.yml` exécute la gate sur chaque pull request vers `main` (npm ci · git diff
   --check · npm run check) ; déploiement réservé à `main`.
 
+## Modules guidés — 2e module réel (LOT 4-M, branche `feat/trademy-lot4m-guided-candles`)
+
+Le parcours passe de **un** module guidé (Fondations) à **deux** : `world.candles` (monde 3) devient un
+module guidé complet, dérivé du **registre canonique unique** `CONTENT_MODULES` (aucune seconde vérité).
+Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fondations est inchangé.
+
+- **Module « Lire les chandeliers »** ✅ : 4 compétences atomiques → concepts réels de `world.candles`
+  (marubozu, marteau, doji, avalement haussier) ; checkpoint **propre** `checkpoint.candles`.
+- **Source de scénario unique** ✅ : 16 exercices dérivés de `candleModuleScenarios.ts` (visuel = réponse
+  = feedback = a11y) ; 3 interactions natives « figure » mappées sur des players **existants**
+  (`identify_figure`, `place_invalidation`, `scenario`) — aucun nouveau primitif.
+- **Objectifs réels** ✅ : dérivés des champs du concept ; le doji, sans invalidation documentée, n'a
+  aucun exercice d'invalidation (honnêteté du modèle). Statuts éditoriaux inchangés (`needsReview`).
+- **Compteurs honnêtes** ✅ : `repoTruth`/`offline` couvrent tous les modules guidés (compétences 4 → 8) ;
+  routes `/session/*` pré-générées pour toutes les compétences + checkpoints (liens directs stables).
+- **Vérité pédagogique préservée** ✅ : prouvée de bout en bout sur les écrans réels (session + fiche du
+  monde 3) — 1 transition/cible, cible échouée due, aucune maîtrise prématurée, reprise idempotente.
+
+> **LOT 4-M — livré en PR (draft), non fusionné, non déployé.** Ne pas fusionner sans validation humaine.
+
 ## Gate canonique
 
 ```bash

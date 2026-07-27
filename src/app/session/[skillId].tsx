@@ -14,8 +14,8 @@ import {
   rotateExercises,
   checkpointExercises,
   isCheckpoint,
-  SKILLS,
-  CHECKPOINT_ID,
+  ALL_MODULE_SKILLS,
+  CONTENT_MODULES,
   isFalseSignalExercise,
   useProgress,
   buildSessionSummary,
@@ -38,12 +38,16 @@ import { analytics } from '@/analytics';
 import { useNow } from '@/lib/useNow';
 
 /**
- * Pré-génère un fichier HTML CONCRET par session connue (skill.* + checkpoint). GitHub Pages sert
- * alors `session/skill.candles.html` directement au lieu du repli `404.html` (l'accueil), ce qui
- * supprime la divergence d'hydratation React #418 sur les liens directs vers les routes dynamiques.
+ * Pré-génère un fichier HTML CONCRET par session connue : TOUTES les compétences des modules guidés
+ * (Fondations + Chandeliers, LOT 4-M) ET tous les checkpoints. GitHub Pages sert alors
+ * `session/skill.candle.pressure.html` (et `session/checkpoint.candles.html`) directement au lieu du
+ * repli `404.html`, ce qui supprime la divergence d'hydratation React #418 sur les liens directs.
  */
 export async function generateStaticParams(): Promise<{ skillId: string }[]> {
-  return [...SKILLS.map((s) => ({ skillId: s.id })), { skillId: CHECKPOINT_ID }];
+  return [
+    ...ALL_MODULE_SKILLS.map((s) => ({ skillId: s.id })),
+    ...CONTENT_MODULES.map((m) => ({ skillId: m.checkpointId })),
+  ];
 }
 
 /**
