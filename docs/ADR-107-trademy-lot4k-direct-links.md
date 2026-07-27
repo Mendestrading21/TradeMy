@@ -1,9 +1,10 @@
 # ADR-107 — LOT 4-K : robustesse des liens directs de contenu (suppression du React #418)
 
-- **Statut** : proposé — LOT 4-K, lot de **robustesse** (correctness), consécutif au LOT 4-J (ADR-106) qui
+- **Statut** : accepté — LOT 4-K, lot de **robustesse** (correctness), consécutif au LOT 4-J (ADR-106) qui
   refondait la présentation de la fiche concept et documentait la limite « React #418 sur deep-link
-  direct » comme à traiter hors de son périmètre. **PR en BROUILLON**, en attente de validation humaine
-  et de CI verte ; passera à « accepté » à la validation.
+  direct » comme à traiter hors de son périmètre. **PR #21 fusionnée** dans `main` (squash, commit
+  `b35a95f`) après validation humaine, CI verte et déploiement Pages. Le même garde-fou de génération
+  statique est réutilisé pour la fiche Monde canonique au LOT 4-L ([ADR-108](./ADR-108-trademy-lot4l-world-canon.md)).
 - **Contexte** : les routes dynamiques de **contenu** `/concept/[slug]` (`src/app/concept/[slug].tsx`) et
   `/glossaire/[slug]` (`src/app/glossaire/[slug].tsx`) émettaient une divergence d'hydratation **React #418**
   lors d'un **accès direct** ou d'un **rechargement** (deep-link), alors que la navigation in-app (SPA) était
