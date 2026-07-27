@@ -59,7 +59,9 @@ export type TrademyIconName =
   | 'psychology'
   // LOT 4-B — application Accueil (canon TradeMy Learning Glass, géométrie originale)
   | 'timer'
-  | 'coin';
+  | 'coin'
+  // LOT 4-M — signature ORIGINALE du monde Chandeliers (motif de 4 bougies, corps + mèches)
+  | 'candles';
 
 type Parts = { color: string; sw: number };
 
@@ -391,6 +393,21 @@ const ICONS: Record<TrademyIconName, (p: Parts) => ReactNode> = {
       <Circle cx="12" cy="12" r="8" {...stroke(color, sw)} />
       <Circle cx="12" cy="12" r="4.6" {...stroke(color, sw)} />
       <Line x1="12" y1="9.6" x2="12" y2="14.4" {...stroke(color, sw)} />
+    </>
+  ),
+  candles: ({ color, sw }) => (
+    // Signature du monde Chandeliers : QUATRE bougies (corps ajourés + mèches fines), hauteurs
+    // alternées formant un rythme d'onde. Motif ORIGINAL, monochrome, lisible de 16 à 64 px ;
+    // aucune direction/valeur de marché n'est impliquée (pure identité de monde).
+    <>
+      <Line x1="5" y1="7" x2="5" y2="18" {...stroke(color, sw)} />
+      <Rect x="3.7" y="10" width="2.6" height="5" rx="0.6" {...stroke(color, sw)} />
+      <Line x1="10" y1="4.5" x2="10" y2="16" {...stroke(color, sw)} />
+      <Rect x="8.7" y="7" width="2.6" height="6.5" rx="0.6" {...stroke(color, sw)} />
+      <Line x1="14.5" y1="8" x2="14.5" y2="19.5" {...stroke(color, sw)} />
+      <Rect x="13.2" y="11" width="2.6" height="5.5" rx="0.6" {...stroke(color, sw)} />
+      <Line x1="19" y1="6" x2="19" y2="16" {...stroke(color, sw)} />
+      <Rect x="17.7" y="8.5" width="2.6" height="5" rx="0.6" {...stroke(color, sw)} />
     </>
   ),
 };

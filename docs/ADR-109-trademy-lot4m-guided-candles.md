@@ -106,6 +106,48 @@ Aucune. Les nouvelles compétences/checkpoints sont des clés supplémentaires d
 - Gate `EXPO_NO_TELEMETRY=1 npm run check` verte (lint, typecheck, jest, validate:content, release:check,
   build:web). Captures Chromium déterministes sous `docs/lot4m-captures/`.
 
+## Direction visuelle et moodboard (complément LOT 4-M)
+Le moodboard (16 images d'intention) n'a servi que de référence : **aucune image de référence n'entre
+dans le dépôt** (garde-fou exécutable dans `candleVisualDirection.test.ts`).
+
+- **Principes retenus** : interface sombre premium (fond noir bleuté, surfaces anthracite) ; graphiques
+  pédagogiques en SVG/primitives exactes dérivés des OHLC ; hiérarchie typographique forte ; états
+  portés par icône **+** couleur (jamais la couleur seule) ; profondeur légère par cartes à bord fin.
+- **Principes volontairement écartés** : aucune perspective 3D sur un graphique (fausserait la lecture) ;
+  aucun néon permanent ; aucune reproduction de widgets/packs de référence ; **aucune icône générique**
+  imposée à la place d'une figure réelle ; **aucun nouveau primitif d'interaction** (les players existants
+  couvrent reconnaissance / réorganisation / placement continu / raisonnement conditionnel / faux signal —
+  la « reconstruction » est servie par le placement accessible d'un extrême OHLC, avec alternative
+  clavier ↑/↓ et tactile ; la règle « au plus un nouveau primitif, seulement si indispensable » aboutit à
+  zéro nouveau primitif).
+- **Composants/SVG originaux créés** : `TrademyIcon` `candles` — **signature du monde Chandeliers**, motif
+  de **quatre bougies** (corps ajourés + mèches fines, hauteurs alternées), monochrome, lisible de 16 à
+  64 px, dans le système d'icônes interne. Rendu comme marque d'identité du monde 3 sur l'en-tête de la
+  fiche Monde (accent violet de marque).
+- **Signature Chandeliers** : même géométrie quel que soit l'état ; l'état reste porté séparément (puce
+  de statut icône+libellé, trail, prochaine étape), jamais par la seule couleur de la signature.
+- **Usage exact des couleurs** : violet = marque / CTA / progression (signature, boutons, barre) ; vert
+  et rouge = marché (bougies, « hausse/baisse » toujours accompagnés d'un libellé) ; cyan = annotation
+  (cadre « SI… » du scénario de contexte) ; **or = uniquement le checkpoint** (accessible ou réussi) ;
+  aucune couleur codée en dur dans le module (tokens seulement, vérifié par test).
+- **Reduced motion** : réutilise le système d'animation existant ; sous `prefers-reduced-motion` les
+  translations/oscillations/zooms décoratifs sont supprimés, l'état final s'affiche immédiatement, et
+  toute l'information (sélection, annotations, figures) reste présente (capture `candle-fiche-reduced-390`).
+- **Assets et licences** : aucune image raster, aucune URL distante, aucune police ajoutée, aucun emoji
+  fonctionnel dans le module (garde-fous `candleVisualDirection.test.ts` + `icons.test.ts` + garde emoji
+  unique du projet). Les captures QA (`docs/lot4m-captures/`) sont des PNG générés, jamais embarqués.
+- **Captures inspectées (12)** : `candle-fiche-390` (signature + module), `candle-fiche-320`,
+  `candle-fiche-web`, `candle-fiche-reduced-390`, `candle-checkpoint-available-390` (or réservé au
+  checkpoint), `candle-review-390` (« à réviser »), `candle-lesson-anatomy-390` (leçon), `candle-context-390`
+  (scénario, cadre cyan « SI… »), `candle-feedback-correct-390`, `candle-feedback-bobo-390` (misconception
+  Bobo, réponse marquée par icône+couleur), `candle-reconstruct-place-390` (placement d'extrême OHLC,
+  clavier ↑/↓), `candle-checkpoint-390` (revue en pratique). Zéro erreur console/page, zéro débordement
+  horizontal, OHLC exacts, focus/CTA lisibles.
+- **Défaut trouvé puis corrigé** : le pilotage Chromium des sessions échouait à franchir l'étape
+  « résumé » de la leçon (sélection par texte ambiguë en RN-web) ; corrigé en ciblant le bouton
+  accessible (`getByRole('button')`), rendant les 12 captures déterministes.
+
 ## Portée
 Aucune dépendance ajoutée ; `package.json` et le lockfile inchangés. Fondations et les 13 autres mondes
-inchangés. Aucun push/fusion/déploiement sans autorisation explicite.
+inchangés. Le complément « direction visuelle » reste limité à `world.candles` et à l'ajout d'une seule
+icône de signature dans le système existant. Aucun push/fusion/déploiement sans autorisation explicite.

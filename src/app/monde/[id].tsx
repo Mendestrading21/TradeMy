@@ -112,6 +112,15 @@ function nodeStatusText(node: MapNode): string {
   }
 }
 
+/**
+ * Signature graphique ORIGINALE d'un monde (identité, pas un statut). LOT 4-M : le monde Chandeliers
+ * porte le motif `candles` (quatre bougies). Les autres mondes n'ont pas encore de signature dédiée ;
+ * la carte est prête à en accueillir sans changer le rendu (aucune icône générique imposée ailleurs).
+ */
+const WORLD_SIGNATURE: Record<string, TrademyIconName> = {
+  'world.candles': 'candles',
+};
+
 // ─── Prochaine étape : DÉRIVÉE de l'état réel, jamais codée en dur ───────────────────────────────
 type NextStepKind = 'lesson' | 'continue' | 'review' | 'checkpoint' | 'explore' | 'next-world' | 'parcours' | 'soon';
 interface NextStep {
@@ -303,10 +312,22 @@ export default function WorldDetail() {
   const isGuided = guidedModules.length > 0;
   const concepts = conceptsByWorld(V5_CONCEPTS, worldId);
 
+  const signatureIcon = WORLD_SIGNATURE[worldId];
   const heroLabel = (
-    <Text variant="label" color={theme.colors.textMuted}>
-      MONDE {world.order} / {WORLDS.length}
-    </Text>
+    <View style={styles.heroEyebrow}>
+      {signatureIcon ? (
+        <TrademyIcon
+          name={signatureIcon}
+          size={22}
+          color={theme.colors.primaryBright}
+          strokeWidth={2}
+          title={`Signature du monde ${world.title}`}
+        />
+      ) : null}
+      <Text variant="label" color={theme.colors.textMuted}>
+        MONDE {world.order} / {WORLDS.length}
+      </Text>
+    </View>
   );
 
   // Monde verrouillé : raison réelle + retour, sans dévoiler le contenu ni proposer d'étape ouvrable.
@@ -632,6 +653,7 @@ function ConceptList({
 const RAIL_W = 52;
 const styles = StyleSheet.create({
   hero: { gap: theme.spacing.xs },
+  heroEyebrow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   heroStatusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, marginTop: theme.spacing.xs },
   section: { gap: theme.spacing.sm },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },

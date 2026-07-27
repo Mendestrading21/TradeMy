@@ -46,6 +46,11 @@ describe('Système d’icônes Trademy', () => {
     }
   });
 
+  it('LOT 4-M — signature ORIGINALE du monde Chandeliers (motif de bougies dans le système d’icônes)', () => {
+    // La signature du monde Chandeliers est un vecteur du système interne (jamais une image importée).
+    expect(TRADEMY_ICON_NAMES).toContain('candles');
+  });
+
   it('LOT 4-A — la direction de marché n’emprunte pas l’icône de progression pédagogique', () => {
     // `progression` reste un glyphe d'APPRENTISSAGE ; les directions ont leurs propres flèches neutres.
     expect(TRADEMY_ICON_NAMES).toContain('progression');
