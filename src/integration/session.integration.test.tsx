@@ -241,12 +241,18 @@ async function answerWrong(root: ReactTestInstance, ex: Exercise): Promise<void>
   }
 }
 /**
- * Le résultat de production affiche-t-il la CÉLÉBRATION ? Depuis LOT 4-A, la célébration est portée
- * par la SCÈNE DE PERSONNAGE accessible (état `celebrate-*`), et non plus par une figure PNG (l'asset
- * « celebrate » portait un damier de transparence et a été retiré). On lit donc l'état de mascotte.
+ * Le résultat de production affiche-t-il la CÉLÉBRATION ? Elle est portée par la SCÈNE DE
+ * PERSONNAGE accessible (état `celebrate-*`) et, depuis le LOT V2, doublée de la FIGURE 3D duo
+ * « celebrate » (asset réparé — damier retiré des pixels), décorative, en cas de réussite seule.
  */
 function hasCelebration(root: ReactTestInstance): boolean {
   return mascotStates(root).some((s) => s.startsWith('celebrate'));
+}
+/** La figure 3D duo « celebrate » (décorative) est-elle rendue sur l'écran de résultat ? */
+function hasCelebrateFigure(root: ReactTestInstance): boolean {
+  return root
+    .findAll((n) => typeof n.props?.name === 'string' && typeof n.props?.gesture === 'string', { deep: true })
+    .some((n) => n.props.name === 'celebrate' && n.props.gesture === 'celebrate');
 }
 /** États de mascotte rendus par les scènes de production (lecture du prop `state`). */
 function mascotStates(root: ReactTestInstance): string[] {
@@ -358,7 +364,8 @@ describe('Écran de session RÉEL — parcours pilote de production', () => {
       await answerWrong(s.root, cp[i]);
       await tapText(s.root, i + 1 >= cp.length ? 'Voir mon résultat' : 'Continuer');
     }
-    expect(hasCelebration(s.root)).toBe(false); // échec → pas de MascotFigure « celebrate »
+    expect(hasCelebration(s.root)).toBe(false); // échec → pas de célébration
+    expect(hasCelebrateFigure(s.root)).toBe(false); // …ni de figure 3D duo (jamais en échec)
     expect(mascotStates(s.root)).not.toContain('celebrate-big');
     s.unmount();
 
@@ -371,6 +378,7 @@ describe('Écran de session RÉEL — parcours pilote de production', () => {
       await tapText(s.root, i + 1 >= cp.length ? 'Voir mon résultat' : 'Continuer');
     }
     expect(hasCelebration(s.root)).toBe(true); // réussite → célébration rendue
+    expect(hasCelebrateFigure(s.root)).toBe(true); // …avec la figure 3D duo (LOT V2)
     expect(mascotStates(s.root)).toContain('celebrate-big'); // proportionnelle (checkpoint réussi)
     s.unmount();
   });
