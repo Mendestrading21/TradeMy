@@ -32,6 +32,9 @@ import {
   ANATOMY_MODULE_ID,
   ANATOMY_CHECKPOINT_ID,
   ANATOMY_CHECKPOINT_TITLE,
+  PATTERNS_MODULE_ID,
+  PATTERNS_CHECKPOINT_ID,
+  PATTERNS_CHECKPOINT_TITLE,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -118,7 +121,7 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
 
   it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
     // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
-    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID]);
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID, PATTERNS_MODULE_ID]);
     expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
     expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
     expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
@@ -160,5 +163,15 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     const cp = checkpointExercises(ANATOMY_CHECKPOINT_ID, 0, 2);
     expect(cp.length).toBeGreaterThan(0);
     expect(cp.every((e) => e.skillId.startsWith('skill.anatomy.'))).toBe(true);
+  });
+
+  it('module RÉEL Figures (LOT 4-Q) : 6e module, checkpoint PROPRE, distinct du skill.patterns Fondations', () => {
+    expect(isCheckpoint(PATTERNS_CHECKPOINT_ID)).toBe(true);
+    expect(skillById(PATTERNS_CHECKPOINT_ID)).toEqual({ id: PATTERNS_CHECKPOINT_ID, name: PATTERNS_CHECKPOINT_TITLE });
+    const cp = checkpointExercises(PATTERNS_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    // Compétences du MODULE (skill.patterns.*), jamais l'ancien skill Fondations `skill.patterns`.
+    expect(cp.every((e) => e.skillId.startsWith('skill.patterns.'))).toBe(true);
+    expect(cp.some((e) => e.skillId === 'skill.patterns')).toBe(false);
   });
 });

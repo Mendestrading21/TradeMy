@@ -57,6 +57,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | 3e module guidé « Lire la structure » (`world.structure`) : 4 compétences → concepts réels (HH/HL, LH/LL, range, BOS), source de scénario unique, placement de plancher honnête (uptrend seul), checkpoint propre, compteurs à 12 compétences (LOT 4-N) | [ADR-111](./ADR-111-trademy-lot4n-guided-structure.md) |
 | 4e module guidé « Lire les niveaux » (`world.support-resistance`) : 3 compétences → 3 concepts réels (zones, flip, retest — 3 objectifs seulement pour le retest, honnêteté du modèle), checkpoint propre, compteurs à 15 compétences (LOT 4-O) | [ADR-112](./ADR-112-trademy-lot4o-guided-sr.md) |
 | 5e module guidé « Lire un graphique de près » (`world.anatomy`) : mondes 1-5 = préfixe entièrement guidé ; le monde 2 se termine par la PREUVE (plus par la lecture) ; tests « monde de contenu » rebasés dynamiquement ; compteurs à 18 compétences (LOT 4-P) | [ADR-113](./ADR-113-trademy-lot4p-guided-anatomy.md) |
+| 6e module guidé « Lire les figures » (`world.patterns`) : 4 familles → concepts réels (double creux, triangle ascendant, drapeau, ÉTÉ), placements de plancher honnêtes (double + drapeau seuls), checkpoint propre distinct du skill Fondations, préfixe 1..6, compteurs à 22 compétences (LOT 4-Q) | [ADR-114](./ADR-114-trademy-lot4q-guided-patterns.md) |
 
 ## Fondations toujours actives
 

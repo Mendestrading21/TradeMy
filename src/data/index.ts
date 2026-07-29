@@ -4,6 +4,7 @@ export * from './candleModuleScenarios';
 export * from './structureModuleScenarios';
 export * from './srModuleScenarios';
 export * from './anatomyModuleScenarios';
+export * from './patternsModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';
