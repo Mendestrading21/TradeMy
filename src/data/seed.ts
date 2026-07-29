@@ -144,6 +144,17 @@ import {
   WYCKOFF_SKILL_CONCEPT_ID,
   WYCKOFF_SKILL_CONCEPT_SLUG,
 } from './wyckoffModuleScenarios';
+import {
+  OPTIONS_SKILLS,
+  OPTIONS_MODULE_ID,
+  OPTIONS_MODULE_TITLE,
+  OPTIONS_MODULE_WORLD_ID,
+  OPTIONS_CHECKPOINT_ID,
+  OPTIONS_CHECKPOINT_TITLE,
+  OPTIONS_MODULE_EXERCISES_BY_SKILL,
+  OPTIONS_SKILL_CONCEPT_ID,
+  OPTIONS_SKILL_CONCEPT_SLUG,
+} from './optionsModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1428,6 +1439,53 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-Y — Module guidé « Lire les payoffs d'options » (world.options) ─
+  'skill.options.call': [
+    {
+      id: 'lesson.options-call',
+      slug: 'option-call-lecture',
+      title: 'Le call : un droit, une prime, un seuil',
+      skillId: 'skill.options.call',
+      objective: 'Lire le payoff d’un call : perte bornée à la prime, seuil au strike + prime.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Un call est un DROIT d’acheter à un prix fixé (le strike), contre une prime payée. Un droit — jamais une obligation.' },
+        { id: 's1', kind: 'observe', body: 'Lis le diagramme de payoff : plat sous le strike (perte = prime), croissant au-delà, avec un seuil de rentabilité.' },
+        { id: 's2', kind: 'visual', conceptRef: 'option-call' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'option-call', body: 'La perte est bornée à la prime AVANT même de commencer ; le scénario ne devient gagnant qu’au-delà du strike + prime, à l’échéance.' },
+        { id: 's4', kind: 'falseSignal', body: 'Oublier l’effet du temps est le piège classique : une option perd de la valeur en approchant de l’échéance.' },
+        { id: 's5', kind: 'summary', body: 'Call = droit d’acheter au strike ; perte max = prime ; seuil = strike + prime ; le temps érode la valeur.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Quelle est la perte maximale d’un call ?', back: 'La prime payée — le droit expire sans valeur sous le strike à l’échéance.' } },
+      ],
+      commonMistake: 'Oublier que le temps érode la valeur d’une option.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.options.put': [
+    {
+      id: 'lesson.options-put',
+      slug: 'option-put-lecture',
+      title: 'Le put : le miroir du call',
+      skillId: 'skill.options.put',
+      objective: 'Lire le payoff d’un put, miroir du call : seuil au strike − prime.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Un put est un DROIT de vendre à un prix fixé (le strike), contre une prime payée : le miroir exact du call.' },
+        { id: 's1', kind: 'observe', body: 'Lis le diagramme de payoff : croissant sous le strike, plat au-dessus (perte = prime) — l’image inversée du call.' },
+        { id: 's2', kind: 'visual', conceptRef: 'option-put' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'option-put', body: 'Le put prend de la valeur quand le prix baisse ; le seuil de rentabilité est au strike MOINS la prime, à l’échéance.' },
+        { id: 's4', kind: 'falseSignal', body: 'Ignorer l’érosion de la valeur temps à l’approche de l’échéance est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Put = droit de vendre au strike ; perte max = prime ; seuil = strike − prime ; même érosion du temps que le call.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Quand un put expire-t-il sans valeur ?', back: 'Au-dessus du strike à l’échéance — la perte est limitée à la prime.' } },
+      ],
+      commonMistake: 'Ignorer l’érosion de la valeur temps à l’approche de l’échéance.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1556,6 +1614,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   // LOT 4-X — module guidé Wyckoff : exercices dérivés des scénarios (source unique).
   'skill.wyckoff.accumulation': WYCKOFF_MODULE_EXERCISES_BY_SKILL['skill.wyckoff.accumulation'],
   'skill.wyckoff.distribution': WYCKOFF_MODULE_EXERCISES_BY_SKILL['skill.wyckoff.distribution'],
+  // LOT 4-Y — module guidé Options : exercices dérivés des scénarios (source unique).
+  'skill.options.call': OPTIONS_MODULE_EXERCISES_BY_SKILL['skill.options.call'],
+  'skill.options.put': OPTIONS_MODULE_EXERCISES_BY_SKILL['skill.options.put'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1582,6 +1643,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...PSYCHOLOGY_SKILL_CONCEPT_ID,
   ...SMC_SKILL_CONCEPT_ID,
   ...WYCKOFF_SKILL_CONCEPT_ID,
+  ...OPTIONS_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1810,6 +1872,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: WYCKOFF_CHECKPOINT_ID,
     checkpointTitle: WYCKOFF_CHECKPOINT_TITLE,
   },
+  // LOT 4-Y — 14e module guidé réel : « Lire les payoffs d'options » (monde 14, world.options).
+  // Une option est un DROIT : perte bornée à la prime, seuil de rentabilité, érosion du temps.
+  {
+    id: OPTIONS_MODULE_ID,
+    title: OPTIONS_MODULE_TITLE,
+    worldId: OPTIONS_MODULE_WORLD_ID,
+    skills: OPTIONS_SKILLS,
+    checkpointId: OPTIONS_CHECKPOINT_ID,
+    checkpointTitle: OPTIONS_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1893,6 +1965,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...PSYCHOLOGY_SKILL_CONCEPT_SLUG,
   ...SMC_SKILL_CONCEPT_SLUG,
   ...WYCKOFF_SKILL_CONCEPT_SLUG,
+  ...OPTIONS_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];

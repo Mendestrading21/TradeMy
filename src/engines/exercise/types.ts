@@ -191,7 +191,7 @@ export interface IdentifyFigureExercise extends BaseExercise {
   /** Variant (= id de figure) pour résoudre overlays/indicateurs au rendu. */
   variant: string;
   /** Type de rendu du moteur de visuels. */
-  visualType: 'candle-anatomy' | 'candlestick-pattern' | 'chart-pattern' | 'market-structure' | 'indicator' | 'volume-profile' | 'risk-reward';
+  visualType: 'candle-anatomy' | 'candlestick-pattern' | 'chart-pattern' | 'market-structure' | 'indicator' | 'volume-profile' | 'risk-reward' | 'option-payoff';
   options: string[];
   validation: { correctIndex: number };
 }
