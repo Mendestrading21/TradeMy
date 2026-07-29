@@ -203,7 +203,17 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 - **Vérité pédagogique préservée** ✅ : prouvée de bout en bout sur les écrans réels (session + fiche du
   monde 3) — 1 transition/cible, cible échouée due, aucune maîtrise prématurée, reprise idempotente.
 
-> **LOT 4-M — livré en PR (draft), non fusionné, non déployé.** Ne pas fusionner sans validation humaine.
+> **LOT 4-M — fusionné dans `main` le 29/07/2026 (PR #23, validation propriétaire) et déployé**
+> (CI + Pages verts). Deux modules guidés sont en ligne : Fondations et Chandeliers.
+
+## v1 web gratuite (ADR-110) — 29/07/2026
+
+Décision propriétaire : publication **web d'abord**, version de test **entièrement gratuite**.
+Le paywall de démonstration est retiré (statistiques complètes et deck de révision ouverts à tous,
+`/premium` devient un écran d'information « Accès libre ») ; le modèle pur `premium.ts` est conservé
+pour une éventuelle décision future. Zéro bouton mort (landing) ; écrans secondaires alignés sur le
+canon (emoji → `TrademyIcon`, états de chargement) ; `docs/REPO_TRUTH.md` régénéré ; branche
+`gh-pages` héritée supprimée (la source Pages est le workflow Actions).
 
 ## Gate canonique
 

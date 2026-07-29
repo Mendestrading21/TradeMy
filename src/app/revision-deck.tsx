@@ -1,56 +1,19 @@
-import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, Flashcard, theme } from '@/design-system';
+import { Screen, Text, Flashcard, Button, theme } from '@/design-system';
 import { CharacterScene } from '@/characters';
 import { MiniVisual } from '@/engines/visual';
-import { useProgress, buildRevisionDeck, isPremium } from '@/data';
-import { analytics } from '@/analytics';
+import { buildRevisionDeck } from '@/data';
 
 const deck = buildRevisionDeck();
 
+/** Deck consolidé de révision — ouvert à tout le monde (v1 gratuite, ADR-110). */
 export default function RevisionDeck() {
   const router = useRouter();
-  const { premium, ready } = useProgress();
-  const premiumActive = isPremium(premium);
-
-  // On n'enregistre le blocage qu'une fois la progression chargée (sinon premium est encore vide).
-  useEffect(() => {
-    if (ready && !premiumActive) analytics.track('premium_gate_hit', { feature: 'revision_deck' });
-  }, [ready, premiumActive]);
-
-  if (!premiumActive) {
-    return (
-      <Screen>
-        <Text variant="h1">Deck de révision 🃏</Text>
-        <Text variant="body" color={theme.colors.textSecondary}>
-          Toutes les flashcards et mini-quiz de tes concepts, réunis pour réviser d’un coup.
-        </Text>
-        <Card elevated style={styles.gate}>
-          <Text variant="title">🔒 Réservé à Premium</Text>
-          <Text variant="body" color={theme.colors.textSecondary}>
-            Le deck regroupe {deck.flashcards.length} flashcards et {deck.quizzes.length} mini-quiz issus de{' '}
-            {deck.conceptCount} concepts. Les cartes restent disponibles gratuitement sur chaque fiche —
-            le deck consolidé est un confort Premium.
-          </Text>
-          <Button
-            label="Débloquer avec Premium ✨"
-            variant="reward"
-            onPress={() => router.push('/premium')}
-            accessibilityHint="Découvrir l’offre Premium"
-          />
-          <Text variant="caption" color={theme.colors.textMuted}>
-            Activation de démonstration — aucun achat réel n’est effectué.
-          </Text>
-        </Card>
-        <Button label="Retour" variant="secondary" onPress={() => router.back()} />
-      </Screen>
-    );
-  }
 
   return (
     <Screen>
-      <Text variant="h1">Deck de révision 🃏</Text>
+      <Text variant="h1">Deck de révision</Text>
       <Text variant="body" color={theme.colors.textSecondary}>
         {deck.flashcards.length} flashcards · {deck.quizzes.length} mini-quiz · {deck.conceptCount} concepts.
       </Text>
@@ -88,7 +51,6 @@ export default function RevisionDeck() {
 }
 
 const styles = StyleSheet.create({
-  gate: { gap: theme.spacing.sm },
   item: { gap: theme.spacing.xs },
   head: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   flex1: { flex: 1 },

@@ -1,12 +1,21 @@
 import { View, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, Chip, ProgressBar, theme } from '@/design-system';
+import { Screen, Text, Card, Button, Chip, ProgressBar, StateView, TrademyIcon, theme } from '@/design-system';
 import { MascotFigure } from '@/characters';
 import { BADGES, earnedBadges, streakInfo, STREAK_MILESTONE_REWARD, buildDailyQuests, useProgress } from '@/data';
 import { useNow } from '@/lib/useNow';
 
 export default function Reussites() {
-  const { state, claimQuest } = useProgress();
+  const { state, ready, claimQuest } = useProgress();
   const now = useNow();
+
+  if (!ready) {
+    return (
+      <Screen>
+        <StateView variant="loading" title="On charge tes réussites…" />
+      </Screen>
+    );
+  }
+
   const earned = earnedBadges(state);
   const streak = streakInfo(state?.streakDays ?? 0);
   // Quêtes du jour — déplacées ici depuis l'accueil (Lot 1 : hors du CTA principal).
@@ -19,7 +28,7 @@ export default function Reussites() {
 
   return (
     <Screen>
-      <Text variant="h1">Réussites 🏅</Text>
+      <Text variant="h1">Réussites</Text>
       <Text variant="body" color={theme.colors.textSecondary}>
         Des badges à débloquer au fil de ta progression.
       </Text>
@@ -28,13 +37,16 @@ export default function Reussites() {
 
       <Card elevated>
         <View style={styles.summary}>
-          <Text variant="title">🔥 Série</Text>
-          <Chip icon="🔥" label={`${streak.current} jour${streak.current > 1 ? 's' : ''}`} color={theme.colors.warning} />
+          <View style={styles.titleRow}>
+            <TrademyIcon name="flame" size={18} color={theme.colors.warning} />
+            <Text variant="title">Série</Text>
+          </View>
+          <Chip iconName="flame" label={`${streak.current} jour${streak.current > 1 ? 's' : ''}`} color={theme.colors.warning} />
         </View>
         <ProgressBar value={streakProgress} color={theme.colors.warning} accessibilityLabel="Progression vers le prochain jalon de série" />
         <Text variant="caption" color={theme.colors.textMuted}>
           {streak.next
-            ? `Encore ${streak.toGo} jour${streak.toGo > 1 ? 's' : ''} jusqu’au jalon ${streak.next} · +${STREAK_MILESTONE_REWARD} 🪙`
+            ? `Encore ${streak.toGo} jour${streak.toGo > 1 ? 's' : ''} jusqu’au jalon ${streak.next} · +${STREAK_MILESTONE_REWARD} pièces`
             : `Tous les jalons de série sont atteints. Bravo pour ta constance !`}
         </Text>
       </Card>
@@ -55,7 +67,7 @@ export default function Reussites() {
         <Card>
           <View style={styles.row}>
             <Text variant="title" style={styles.flex1}>
-              🏹 Quêtes du jour
+              Quêtes du jour
             </Text>
             <Text variant="caption" color={theme.colors.textMuted}>
               {questsDone} / {quests.length}
@@ -70,7 +82,7 @@ export default function Reussites() {
                   </Text>
                   {q.claimable ? (
                     <Button
-                      label={`Réclamer +${q.reward} 🪙`}
+                      label={`Réclamer +${q.reward} pièces`}
                       variant="reward"
                       fullWidth={false}
                       onPress={() => claimQuest(q.id)}
@@ -115,9 +127,15 @@ export default function Reussites() {
     const has = earned.has(b.id);
     return (
       <Card key={b.id} style={[styles.badge, !has && styles.locked]}>
-        <Text variant="display" center>
-          {has ? b.emoji : '🔒'}
-        </Text>
+        {has ? (
+          <Text variant="display" center>
+            {b.emoji}
+          </Text>
+        ) : (
+          <View style={styles.lockWrap}>
+            <TrademyIcon name="lock" size={34} color={theme.colors.textMuted} title="Badge verrouillé" />
+          </View>
+        )}
         <Text variant="title" center>
           {b.name}
         </Text>
@@ -134,6 +152,8 @@ export default function Reussites() {
 
 const styles = StyleSheet.create({
   summary: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.sm },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
+  lockWrap: { alignItems: 'center', justifyContent: 'center', height: 40 },
   sectionTitle: { marginTop: theme.spacing.sm },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md },
   badge: { flexGrow: 1, flexBasis: '44%', alignItems: 'center', gap: theme.spacing.xs },

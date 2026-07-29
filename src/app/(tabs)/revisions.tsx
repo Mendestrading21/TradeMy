@@ -265,14 +265,13 @@ export default function Revisions() {
         })
       )}
 
-      {/* ── Deck de révision (secondaire, Premium) ── */}
+      {/* ── Deck de révision (secondaire) — ouvert à tout le monde (v1 gratuite, ADR-110) ── */}
       <Card>
         <View style={styles.row}>
           <View style={[styles.sectionLabel, styles.flex1]}>
             <TrademyIcon name="book" size={18} color={theme.colors.textSecondary} />
             <Text variant="title">Deck de révision des concepts</Text>
           </View>
-          <Chip iconName="star" label="Premium" color={theme.colors.reward} accessibilityLabel="Fonction Premium" />
         </View>
         <Text variant="body" color={theme.colors.textSecondary}>
           Flashcards et mini-quiz de tous les concepts, réunis pour réviser d’un coup.
@@ -281,7 +280,7 @@ export default function Revisions() {
           label="Ouvrir le deck"
           variant="secondary"
           onPress={() => router.push('/revision-deck')}
-          accessibilityHint="Deck de révision des concepts (Premium)"
+          accessibilityHint="Deck de révision des concepts"
         />
       </Card>
     </Screen>
