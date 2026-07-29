@@ -3,6 +3,8 @@
  * de la compétence (dataset de la fiche) s'affiche au-dessus de la consigne. Repli texte inchangé
  * quand aucun concept n'est résolvable. Garde-fous sur une leçon RÉELLE d'un module guidé.
  */
+/* eslint-disable @typescript-eslint/no-require-imports, import/first -- les fabriques jest.mock sont
+   hissées par jest au-dessus des imports ; require() y est le seul mécanisme disponible. */
 import { describe, it, expect, jest } from '@jest/globals';
 import renderer, { act, type ReactTestRenderer } from 'react-test-renderer';
 
