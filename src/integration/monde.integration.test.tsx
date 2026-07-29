@@ -58,7 +58,7 @@ jest.mock('expo-router', () => {
 });
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
-import { ProgressProvider, WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, PATTERNS_CHECKPOINT_ID, INDICATORS_SKILLS, INDICATORS_CHECKPOINT_TITLE, INDICATORS_CHECKPOINT_ID, VOLUME_SKILLS, VOLUME_CHECKPOINT_TITLE, VOLUME_CHECKPOINT_ID, PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
+import { ProgressProvider, WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, PATTERNS_CHECKPOINT_ID, INDICATORS_SKILLS, INDICATORS_CHECKPOINT_TITLE, INDICATORS_CHECKPOINT_ID, VOLUME_SKILLS, VOLUME_CHECKPOINT_TITLE, VOLUME_CHECKPOINT_ID, PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_TITLE, PRICEACTION_CHECKPOINT_ID, RISK_SKILLS, RISK_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -148,6 +148,19 @@ const W8_DONE = seed({
     ...PATTERNS_SKILLS.map((s) => s.id), PATTERNS_CHECKPOINT_ID,
     ...INDICATORS_SKILLS.map((s) => s.id), INDICATORS_CHECKPOINT_ID,
     ...VOLUME_SKILLS.map((s) => s.id), VOLUME_CHECKPOINT_ID,
+  ],
+});
+// Mondes 1-9 avancés (…+ Price action validé) → le monde 10 (Risk management) s'ouvre.
+const W9_DONE = seed({
+  completedSkills: [
+    ...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS,
+    ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
+    ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
+    ...SR_SKILLS.map((s) => s.id), SR_CHECKPOINT_ID,
+    ...PATTERNS_SKILLS.map((s) => s.id), PATTERNS_CHECKPOINT_ID,
+    ...INDICATORS_SKILLS.map((s) => s.id), INDICATORS_CHECKPOINT_ID,
+    ...VOLUME_SKILLS.map((s) => s.id), VOLUME_CHECKPOINT_ID,
+    ...PRICEACTION_SKILLS.map((s) => s.id), PRICEACTION_CHECKPOINT_ID,
   ],
 });
 // Tous les mondes guidés validés → le premier monde de CONTENU est ouvert.
@@ -431,6 +444,24 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     expect(cta).toBeDefined();
     act(() => (cta!.props.onPress as () => void)());
     expect(pushes()).toContain(`/session/${PRICEACTION_SKILLS[0].id}`);
+    await act(async () => r.unmount());
+  });
+
+  it('guidé Risk (monde 10, LOT 4-U) : ses 3 compétences + checkpoint PROPRE surfacent, prochaine étape correcte', async () => {
+    // Mondes 1-9 validés → le monde 10 (Risk management) est « en cours ».
+    await persist(W9_DONE);
+    const r = await mount('world.risk');
+    expect(hasText(r.root, 'Risk management')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    for (const s of RISK_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    expect(hasTextIncluding(r.root, RISK_CHECKPOINT_TITLE)).toBe(true);
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${RISK_SKILLS[0].id}`);
     await act(async () => r.unmount());
   });
 
