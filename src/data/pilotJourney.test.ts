@@ -122,7 +122,9 @@ describe('Parcours pilote — intégration accueil → checkpoint → progressio
     const recognize = objectiveId(C, 'recognize');
     const recognizeResult = agg1.perTarget.find((t) => t.objectiveId === recognize)!;
     expect(recognizeResult.total).toBe(3); // 3 exercices recognize (direction, label-high, place-high) → UNE cible
-    expect(agg1.perTarget).toHaveLength(exercisableObjectiveIds(C).length); // 3 cibles distinctes
+    // 3 cibles distinctes dans l'UNITÉ PILOTE (le 4e objectif du concept, `confirm`,
+    // appartient au module Anatomie depuis le LOT 4-P et ne se joue pas dans cette session).
+    expect(agg1.perTarget).toHaveLength(3);
 
     state = recordSessionReview(state, 'skill.candles', agg1.perSkill[0].correct, agg1.perSkill[0].total, NOW);
     state = recordTargetSessionReview(state, agg1.perTarget, NOW);
@@ -134,9 +136,16 @@ describe('Parcours pilote — intégration accueil → checkpoint → progressio
     const agg2 = aggregateAnswered(playSession(exs, true));
     state = recordTargetSessionReview(state, agg2.perTarget, NOW + DAY);
     expect(state.targets![recognize].review.repetitions).toBe(2);
-    const cov = objectiveCoverage(exercisableObjectiveIds(C), state.targets!);
+    // Tous les objectifs de l'UNITÉ PILOTE sont prouvés après deux sessions espacées.
+    const pilotObjectives = [recognize, objectiveId(C, 'interpret'), objectiveId(C, 'avoid-false-signal')];
+    const cov = objectiveCoverage(pilotObjectives, state.targets!);
     expect(cov.total).toBe(3);
-    expect(cov.complete).toBe(true); // tous les objectifs exerçables prouvés
+    expect(cov.complete).toBe(true); // tous les objectifs de l'unité prouvés
+    // Maîtrise par COUVERTURE (honnête) : depuis le LOT 4-P le concept a un 4e objectif exerçable
+    // (`confirm`, module Anatomie) — la couverture complète du concept exige AUSSI ce module.
+    const full = objectiveCoverage(exercisableObjectiveIds(C), state.targets!);
+    expect(full.total).toBe(4);
+    expect(full.complete).toBe(false);
   });
 
   it('progression : une cible ÉCHOUÉE reste due rapidement (jamais « prouvée »)', () => {
