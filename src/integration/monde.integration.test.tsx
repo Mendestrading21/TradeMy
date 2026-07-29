@@ -59,7 +59,7 @@ jest.mock('expo-router', () => {
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
 import { ProgressProvider } from '@/data';
-import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE } from '@/data';
+import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,8 +72,12 @@ const KEY = 'patternlab.progress.v1';
 const ALL_SKILLS = SKILLS.map((s) => s.id);
 const WORLD1 = 'world.foundations';
 const SORTED = [...WORLDS].sort((a, b) => a.order - b.order);
-const WORLD2 = SORTED[1]; // world.anatomy — monde de contenu, ordre 2
-const WORLD2_SLUGS = conceptsByWorld(V5_CONCEPTS, WORLD2.id).map((c) => c.slug);
+const WORLD2 = SORTED[1]; // world.anatomy — GUIDÉ depuis le LOT 4-P (ordre 2)
+// Premier monde de CONTENU (non guidé, avec concepts) — DYNAMIQUE, robuste aux conversions futures.
+const CONTENT_WORLD = SORTED.find((w) => !isGuidedWorld(w.id) && conceptsByWorld(V5_CONCEPTS, w.id).length > 0)!;
+const CONTENT_SLUGS = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id).map((c) => c.slug);
+// Tous les modules guidés validés (compétences + checkpoints) — préfixe du parcours terminé.
+const ALL_GUIDED_DONE_IDS = CONTENT_MODULES.flatMap((m) => [...m.skills.map((s) => s.id), m.checkpointId]);
 
 function seed(json: object) {
   return JSON.stringify({ onboarded: true, schemaVersion: 8, completedSkills: [], totalXp: 0, streakDays: 0, coins: 0, ...json });
@@ -90,21 +94,24 @@ const GUIDED_PARTIAL = seed({ completedSkills: [ALL_SKILLS[0]] }); // 1 compéte
 const GUIDED_DUE = seed({ completedSkills: [ALL_SKILLS[0]], skills: { [ALL_SKILLS[0]]: dueSkill(ALL_SKILLS[0]) } });
 const ALL_SKILLS_DONE = seed({ completedSkills: [...ALL_SKILLS] }); // checkpoint restant
 const W1_DONE = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID] });
-const W2_EXPLORED = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], learning: { conceptsExplored: WORLD2_SLUGS } });
-// Mondes 1-3 avancés (Fondations + Chandeliers validés par la preuve) → le monde 4 (Structure) s'ouvre.
+// Mondes 1-2 VALIDÉS par la preuve (le monde 2 est guidé depuis le LOT 4-P) → le monde 3 s'ouvre.
+const ANATOMY_DONE_IDS = [...ANATOMY_SKILLS.map((s) => s.id), ANATOMY_CHECKPOINT_ID];
+const W2_DONE = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS] });
+// Mondes 1-3 avancés (…+ Chandeliers validé) → le monde 4 (Structure) s'ouvre.
 const W3_DONE = seed({
-  completedSkills: [...ALL_SKILLS, CHECKPOINT_ID, ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID],
-  learning: { conceptsExplored: WORLD2_SLUGS },
+  completedSkills: [...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS, ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID],
 });
 // Mondes 1-4 avancés (…+ Structure validé) → le monde 5 (Supports et résistances) s'ouvre.
 const W4_DONE = seed({
   completedSkills: [
-    ...ALL_SKILLS, CHECKPOINT_ID,
+    ...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS,
     ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
     ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
   ],
-  learning: { conceptsExplored: WORLD2_SLUGS },
 });
+// Tous les mondes guidés validés → le premier monde de CONTENU est ouvert.
+const GUIDED_ALL_DONE = seed({ completedSkills: ALL_GUIDED_DONE_IDS });
+const CONTENT_EXPLORED = seed({ completedSkills: ALL_GUIDED_DONE_IDS, learning: { conceptsExplored: CONTENT_SLUGS } });
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -246,8 +253,8 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
 
   // ─── LOT 4-M — 2e monde GUIDÉ réel (Chandeliers) surfacé sur SA fiche ────────
   it('guidé Chandeliers (monde 3) : ses 4 compétences + checkpoint PROPRE surfacent, notion liée ouvrable', async () => {
-    // world 1 terminé + world 2 (anatomie) exploré → world 3 (Chandeliers) « en cours ».
-    await persist(W2_EXPLORED);
+    // Mondes 1-2 validés par la preuve → world 3 (Chandeliers) « en cours ».
+    await persist(W2_DONE);
     const r = await mount('world.candles');
     expect(hasText(r.root, 'Chandeliers japonais')).toBe(true);
     expect(hasText(r.root, 'En cours')).toBe(true);
@@ -268,6 +275,23 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     expect(discover).toBeDefined();
     act(() => (discover!.props.onPress as () => void)());
     expect(pushes().some((p) => typeof p === 'string' && p.startsWith('/concept/'))).toBe(true);
+    await act(async () => r.unmount());
+  });
+
+  it('guidé Anatomie (monde 2, LOT 4-P) : ses 3 compétences + checkpoint PROPRE surfacent dès Fondations terminées', async () => {
+    await persist(W1_DONE); // monde 1 validé → monde 2 (guidé) « en cours »
+    const r = await mount('world.anatomy');
+    expect(hasText(r.root, 'Anatomie d’un graphique')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    for (const s of ANATOMY_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    expect(hasTextIncluding(r.root, ANATOMY_CHECKPOINT_TITLE)).toBe(true);
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${ANATOMY_SKILLS[0].id}`);
     await act(async () => r.unmount());
   });
 
@@ -342,14 +366,14 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     await act(async () => r.unmount());
   });
 
-  // ─── Monde de contenu avec concepts ─────────────────────────────────────────
+  // ─── Monde de contenu avec concepts (premier monde NON guidé — dynamique) ──
   it('contenu déverrouillé : aucune fausse leçon, concepts canoniques, nav /concept/[slug], consulté ≠ maîtrisé', async () => {
-    await persist(W1_DONE); // débloque le monde 2
-    const r = await mount(WORLD2.id);
+    await persist(GUIDED_ALL_DONE); // tous les modules guidés validés → premier monde de contenu ouvert
+    const r = await mount(CONTENT_WORLD.id);
     // Message honnête (pas de leçon inexistante).
     expect(hasTextIncluding(r.root, 'n’est pas la maîtriser')).toBe(true);
     // Concepts issus de la source canonique (titres réels).
-    const c0 = conceptsByWorld(V5_CONCEPTS, WORLD2.id)[0];
+    const c0 = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id)[0];
     expect(hasText(r.root, c0.title)).toBe(true);
     // Prochaine étape = explorer la première fiche.
     const cta = ctaWithHint(r.root, 'Explorer les notions');
@@ -360,8 +384,8 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
   });
 
   it('contenu entièrement consulté : « exploré » (jamais « terminé »), suite = monde suivant si ouvert', async () => {
-    await persist(W2_EXPLORED);
-    const r = await mount(WORLD2.id);
+    await persist(CONTENT_EXPLORED);
+    const r = await mount(CONTENT_WORLD.id);
     expect(hasText(r.root, 'Exploré')).toBe(true);
     expect(hasText(r.root, 'Terminé')).toBe(false); // un monde de contenu n’est jamais « terminé »
     // Marque « consultée » présente (consultation distincte de la maîtrise).

@@ -3,6 +3,7 @@ export * from './seed';
 export * from './candleModuleScenarios';
 export * from './structureModuleScenarios';
 export * from './srModuleScenarios';
+export * from './anatomyModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';

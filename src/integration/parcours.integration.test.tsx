@@ -76,7 +76,7 @@ import Apprendre from '@/app/(tabs)/parcours';
 import { ProgressProvider } from '@/data';
 import { WORLDS, conceptsByWorld } from '@/data';
 import { V5_CONCEPTS } from '@/data';
-import { SKILLS, CHECKPOINT_ID } from '@/data';
+import { SKILLS, CHECKPOINT_ID, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { buildLearningPath, worldEntryById } from '@/data';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -85,8 +85,13 @@ import * as ExpoRouter from 'expo-router';
 const routerState = (ExpoRouter as unknown as { __state: { calls: unknown[][] } }).__state;
 
 const ALL_SKILLS = SKILLS.map((s) => s.id);
-const WORLD2 = [...WORLDS].sort((a, b) => a.order - b.order)[1]; // world.anatomy (ordre 2, contenu)
-const WORLD2_SLUGS = conceptsByWorld(V5_CONCEPTS, WORLD2.id).map((c) => c.slug);
+const SORTED_WORLDS = [...WORLDS].sort((a, b) => a.order - b.order);
+const WORLD2 = SORTED_WORLDS[1]; // world.anatomy (ordre 2) — GUIDÉ depuis le LOT 4-P
+// Premier monde de CONTENU (non guidé, avec concepts) — DYNAMIQUE, robuste aux conversions futures.
+const CONTENT_WORLD = SORTED_WORLDS.find((w) => !isGuidedWorld(w.id) && conceptsByWorld(V5_CONCEPTS, w.id).length > 0)!;
+const CONTENT_SLUGS = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id).map((c) => c.slug);
+// Tous les modules guidés validés (compétences + checkpoints).
+const ALL_GUIDED_DONE_IDS = CONTENT_MODULES.flatMap((m) => [...m.skills.map((s) => s.id), m.checkpointId]);
 
 function seed(json: object) {
   return JSON.stringify({ onboarded: true, schemaVersion: 8, completedSkills: [], totalXp: 0, streakDays: 0, coins: 0, ...json });
@@ -98,7 +103,7 @@ async function persist(json: string | null) {
 const NEW = seed({});
 const GUIDED_PARTIAL = seed({ completedSkills: [ALL_SKILLS[0]] }); // 1 compétence, PAS le checkpoint
 const W1_DONE = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID] });
-const W2_EXPLORED = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], learning: { conceptsExplored: WORLD2_SLUGS } });
+const CONTENT_EXPLORED = seed({ completedSkills: ALL_GUIDED_DONE_IDS, learning: { conceptsExplored: CONTENT_SLUGS } });
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -186,14 +191,15 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
     await act(async () => r.unmount());
   });
 
-  it('checkpoint validé : monde 1 « terminé » et monde 2 débloqué (« en cours » de contenu) → action « Explorer » /monde/world.anatomy', async () => {
+  it('checkpoint validé : monde 1 « terminé » et monde 2 (guidé) débloqué → ouverture /monde/world.anatomy', async () => {
     await persist(W1_DONE);
     const r = await mount();
     const root = r.root;
     expect(labelForOrder(root, 1)).toMatch(/Niveau : terminé\./);
     expect(labelForOrder(root, 2)).not.toMatch(/verrouillé/);
 
-    const cta = byHint(root, `Ouvrir le monde ${WORLD2.title}`);
+    // Le monde 2 est GUIDÉ : l'action principale porte le hint du module guidé.
+    const cta = byHint(root, `Ouvrir le module guidé ${WORLD2.title}`);
     expect(cta).toBeDefined();
     act(() => (cta!.props.onPress as () => void)());
     expect(routerState.calls.filter((c) => c[0] === 'push')).toEqual([['push', `/monde/${WORLD2.id}`]]);
@@ -201,13 +207,14 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
   });
 
   it('toutes les fiches d’un monde de contenu consultées : « exploré » (jamais « terminé »), monde suivant débloqué', async () => {
-    await persist(W2_EXPLORED);
+    // DYNAMIQUE : premier monde NON guidé avec concepts, atteint en validant tous les modules guidés.
+    await persist(CONTENT_EXPLORED);
     const r = await mount();
     const root = r.root;
-    const l2 = labelForOrder(root, 2)!;
-    expect(l2).toMatch(/Niveau : exploré/);
-    expect(l2).not.toMatch(/Niveau : terminé/);
-    expect(labelForOrder(root, 3)).not.toMatch(/verrouillé/); // monde 3 ouvert
+    const lc = labelForOrder(root, CONTENT_WORLD.order)!;
+    expect(lc).toMatch(/Niveau : exploré/);
+    expect(lc).not.toMatch(/Niveau : terminé/);
+    expect(labelForOrder(root, CONTENT_WORLD.order + 1)).not.toMatch(/verrouillé/); // monde suivant ouvert
     await act(async () => r.unmount());
   });
 
@@ -272,11 +279,11 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
   it('reprise après remontage : l’état persisté redonne la même action principale', async () => {
     await persist(W1_DONE);
     const first = await mount();
-    expect(byHint(first.root, `Ouvrir le monde ${WORLD2.title}`)).toBeDefined();
+    expect(byHint(first.root, `Ouvrir le module guidé ${WORLD2.title}`)).toBeDefined();
     await act(async () => first.unmount());
 
     const second = await mount();
-    expect(byHint(second.root, `Ouvrir le monde ${WORLD2.title}`)).toBeDefined();
+    expect(byHint(second.root, `Ouvrir le module guidé ${WORLD2.title}`)).toBeDefined();
     await act(async () => second.unmount());
   });
 
@@ -306,8 +313,8 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
     // Checkpoint validé : monde 1 terminé.
     const done1 = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], exploredSlugs: [] });
     expect(worldEntryById(done1, 'world.foundations')!.status).toBe('done');
-    // Contenu consulté = exploré, jamais terminé.
-    const explored2 = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], exploredSlugs: WORLD2_SLUGS });
-    expect(worldEntryById(explored2, WORLD2.id)!.status).toBe('explored');
+    // Contenu consulté = exploré, jamais terminé (premier monde de contenu, dynamique).
+    const exploredContent = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: ALL_GUIDED_DONE_IDS, exploredSlugs: CONTENT_SLUGS });
+    expect(worldEntryById(exploredContent, CONTENT_WORLD.id)!.status).toBe('explored');
   });
 });

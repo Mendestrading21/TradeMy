@@ -19,6 +19,8 @@ import { SKILLS, CHECKPOINT_ID } from './seed';
 import { CANDLE_SKILLS, CANDLE_CHECKPOINT_ID } from './candleModuleScenarios';
 import { STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_ID } from './structureModuleScenarios';
 import { SR_SKILLS, SR_CHECKPOINT_ID } from './srModuleScenarios';
+import { ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID } from './anatomyModuleScenarios';
+import { CONTENT_MODULES } from './seed';
 
 const EMPTY: LearningProgressInput = { completedSkills: [], exploredSlugs: [] };
 const WORLD1_DONE: LearningProgressInput = {
@@ -29,8 +31,8 @@ const WORLD1_DONE: LearningProgressInput = {
 const foundations = WORLDS.find((w) => w.id === 'world.foundations')!;
 
 describe('learningMap — hiérarchie unique', () => {
-  it('quatre modules guidés : Fondations (1), Chandeliers (3), Structure (4) et Niveaux (5), chacun son checkpoint propre', () => {
-    expect(GUIDED_MODULES).toHaveLength(4);
+  it('cinq modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4) et Niveaux (5), chacun son checkpoint propre', () => {
+    expect(GUIDED_MODULES).toHaveLength(5);
     const foundationsModule = GUIDED_MODULES.find((m) => m.worldId === 'world.foundations')!;
     expect(foundationsModule).toBeDefined();
     expect(foundationsModule.skillIds).toEqual(SKILLS.map((s) => s.id));
@@ -47,19 +49,26 @@ describe('learningMap — hiérarchie unique', () => {
     expect(srModule).toBeDefined();
     expect(srModule.skillIds).toEqual(SR_SKILLS.map((s) => s.id));
     expect(srModule.checkpointId).toBe(SR_CHECKPOINT_ID);
+    const anatomyModule = GUIDED_MODULES.find((m) => m.worldId === 'world.anatomy')!;
+    expect(anatomyModule).toBeDefined();
+    expect(anatomyModule.skillIds).toEqual(ANATOMY_SKILLS.map((s) => s.id));
+    expect(anatomyModule.checkpointId).toBe(ANATOMY_CHECKPOINT_ID);
     // Chaque monde guidé est reconnu ; les checkpoints sont PROPRES (jamais partagés).
     expect(isGuidedWorld('world.foundations')).toBe(true);
     expect(isGuidedWorld('world.candles')).toBe(true);
     expect(isGuidedWorld('world.structure')).toBe(true);
     expect(isGuidedWorld('world.support-resistance')).toBe(true);
-    expect(guidedModulesForWorld('world.foundations')).toHaveLength(1);
-    expect(guidedModulesForWorld('world.candles')).toHaveLength(1);
-    expect(guidedModulesForWorld('world.structure')).toHaveLength(1);
-    expect(guidedModulesForWorld('world.support-resistance')).toHaveLength(1);
-    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(4);
-    // Les 11 autres mondes restent des collections de notions (aucun module guidé).
+    expect(isGuidedWorld('world.anatomy')).toBe(true);
+    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance']) {
+      expect(guidedModulesForWorld(wid)).toHaveLength(1);
+    }
+    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(5);
+    // Les 10 autres mondes restent des collections de notions (aucun module guidé).
     const guidedWorldIds = new Set(GUIDED_MODULES.map((m) => m.worldId));
-    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(11);
+    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(10);
+    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..5) — la progression reste linéaire.
+    const guidedOrders = WORLDS.filter((w) => guidedWorldIds.has(w.id)).map((w) => w.order).sort((a, b) => a - b);
+    expect(guidedOrders).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('nouvel utilisateur : seul le monde 1 est ouvert (en cours), le reste verrouillé', () => {
@@ -97,22 +106,22 @@ describe('learningMap — hiérarchie unique', () => {
     expect(isWorldExplored(content, V5_CONCEPTS, { completedSkills: [], exploredSlugs: slugs.slice(0, -1) })).toBe(false);
   });
 
-  it('consulter toutes les fiches d’un monde de contenu = statut « exploré » (pas « terminé »), et débloque la suite', () => {
+  it('consulter toutes les fiches du premier monde de CONTENU = « exploré » (pas « terminé »), et débloque la suite', () => {
+    // DYNAMIQUE : le premier monde NON guidé avec des concepts (robuste aux conversions futures).
     const sorted = [...WORLDS].sort((a, b) => a.order - b.order);
-    // Monde 1 terminé (checkpoint) + monde 2 (contenu) entièrement consulté.
-    const world2 = sorted[1];
-    const world2Slugs = conceptsByWorld(V5_CONCEPTS, world2.id).map((c) => c.slug);
-    const input: LearningProgressInput = {
-      completedSkills: [...SKILLS.map((s) => s.id), CHECKPOINT_ID],
-      exploredSlugs: world2Slugs,
-    };
+    const content = sorted.find((w) => !isGuidedWorld(w.id) && conceptsByWorld(V5_CONCEPTS, w.id).length > 0)!;
+    expect(content).toBeDefined();
+    // Tous les modules guidés validés (préfixe du parcours) + fiches du monde de contenu consultées.
+    const guidedDone = CONTENT_MODULES.flatMap((m) => [...m.skills.map((s) => s.id), m.checkpointId]);
+    const slugs = conceptsByWorld(V5_CONCEPTS, content.id).map((c) => c.slug);
+    const input: LearningProgressInput = { completedSkills: guidedDone, exploredSlugs: slugs };
     const path = buildLearningPath(WORLDS, V5_CONCEPTS, input);
-    const e2 = worldEntryById(path, world2.id)!;
-    expect(e2.status).toBe('explored'); // exploré, pas terminé
-    expect(e2.mastered).toBe(false); // un monde de contenu ne se maîtrise pas par la lecture
-    // Le monde 3 est débloqué (l'exploration permet d'avancer, sans mentir sur « terminé »).
-    const e3 = worldEntryById(path, sorted[2].id)!;
-    expect(e3.status).not.toBe('locked');
+    const e = worldEntryById(path, content.id)!;
+    expect(e.status).toBe('explored'); // exploré, pas terminé
+    expect(e.mastered).toBe(false); // un monde de contenu ne se maîtrise pas par la lecture
+    // Le monde suivant est débloqué (l'exploration permet d'avancer, sans mentir sur « terminé »).
+    const next = sorted[sorted.findIndex((w) => w.id === content.id) + 1];
+    expect(worldEntryById(path, next.id)!.status).not.toBe('locked');
   });
 
   it('la visite seule ne valide jamais le monde guidé (maîtrise ≠ visite)', () => {

@@ -204,9 +204,10 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
   monde 3) — 1 transition/cible, cible échouée due, aucune maîtrise prématurée, reprise idempotente.
 
 > **Programme « guider tous les mondes » en cours** (autorisation propriétaire du 29/07/2026 : un
-> lot par monde, gate verte à chaque fusion). Modules guidés fusionnés et déployés : Fondations,
-> Chandeliers (LOT 4-M, ADR-109), Structure (LOT 4-N, ADR-111), Niveaux (LOT 4-O, ADR-112) —
-> **4 mondes guidés sur 15**, 11 restent des collections de notions.
+> lot par monde, gate verte à chaque fusion). Modules guidés : Fondations, Anatomie (LOT 4-P,
+> ADR-113), Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112) — **5 mondes guidés sur
+> 15** (préfixe 1-5 entièrement guidé), 10 restent des collections de notions. Depuis le LOT 4-P le
+> monde 2 se termine par la preuve (checkpoint), plus par la seule lecture.
 
 ## v1 web gratuite (ADR-110) — 29/07/2026
 
