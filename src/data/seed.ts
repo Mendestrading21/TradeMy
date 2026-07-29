@@ -78,6 +78,17 @@ import {
   INDICATORS_SKILL_CONCEPT_ID,
   INDICATORS_SKILL_CONCEPT_SLUG,
 } from './indicatorsModuleScenarios';
+import {
+  VOLUME_SKILLS,
+  VOLUME_MODULE_ID,
+  VOLUME_MODULE_TITLE,
+  VOLUME_MODULE_WORLD_ID,
+  VOLUME_CHECKPOINT_ID,
+  VOLUME_CHECKPOINT_TITLE,
+  VOLUME_MODULE_EXERCISES_BY_SKILL,
+  VOLUME_SKILL_CONCEPT_ID,
+  VOLUME_SKILL_CONCEPT_SLUG,
+} from './volumeModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -941,6 +952,77 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-S — Module guidé « Lire le volume » (world.volume) ──────
+  'skill.volume.participation': [
+    {
+      id: 'lesson.volume-participation',
+      slug: 'volume-lecture',
+      title: 'Le volume : qui participe au mouvement ?',
+      skillId: 'skill.volume.participation',
+      objective: 'Lire le volume comme mesure de participation, jamais comme signal.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Sous chaque bougie, une barre : la quantité échangée sur la période. C’est le volume — la participation au mouvement.' },
+        { id: 's1', kind: 'observe', body: 'Compare les barres : lesquelles ressortent ? Sur quels mouvements ?' },
+        { id: 's2', kind: 'visual', conceptRef: 'volume' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'volume', body: 'Un mouvement accompagné (volume élevé) n’a pas le même poids qu’un mouvement désert — mais le volume ne donne jamais la direction.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une cassure sur volume faible est souvent suivie d’un retour : le faux départ classique.' },
+        { id: 's5', kind: 'summary', body: 'Volume = participation par période ; il crédibilise une cassure AVEC la structure, il ne prédit rien seul.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que mesure le volume ?', back: 'La quantité échangée par période : la participation au mouvement — jamais sa direction.' } },
+      ],
+      commonMistake: 'Lire le volume comme un signal directionnel.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.volume.vwap': [
+    {
+      id: 'lesson.volume-vwap',
+      slug: 'vwap-lecture',
+      title: 'Le VWAP : la moyenne qui pèse le volume',
+      skillId: 'skill.volume.vwap',
+      objective: 'Lire le VWAP comme repère intraday — jamais comme un ordre.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le VWAP est le prix moyen de la séance, pondéré par le volume : là où la séance a « vraiment » échangé.' },
+        { id: 's1', kind: 'observe', body: 'Situe le prix par rapport à la ligne : au-dessus, en dessous, ou en train d’y revenir ?' },
+        { id: 's2', kind: 'visual', conceptRef: 'vwap' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'vwap', body: 'La lecture se joue à la RÉACTION du prix autour du VWAP, avec la structure de la séance — pas au simple contact.' },
+        { id: 's4', kind: 'falseSignal', body: 'Traiter chaque contact du VWAP comme un ordre d’entrée est le piège classique : c’est un repère, pas un déclencheur.' },
+        { id: 's5', kind: 'summary', body: 'VWAP = moyenne pondérée par le volume ; repère de séance dont la lecture se confirme par la réaction du prix.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce que le VWAP ?', back: 'Le prix moyen d’une séance pondéré par le volume : un repère intraday, jamais un ordre.' } },
+      ],
+      commonMistake: 'Prendre chaque contact du VWAP pour un déclencheur.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.volume.profile': [
+    {
+      id: 'lesson.volume-profile',
+      slug: 'profil-de-volume-lecture',
+      title: 'Le profil de volume : la mémoire des niveaux',
+      skillId: 'skill.volume.profile',
+      objective: 'Repérer le POC et lire les paliers échangés comme des zones de mémoire.',
+      difficulty: 'advanced',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Au lieu de compter les échanges par période, le profil les répartit par NIVEAU de prix : où le marché a-t-il le plus échangé ?' },
+        { id: 's1', kind: 'observe', body: 'Repère le palier le plus fourni de l’histogramme : c’est le POC. Note aussi les zones désertes.' },
+        { id: 's2', kind: 'visual', conceptRef: 'profil-de-volume' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'profil-de-volume', body: 'Un palier très échangé est une zone de mémoire : on y ATTEND une réaction — on ne la présume jamais acquise.' },
+        { id: 's4', kind: 'explain', body: 'La lecture se confirme à la réaction du prix sur le palier ; si le prix l’ignore et le traverse franchement, la lecture d’appui est invalidée.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un POC lu sur une période trop courte est un repère fragile : le piège classique du profil.' },
+        { id: 's6', kind: 'summary', body: 'Profil = échanges par niveau ; POC = palier dominant ; confirmé par la réaction, invalidé par la traversée franche.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce que le POC d’un profil de volume ?', back: 'Le palier de prix le plus échangé de la période : une zone de mémoire du marché, pas une promesse.' } },
+      ],
+      commonMistake: 'Lire un POC sur une période trop courte.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1048,6 +1130,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.indicators.macd': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.macd'],
   'skill.indicators.bollinger': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.bollinger'],
   'skill.indicators.divergence': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.divergence'],
+  'skill.volume.participation': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.participation'],
+  'skill.volume.vwap': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.vwap'],
+  'skill.volume.profile': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.profile'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1068,6 +1153,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   // LOT 4-Q — compétences du module « Lire les figures » (concepts réels de world.patterns).
   ...PATTERNS_SKILL_CONCEPT_ID,
   ...INDICATORS_SKILL_CONCEPT_ID,
+  ...VOLUME_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1236,6 +1322,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: INDICATORS_CHECKPOINT_ID,
     checkpointTitle: INDICATORS_CHECKPOINT_TITLE,
   },
+  // LOT 4-S — 8e module guidé réel : « Lire le volume » (monde 8, world.volume).
+  // Le volume mesure la participation, jamais la direction ; le POC est une mémoire, pas une promesse.
+  {
+    id: VOLUME_MODULE_ID,
+    title: VOLUME_MODULE_TITLE,
+    worldId: VOLUME_MODULE_WORLD_ID,
+    skills: VOLUME_SKILLS,
+    checkpointId: VOLUME_CHECKPOINT_ID,
+    checkpointTitle: VOLUME_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1313,6 +1409,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...ANATOMY_SKILL_CONCEPT_SLUG,
   ...PATTERNS_SKILL_CONCEPT_SLUG,
   ...INDICATORS_SKILL_CONCEPT_SLUG,
+  ...VOLUME_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];

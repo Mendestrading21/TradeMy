@@ -22,6 +22,7 @@ import { SR_SKILLS, SR_CHECKPOINT_ID } from './srModuleScenarios';
 import { ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID } from './anatomyModuleScenarios';
 import { PATTERNS_SKILLS, PATTERNS_CHECKPOINT_ID } from './patternsModuleScenarios';
 import { INDICATORS_SKILLS, INDICATORS_CHECKPOINT_ID } from './indicatorsModuleScenarios';
+import { VOLUME_SKILLS, VOLUME_CHECKPOINT_ID } from './volumeModuleScenarios';
 
 const EMPTY: LearningProgressInput = { completedSkills: [], exploredSlugs: [] };
 const WORLD1_DONE: LearningProgressInput = {
@@ -32,8 +33,8 @@ const WORLD1_DONE: LearningProgressInput = {
 const foundations = WORLDS.find((w) => w.id === 'world.foundations')!;
 
 describe('learningMap — hiérarchie unique', () => {
-  it('sept modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6) et Indicateurs (7), chacun son checkpoint propre', () => {
-    expect(GUIDED_MODULES).toHaveLength(7);
+  it('huit modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6), Indicateurs (7) et Volume (8), chacun son checkpoint propre', () => {
+    expect(GUIDED_MODULES).toHaveLength(8);
     const foundationsModule = GUIDED_MODULES.find((m) => m.worldId === 'world.foundations')!;
     expect(foundationsModule).toBeDefined();
     expect(foundationsModule.skillIds).toEqual(SKILLS.map((s) => s.id));
@@ -62,6 +63,10 @@ describe('learningMap — hiérarchie unique', () => {
     expect(indicatorsModule).toBeDefined();
     expect(indicatorsModule.skillIds).toEqual(INDICATORS_SKILLS.map((s) => s.id));
     expect(indicatorsModule.checkpointId).toBe(INDICATORS_CHECKPOINT_ID);
+    const volumeModule = GUIDED_MODULES.find((m) => m.worldId === 'world.volume')!;
+    expect(volumeModule).toBeDefined();
+    expect(volumeModule.skillIds).toEqual(VOLUME_SKILLS.map((s) => s.id));
+    expect(volumeModule.checkpointId).toBe(VOLUME_CHECKPOINT_ID);
     // Chaque monde guidé est reconnu ; les checkpoints sont PROPRES (jamais partagés).
     expect(isGuidedWorld('world.foundations')).toBe(true);
     expect(isGuidedWorld('world.candles')).toBe(true);
@@ -70,16 +75,17 @@ describe('learningMap — hiérarchie unique', () => {
     expect(isGuidedWorld('world.anatomy')).toBe(true);
     expect(isGuidedWorld('world.patterns')).toBe(true);
     expect(isGuidedWorld('world.indicators')).toBe(true);
-    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators']) {
+    expect(isGuidedWorld('world.volume')).toBe(true);
+    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators', 'world.volume']) {
       expect(guidedModulesForWorld(wid)).toHaveLength(1);
     }
-    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(7);
-    // Les 8 autres mondes restent des collections de notions (aucun module guidé).
+    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(8);
+    // Les 7 autres mondes restent des collections de notions (aucun module guidé).
     const guidedWorldIds = new Set(GUIDED_MODULES.map((m) => m.worldId));
-    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(8);
-    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..7) — la progression reste linéaire.
+    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(7);
+    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..8) — la progression reste linéaire.
     const guidedOrders = WORLDS.filter((w) => guidedWorldIds.has(w.id)).map((w) => w.order).sort((a, b) => a - b);
-    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   it('nouvel utilisateur : seul le monde 1 est ouvert (en cours), le reste verrouillé', () => {
