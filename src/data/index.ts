@@ -10,6 +10,7 @@ export * from './volumeModuleScenarios';
 export * from './priceActionModuleScenarios';
 export * from './riskModuleScenarios';
 export * from './psychologyModuleScenarios';
+export * from './smcModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';

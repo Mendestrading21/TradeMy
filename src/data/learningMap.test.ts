@@ -26,6 +26,7 @@ import { VOLUME_SKILLS, VOLUME_CHECKPOINT_ID } from './volumeModuleScenarios';
 import { PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_ID } from './priceActionModuleScenarios';
 import { RISK_SKILLS, RISK_CHECKPOINT_ID } from './riskModuleScenarios';
 import { PSYCHOLOGY_SKILLS, PSYCHOLOGY_CHECKPOINT_ID } from './psychologyModuleScenarios';
+import { SMC_SKILLS, SMC_CHECKPOINT_ID } from './smcModuleScenarios';
 
 const EMPTY: LearningProgressInput = { completedSkills: [], exploredSlugs: [] };
 const WORLD1_DONE: LearningProgressInput = {
@@ -36,8 +37,8 @@ const WORLD1_DONE: LearningProgressInput = {
 const foundations = WORLDS.find((w) => w.id === 'world.foundations')!;
 
 describe('learningMap — hiérarchie unique', () => {
-  it('onze modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6), Indicateurs (7), Volume (8), Price action (9), Risk (10) et Psychologie (11), chacun son checkpoint propre', () => {
-    expect(GUIDED_MODULES).toHaveLength(11);
+  it('douze modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6), Indicateurs (7), Volume (8), Price action (9), Risk (10), Psychologie (11) et SMC (12), chacun son checkpoint propre', () => {
+    expect(GUIDED_MODULES).toHaveLength(12);
     const foundationsModule = GUIDED_MODULES.find((m) => m.worldId === 'world.foundations')!;
     expect(foundationsModule).toBeDefined();
     expect(foundationsModule.skillIds).toEqual(SKILLS.map((s) => s.id));
@@ -82,6 +83,10 @@ describe('learningMap — hiérarchie unique', () => {
     expect(psychologyModule).toBeDefined();
     expect(psychologyModule.skillIds).toEqual(PSYCHOLOGY_SKILLS.map((s) => s.id));
     expect(psychologyModule.checkpointId).toBe(PSYCHOLOGY_CHECKPOINT_ID);
+    const smcModule = GUIDED_MODULES.find((m) => m.worldId === 'world.smc')!;
+    expect(smcModule).toBeDefined();
+    expect(smcModule.skillIds).toEqual(SMC_SKILLS.map((s) => s.id));
+    expect(smcModule.checkpointId).toBe(SMC_CHECKPOINT_ID);
     // Chaque monde guidé est reconnu ; les checkpoints sont PROPRES (jamais partagés).
     expect(isGuidedWorld('world.foundations')).toBe(true);
     expect(isGuidedWorld('world.candles')).toBe(true);
@@ -94,16 +99,17 @@ describe('learningMap — hiérarchie unique', () => {
     expect(isGuidedWorld('world.price-action')).toBe(true);
     expect(isGuidedWorld('world.risk')).toBe(true);
     expect(isGuidedWorld('world.psychology')).toBe(true);
-    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators', 'world.volume', 'world.price-action', 'world.risk', 'world.psychology']) {
+    expect(isGuidedWorld('world.smc')).toBe(true);
+    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators', 'world.volume', 'world.price-action', 'world.risk', 'world.psychology', 'world.smc']) {
       expect(guidedModulesForWorld(wid)).toHaveLength(1);
     }
-    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(11);
-    // Les 4 autres mondes restent des collections de notions (aucun module guidé).
+    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(12);
+    // Les 3 autres mondes restent des collections de notions (aucun module guidé).
     const guidedWorldIds = new Set(GUIDED_MODULES.map((m) => m.worldId));
-    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(4);
-    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..11) — la progression reste linéaire.
+    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(3);
+    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..12) — la progression reste linéaire.
     const guidedOrders = WORLDS.filter((w) => guidedWorldIds.has(w.id)).map((w) => w.order).sort((a, b) => a - b);
-    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
 
   it('nouvel utilisateur : seul le monde 1 est ouvert (en cours), le reste verrouillé', () => {
