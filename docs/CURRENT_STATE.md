@@ -205,8 +205,9 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 
 > **Programme « guider tous les mondes » en cours** (autorisation propriétaire du 29/07/2026 : un
 > lot par monde, gate verte à chaque fusion). Modules guidés : Fondations, Anatomie (ADR-113),
-> Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112), Figures (LOT 4-Q, ADR-114) —
-> **6 mondes guidés sur 15** (préfixe 1-6 entièrement guidé), 9 restent des collections de notions.
+> Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112), Figures (ADR-114), Indicateurs
+> (LOT 4-R, ADR-115) — **7 mondes guidés sur 15** (préfixe 1-7 entièrement guidé), 8 restent des
+> collections de notions.
 > Depuis le LOT 4-P, un monde guidé se termine par la preuve (checkpoint), plus par la seule lecture.
 
 ## v1 web gratuite (ADR-110) — 29/07/2026

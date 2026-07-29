@@ -67,6 +67,17 @@ import {
   PATTERNS_SKILL_CONCEPT_ID,
   PATTERNS_SKILL_CONCEPT_SLUG,
 } from './patternsModuleScenarios';
+import {
+  INDICATORS_SKILLS,
+  INDICATORS_MODULE_ID,
+  INDICATORS_MODULE_TITLE,
+  INDICATORS_MODULE_WORLD_ID,
+  INDICATORS_CHECKPOINT_ID,
+  INDICATORS_CHECKPOINT_TITLE,
+  INDICATORS_MODULE_EXERCISES_BY_SKILL,
+  INDICATORS_SKILL_CONCEPT_ID,
+  INDICATORS_SKILL_CONCEPT_SLUG,
+} from './indicatorsModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -836,6 +847,100 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-R — Module guidé « Lire les indicateurs » (world.indicators) ──
+  'skill.indicators.rsi': [
+    {
+      id: 'lesson.indicators-rsi',
+      slug: 'rsi-lecture',
+      title: 'Le RSI : la force relative, pas un ordre',
+      skillId: 'skill.indicators.rsi',
+      objective: 'Lire le RSI, ses zones extrêmes et ses limites.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Sous le prix, une courbe bornée entre 0 et 100 : le RSI. Elle résume la force relative des hausses et des baisses récentes.' },
+        { id: 's1', kind: 'observe', body: 'Repère les deux seuils de référence : 70 (zone de surachat) et 30 (zone de survente).' },
+        { id: 's2', kind: 'visual', conceptRef: 'rsi' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'rsi', body: 'Un extrême n’est pas un signal : c’est un repère de contexte, à confirmer par la structure de prix.' },
+        { id: 's4', kind: 'falseSignal', body: 'En pleine tendance haussière, agir sur un simple « surachat » est le piège classique : le RSI peut rester longtemps à l’extrême.' },
+        { id: 's5', kind: 'summary', body: 'RSI = oscillateur borné 0–100 ; 70/30 sont des repères de contexte, jamais des ordres — la structure confirme.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que signifie un RSI au-dessus de 70 ?', back: 'Une zone de surachat : un repère de contexte à confirmer par la structure — pas un signal automatique.' } },
+      ],
+      commonMistake: 'Traiter 70/30 comme des ordres automatiques.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.indicators.macd': [
+    {
+      id: 'lesson.indicators-macd',
+      slug: 'macd-lecture',
+      title: 'Le MACD : l’élan, en retard',
+      skillId: 'skill.indicators.macd',
+      objective: 'Lire le MACD (ligne, signal, histogramme) et son retard.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le MACD mesure l’élan : l’écart entre une moyenne rapide et une lente, complété d’une ligne de signal et d’un histogramme.' },
+        { id: 's1', kind: 'observe', body: 'Repère les deux lignes (MACD et signal) et l’histogramme qui matérialise leur écart.' },
+        { id: 's2', kind: 'visual', conceptRef: 'macd' },
+        { id: 's3', kind: 'explain', body: 'Croisements et passage par zéro sont des repères d’élan — fondé sur des moyennes, le MACD retarde le prix. Si le prix contredit franchement le signal, le signal est invalidé.' },
+        { id: 's4', kind: 'falseSignal', body: 'En range, les croisements se multiplient sans tendance derrière : c’est le faux signal classique du MACD.' },
+        { id: 's5', kind: 'summary', body: 'MACD = élan par moyennes (retardé) ; croisements = repères, jamais des ordres — le prix prime.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Pourquoi le MACD est-il dit « retardé » ?', back: 'Fondé sur des moyennes, il suit le prix : ses signaux arrivent après le mouvement.' } },
+      ],
+      commonMistake: 'Traiter chaque croisement comme un ordre d’entrée.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.indicators.bollinger': [
+    {
+      id: 'lesson.indicators-bollinger',
+      slug: 'bollinger-lecture',
+      title: 'Les bandes de Bollinger : respirer avec la volatilité',
+      skillId: 'skill.indicators.bollinger',
+      objective: 'Lire compression et expansion — sans signal automatique.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une moyenne encadrée de deux bandes à ±2 écarts-types : les bandes de Bollinger mesurent la volatilité, pas la direction.' },
+        { id: 's1', kind: 'observe', body: 'Repère le resserrement des bandes (compression, faible volatilité) puis leur écartement (expansion).' },
+        { id: 's2', kind: 'visual', conceptRef: 'bandes-de-bollinger' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'bandes-de-bollinger', body: 'Une sortie de compression est une hypothèse : elle se confirme avec la structure — une sortie aussitôt annulée est une fausse sortie.' },
+        { id: 's4', kind: 'falseSignal', body: 'En tendance, le prix peut « marcher » le long d’une bande : chaque contact de bande n’est pas un signal de retour vers la moyenne.' },
+        { id: 's5', kind: 'summary', body: 'Bollinger = volatilité (compression/expansion) ; le contact d’une bande n’est jamais un signal automatique — la structure confirme.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que signale un resserrement des bandes ?', back: 'Une compression : la volatilité baisse — la sortie éventuelle reste à confirmer par la structure.' } },
+      ],
+      commonMistake: 'Prendre le contact d’une bande pour un signal automatique de retour.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.indicators.divergence': [
+    {
+      id: 'lesson.indicators-divergence',
+      slug: 'divergence-lecture',
+      title: 'La divergence : quand le prix et l’oscillateur se contredisent',
+      skillId: 'skill.indicators.divergence',
+      objective: 'Lire un désaccord prix/oscillateur comme essoufflement à confirmer.',
+      difficulty: 'advanced',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le prix fait des plus-hauts croissants, l’oscillateur des plus-hauts décroissants : les deux séries ne racontent plus la même histoire.' },
+        { id: 's1', kind: 'observe', body: 'Compare les pivots du prix et ceux de l’oscillateur : cherche un désaccord de sens.' },
+        { id: 's2', kind: 'visual', conceptRef: 'divergence' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'divergence', body: 'L’élan faiblit sous la surface — mais ce n’est qu’un essoufflement POSSIBLE, jamais un signal isolé.' },
+        { id: 's4', kind: 'explain', body: 'La divergence se confirme par la structure (cassure d’un creux) ; si le prix poursuit et que l’oscillateur repart avec lui, le désaccord est effacé.' },
+        { id: 's5', kind: 'falseSignal', body: 'Prendre chaque divergence pour un retournement imminent est le piège classique : beaucoup s’effacent sans suite.' },
+        { id: 's6', kind: 'summary', body: 'Divergence = désaccord de pivots prix/oscillateur ; hypothèse d’essoufflement, confirmée par la structure seulement.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui confirme une divergence baissière ?', back: 'La structure : la cassure d’un creux — jamais l’oscillateur seul.' } },
+      ],
+      commonMistake: 'Entrer sur la seule divergence, sans confirmation de structure.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -939,6 +1044,10 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.patterns.triangle': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.triangle'],
   'skill.patterns.flag': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.flag'],
   'skill.patterns.reversal': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.reversal'],
+  'skill.indicators.rsi': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.rsi'],
+  'skill.indicators.macd': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.macd'],
+  'skill.indicators.bollinger': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.bollinger'],
+  'skill.indicators.divergence': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.divergence'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -958,6 +1067,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...ANATOMY_SKILL_CONCEPT_ID,
   // LOT 4-Q — compétences du module « Lire les figures » (concepts réels de world.patterns).
   ...PATTERNS_SKILL_CONCEPT_ID,
+  ...INDICATORS_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1116,6 +1226,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: PATTERNS_CHECKPOINT_ID,
     checkpointTitle: PATTERNS_CHECKPOINT_TITLE,
   },
+  // LOT 4-R — 7e module guidé réel : « Lire les indicateurs » (monde 7, world.indicators).
+  // Un indicateur dérive du prix : repères de contexte, jamais des ordres — la structure confirme.
+  {
+    id: INDICATORS_MODULE_ID,
+    title: INDICATORS_MODULE_TITLE,
+    worldId: INDICATORS_MODULE_WORLD_ID,
+    skills: INDICATORS_SKILLS,
+    checkpointId: INDICATORS_CHECKPOINT_ID,
+    checkpointTitle: INDICATORS_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1192,6 +1312,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...SR_SKILL_CONCEPT_SLUG,
   ...ANATOMY_SKILL_CONCEPT_SLUG,
   ...PATTERNS_SKILL_CONCEPT_SLUG,
+  ...INDICATORS_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];

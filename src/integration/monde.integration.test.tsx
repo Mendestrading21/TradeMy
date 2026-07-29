@@ -58,7 +58,7 @@ jest.mock('expo-router', () => {
 });
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
-import { ProgressProvider, WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
+import { ProgressProvider, WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, PATTERNS_CHECKPOINT_ID, INDICATORS_SKILLS, INDICATORS_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -115,6 +115,16 @@ const W5_DONE = seed({
     ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
     ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
     ...SR_SKILLS.map((s) => s.id), SR_CHECKPOINT_ID,
+  ],
+});
+// Mondes 1-6 avancés (…+ Figures validé) → le monde 7 (Indicateurs techniques) s'ouvre.
+const W6_DONE = seed({
+  completedSkills: [
+    ...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS,
+    ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
+    ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
+    ...SR_SKILLS.map((s) => s.id), SR_CHECKPOINT_ID,
+    ...PATTERNS_SKILLS.map((s) => s.id), PATTERNS_CHECKPOINT_ID,
   ],
 });
 // Tous les mondes guidés validés → le premier monde de CONTENU est ouvert.
@@ -344,6 +354,24 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     expect(cta).toBeDefined();
     act(() => (cta!.props.onPress as () => void)());
     expect(pushes()).toContain(`/session/${PATTERNS_SKILLS[0].id}`);
+    await act(async () => r.unmount());
+  });
+
+  it('guidé Indicateurs (monde 7, LOT 4-R) : ses 4 compétences + checkpoint PROPRE surfacent, prochaine étape correcte', async () => {
+    // Mondes 1-6 validés → le monde 7 (Indicateurs techniques) est « en cours ».
+    await persist(W6_DONE);
+    const r = await mount('world.indicators');
+    expect(hasText(r.root, 'Indicateurs techniques')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    for (const s of INDICATORS_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    expect(hasTextIncluding(r.root, INDICATORS_CHECKPOINT_TITLE)).toBe(true);
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${INDICATORS_SKILLS[0].id}`);
     await act(async () => r.unmount());
   });
 

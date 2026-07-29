@@ -35,6 +35,9 @@ import {
   PATTERNS_MODULE_ID,
   PATTERNS_CHECKPOINT_ID,
   PATTERNS_CHECKPOINT_TITLE,
+  INDICATORS_MODULE_ID,
+  INDICATORS_CHECKPOINT_ID,
+  INDICATORS_CHECKPOINT_TITLE,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -121,7 +124,7 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
 
   it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
     // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
-    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID, PATTERNS_MODULE_ID]);
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID, PATTERNS_MODULE_ID, INDICATORS_MODULE_ID]);
     expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
     expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
     expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
@@ -173,5 +176,16 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     // Compétences du MODULE (skill.patterns.*), jamais l'ancien skill Fondations `skill.patterns`.
     expect(cp.every((e) => e.skillId.startsWith('skill.patterns.'))).toBe(true);
     expect(cp.some((e) => e.skillId === 'skill.patterns')).toBe(false);
+  });
+
+  it('module RÉEL Indicateurs (LOT 4-R) : 7e module, checkpoint PROPRE et indépendant', () => {
+    expect(isCheckpoint(INDICATORS_CHECKPOINT_ID)).toBe(true);
+    expect(
+      new Set([CHECKPOINT_ID, CANDLE_CHECKPOINT_ID, STRUCTURE_CHECKPOINT_ID, SR_CHECKPOINT_ID, ANATOMY_CHECKPOINT_ID, PATTERNS_CHECKPOINT_ID, INDICATORS_CHECKPOINT_ID]).size,
+    ).toBe(7);
+    expect(skillById(INDICATORS_CHECKPOINT_ID)).toEqual({ id: INDICATORS_CHECKPOINT_ID, name: INDICATORS_CHECKPOINT_TITLE });
+    const cp = checkpointExercises(INDICATORS_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    expect(cp.every((e) => e.skillId.startsWith('skill.indicators.'))).toBe(true);
   });
 });
