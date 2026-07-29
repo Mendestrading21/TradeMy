@@ -121,6 +121,18 @@ export default function ConceptFiche() {
     if (concept) analytics.track('concept_viewed', { categoryId: concept.categoryId, hasVisual: Boolean(concept.visualSpec) });
   }, [concept]);
 
+  // LOT V4 — détail à la demande : la fiche s'ouvre visuelle et courte ; la définition complète et
+  // la réponse de la flashcard s'affichent au tap. Repli automatique quand on change de concept
+  // (réinitialisation PENDANT le rendu — pattern React documenté, pas d'effet en cascade).
+  const [showDetail, setShowDetail] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [prevSlug, setPrevSlug] = useState(slug);
+  if (slug !== prevSlug) {
+    setPrevSlug(slug);
+    setShowDetail(false);
+    setShowAnswer(false);
+  }
+
   // La progression se charge de façon asynchrone : on n'enregistre l'exploration
   // qu'une fois `ready` (sinon l'état est encore null et le marquage est perdu).
   useEffect(() => {
@@ -210,9 +222,23 @@ export default function ConceptFiche() {
         </View>
       ) : null}
 
+      {/* LOT V4 — moins de texte par défaut : « En bref » suffit à comprendre ; la définition
+          COMPLÈTE s'ouvre à la demande (bouton accessible, état expanded, chevron pivotant). */}
       <Card>
-        <SectionHead iconName="book" title="Définition" color={theme.colors.textSecondary} />
-        <Text variant="body">{concept.definitionDetailed}</Text>
+        <Pressable
+          accessible
+          accessibilityRole="button"
+          accessibilityState={{ expanded: showDetail }}
+          accessibilityLabel={showDetail ? 'Masquer la définition complète' : 'Lire la définition complète'}
+          onPress={() => setShowDetail((v) => !v)}
+          style={styles.toggleRow}
+        >
+          <SectionHead iconName="book" title="Définition" color={theme.colors.textSecondary} />
+          <View style={showDetail ? styles.chevronOpen : styles.chevronClosed}>
+            <TrademyIcon name="chevron-right" size={18} color={theme.colors.textMuted} strokeWidth={2.2} />
+          </View>
+        </Pressable>
+        {showDetail ? <Text variant="body">{concept.definitionDetailed}</Text> : null}
       </Card>
 
       {concept.howToRecognize.length ? (
@@ -270,13 +296,19 @@ export default function ConceptFiche() {
         </Card>
       ) : null}
 
+      {/* LOT V4 — flashcard interactive : la question s'affiche, la réponse se RÉVÈLE au tap
+          (micro-rappel actif, comme en révision — jamais les deux faces d'un coup). */}
       {concept.flashcards[0] ? (
         <Card>
           <SectionHead iconName="review" title="Flashcard" color={theme.colors.primaryBright} />
           <Text variant="body">{concept.flashcards[0].front}</Text>
-          <Text variant="body" color={theme.colors.textSecondary}>
-            {concept.flashcards[0].back}
-          </Text>
+          {showAnswer ? (
+            <Text variant="body" color={theme.colors.textSecondary}>
+              {concept.flashcards[0].back}
+            </Text>
+          ) : (
+            <Button label="Révéler la réponse" variant="secondary" onPress={() => setShowAnswer(true)} />
+          )}
         </Card>
       ) : null}
 
@@ -318,6 +350,9 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
   reviewNotice: { gap: theme.spacing.xs, borderColor: theme.colors.warning },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 },
+  chevronClosed: { transform: [{ rotate: '0deg' }] },
+  chevronOpen: { transform: [{ rotate: '90deg' }] },
   dialogue: { gap: theme.spacing.md },
   list: { gap: theme.spacing.sm, marginTop: theme.spacing.xs },
   bulletRow: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.sm },
