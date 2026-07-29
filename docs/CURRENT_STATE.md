@@ -210,6 +210,15 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 > collections de notions.
 > Depuis le LOT 4-P, un monde guidé se termine par la preuve (checkpoint), plus par la seule lecture.
 
+## Programme « Visual Max » (ADR-116) — 29/07/2026, livré
+
+Priorité propriétaire (captures à l'appui) : mascottes 3D partout, moins de texte, plus
+d'interaction. Lots livrés (PR #30-#34) : avatars 3D (fin du vectoriel 2D), célébration 3D de fin
+de session (asset `celebrate` réparé), fiche concept « détail à la demande », étape observe
+visuelle dans toutes les leçons guidées, défrange des 8 renders (fin du liseré blanc).
+**Reste ouvert** : LOT V3 — nouvelles poses 3D, bloqué sur la production design du propriétaire
+(brief transmis : 10 poses, PNG fond transparent ~760 px, même style que les 8 renders).
+
 ## v1 web gratuite (ADR-110) — 29/07/2026
 
 Décision propriétaire : publication **web d'abord**, version de test **entièrement gratuite**.
