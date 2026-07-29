@@ -60,6 +60,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | 6e module guidé « Lire les figures » (`world.patterns`) : 4 familles → concepts réels (double creux, triangle ascendant, drapeau, ÉTÉ), placements de plancher honnêtes (double + drapeau seuls), checkpoint propre distinct du skill Fondations, préfixe 1..6, compteurs à 22 compétences (LOT 4-Q) | [ADR-114](./ADR-114-trademy-lot4q-guided-patterns.md) |
 | 7e module guidé « Lire les indicateurs » (`world.indicators`) : 4 compétences → 4 concepts réels (RSI, MACD, Bollinger, divergence), objectifs honnêtes (seule la divergence documente une invalidation → 5 exercices pour elle, aucun placement), checkpoint propre, préfixe 1..7, compteurs à 26 compétences (LOT 4-R) | [ADR-115](./ADR-115-trademy-lot4r-guided-indicators.md) |
 | Programme « Visual Max » (LOTS V1-V6) : avatars 3D partout (fin du vectoriel 2D), célébration 3D de fin de session (asset réparé), fiche concept « détail à la demande », étape observe visuelle, défrange des 8 renders — renders + motion, jamais de 3D temps réel | [ADR-116](./ADR-116-trademy-visual-max.md) |
+| 8e module guidé « Lire le volume » (`world.volume`) : 3 compétences → 3 concepts réels (volume, VWAP, profil de volume), objectifs honnêtes (seul le profil documente une invalidation — contextuelle, aucun placement), reconnaissance du profil au rendu réel de sa fiche (`visualType` étendu à volume-profile), checkpoint propre, préfixe 1..8, compteurs à 29 compétences (LOT 4-S) | [ADR-117](./ADR-117-trademy-lot4s-guided-volume.md) |
 
 ## Fondations toujours actives
 
