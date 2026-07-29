@@ -74,7 +74,7 @@ jest.mock('expo-router', () => {
 
 import Apprendre from '@/app/(tabs)/parcours';
 import { ProgressProvider } from '@/data';
-import { WORLDS, conceptsByWorld } from '@/data';
+import { WORLDS } from '@/data';
 import { V5_CONCEPTS } from '@/data';
 import { SKILLS, CHECKPOINT_ID, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { buildLearningPath, worldEntryById } from '@/data';
@@ -87,9 +87,8 @@ const routerState = (ExpoRouter as unknown as { __state: { calls: unknown[][] } 
 const ALL_SKILLS = SKILLS.map((s) => s.id);
 const SORTED_WORLDS = [...WORLDS].sort((a, b) => a.order - b.order);
 const WORLD2 = SORTED_WORLDS[1]; // world.anatomy (ordre 2) — GUIDÉ depuis le LOT 4-P
-// Premier monde de CONTENU (non guidé, avec concepts) — DYNAMIQUE, robuste aux conversions futures.
-const CONTENT_WORLD = SORTED_WORLDS.find((w) => !isGuidedWorld(w.id) && conceptsByWorld(V5_CONCEPTS, w.id).length > 0)!;
-const CONTENT_SLUGS = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id).map((c) => c.slug);
+// Depuis le LOT 4-Z, PLUS AUCUN monde de contenu : les 15 mondes sont guidés (vérifié en test).
+const LAST_WORLD = SORTED_WORLDS[SORTED_WORLDS.length - 1]; // world.false-signals (ordre 15)
 // Tous les modules guidés validés (compétences + checkpoints).
 const ALL_GUIDED_DONE_IDS = CONTENT_MODULES.flatMap((m) => [...m.skills.map((s) => s.id), m.checkpointId]);
 
@@ -103,7 +102,7 @@ async function persist(json: string | null) {
 const NEW = seed({});
 const GUIDED_PARTIAL = seed({ completedSkills: [ALL_SKILLS[0]] }); // 1 compétence, PAS le checkpoint
 const W1_DONE = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID] });
-const CONTENT_EXPLORED = seed({ completedSkills: ALL_GUIDED_DONE_IDS, learning: { conceptsExplored: CONTENT_SLUGS } });
+const ALL_DONE = seed({ completedSkills: ALL_GUIDED_DONE_IDS });
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -206,18 +205,15 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
     await act(async () => r.unmount());
   });
 
-  it('toutes les fiches d’un monde de contenu consultées : « exploré » (jamais « terminé »), monde suivant débloqué', async () => {
-    // DYNAMIQUE : premier monde NON guidé avec concepts, atteint en validant tous les modules guidés.
-    await persist(CONTENT_EXPLORED);
+  it('15/15 (LOT 4-Z) : tous les modules guidés validés → le parcours ENTIER est terminé, dernier monde compris', async () => {
+    // Plus aucun monde de contenu : chaque monde (même le 15e) se termine par la PREUVE.
+    expect(SORTED_WORLDS.every((w) => isGuidedWorld(w.id))).toBe(true);
+    await persist(ALL_DONE);
     const r = await mount();
     const root = r.root;
-    const lc = labelForOrder(root, CONTENT_WORLD.order)!;
-    expect(lc).toMatch(/Niveau : exploré/);
-    expect(lc).not.toMatch(/Niveau : terminé/);
-    // Le monde suivant (s'il existe) est ouvert — depuis le LOT 4-Y, le monde de contenu est le
-    // DERNIER du parcours (ordre 15) : l'assertion ne s'applique que s'il reste un monde après.
-    const next = labelForOrder(root, CONTENT_WORLD.order + 1);
-    if (next !== undefined) expect(next).not.toMatch(/verrouillé/);
+    const last = labelForOrder(root, LAST_WORLD.order)!;
+    expect(last).toMatch(/Niveau : terminé/);
+    expect(last).not.toMatch(/verrouillé/);
     await act(async () => r.unmount());
   });
 
@@ -316,8 +312,8 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
     // Checkpoint validé : monde 1 terminé.
     const done1 = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], exploredSlugs: [] });
     expect(worldEntryById(done1, 'world.foundations')!.status).toBe('done');
-    // Contenu consulté = exploré, jamais terminé (premier monde de contenu, dynamique).
-    const exploredContent = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: ALL_GUIDED_DONE_IDS, exploredSlugs: CONTENT_SLUGS });
-    expect(worldEntryById(exploredContent, CONTENT_WORLD.id)!.status).toBe('explored');
+    // 15/15 : tous les modules validés → chaque monde est « done » (plus aucun monde de contenu).
+    const allDone = buildLearningPath(WORLDS, V5_CONCEPTS, { completedSkills: ALL_GUIDED_DONE_IDS, exploredSlugs: [] });
+    expect(allDone.every((e) => e.status === 'done')).toBe(true);
   });
 });

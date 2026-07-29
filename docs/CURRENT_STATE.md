@@ -203,13 +203,13 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 - **Vérité pédagogique préservée** ✅ : prouvée de bout en bout sur les écrans réels (session + fiche du
   monde 3) — 1 transition/cible, cible échouée due, aucune maîtrise prématurée, reprise idempotente.
 
-> **Programme « guider tous les mondes » en cours** (autorisation propriétaire du 29/07/2026 : un
+> **Programme « guider tous les mondes » TERMINÉ** (autorisation propriétaire du 29/07/2026 : un
 > lot par monde, gate verte à chaque fusion). Modules guidés : Fondations, Anatomie (ADR-113),
 > Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112), Figures (ADR-114), Indicateurs
 > (ADR-115), Volume (ADR-117), Price action (ADR-118), Risk (ADR-119), Psychologie (ADR-120),
-> SMC (ADR-121), Wyckoff (ADR-122), Options (LOT 4-Y, ADR-123) — **14 mondes guidés sur 15**
-> (préfixe 1-14 entièrement guidé), seul le monde 15 reste une collection de notions.
-> Depuis le LOT 4-P, un monde guidé se termine par la preuve (checkpoint), plus par la seule lecture.
+> SMC (ADR-121), Wyckoff (ADR-122), Options (ADR-123), Faux signaux (LOT 4-Z, ADR-124) —
+> **15 mondes guidés sur 15** : le parcours entier est guidé, plus aucun « monde de contenu ».
+> Chaque monde se termine par la preuve (checkpoint propre), jamais par la seule lecture.
 
 ## Programme « Visual Max » (ADR-116) — 29/07/2026, livré
 

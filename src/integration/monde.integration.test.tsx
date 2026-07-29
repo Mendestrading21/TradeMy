@@ -58,7 +58,7 @@ jest.mock('expo-router', () => {
 });
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
-import { ProgressProvider, WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, PATTERNS_CHECKPOINT_ID, INDICATORS_SKILLS, INDICATORS_CHECKPOINT_TITLE, INDICATORS_CHECKPOINT_ID, VOLUME_SKILLS, VOLUME_CHECKPOINT_TITLE, VOLUME_CHECKPOINT_ID, PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_TITLE, PRICEACTION_CHECKPOINT_ID, RISK_SKILLS, RISK_CHECKPOINT_TITLE, RISK_CHECKPOINT_ID, PSYCHOLOGY_SKILLS, PSYCHOLOGY_CHECKPOINT_TITLE, PSYCHOLOGY_CHECKPOINT_ID, SMC_SKILLS, SMC_CHECKPOINT_TITLE, SMC_CHECKPOINT_ID, WYCKOFF_SKILLS, WYCKOFF_CHECKPOINT_TITLE, WYCKOFF_CHECKPOINT_ID, OPTIONS_SKILLS, OPTIONS_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
+import { ProgressProvider, WORLDS, V5_CONCEPTS, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE, SR_CHECKPOINT_ID, ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID, ANATOMY_CHECKPOINT_TITLE, PATTERNS_SKILLS, PATTERNS_CHECKPOINT_TITLE, PATTERNS_CHECKPOINT_ID, INDICATORS_SKILLS, INDICATORS_CHECKPOINT_TITLE, INDICATORS_CHECKPOINT_ID, VOLUME_SKILLS, VOLUME_CHECKPOINT_TITLE, VOLUME_CHECKPOINT_ID, PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_TITLE, PRICEACTION_CHECKPOINT_ID, RISK_SKILLS, RISK_CHECKPOINT_TITLE, RISK_CHECKPOINT_ID, PSYCHOLOGY_SKILLS, PSYCHOLOGY_CHECKPOINT_TITLE, PSYCHOLOGY_CHECKPOINT_ID, SMC_SKILLS, SMC_CHECKPOINT_TITLE, SMC_CHECKPOINT_ID, WYCKOFF_SKILLS, WYCKOFF_CHECKPOINT_TITLE, WYCKOFF_CHECKPOINT_ID, OPTIONS_SKILLS, OPTIONS_CHECKPOINT_TITLE, OPTIONS_CHECKPOINT_ID, FALSESIGNALS_SKILLS, FALSESIGNALS_CHECKPOINT_TITLE, CONTENT_MODULES, isGuidedWorld } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -73,8 +73,8 @@ const WORLD1 = 'world.foundations';
 const SORTED = [...WORLDS].sort((a, b) => a.order - b.order);
 const WORLD2 = SORTED[1]; // world.anatomy — GUIDÉ depuis le LOT 4-P (ordre 2)
 // Premier monde de CONTENU (non guidé, avec concepts) — DYNAMIQUE, robuste aux conversions futures.
-const CONTENT_WORLD = SORTED.find((w) => !isGuidedWorld(w.id) && conceptsByWorld(V5_CONCEPTS, w.id).length > 0)!;
-const CONTENT_SLUGS = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id).map((c) => c.slug);
+// Depuis le LOT 4-Z, PLUS AUCUN monde de contenu : les 15 mondes sont guidés (vérifié ici).
+const LAST_WORLD = SORTED[SORTED.length - 1]; // world.false-signals (ordre 15)
 // Tous les modules guidés validés (compétences + checkpoints) — préfixe du parcours terminé.
 const ALL_GUIDED_DONE_IDS = CONTENT_MODULES.flatMap((m) => [...m.skills.map((s) => s.id), m.checkpointId]);
 
@@ -225,9 +225,26 @@ const W13_DONE = seed({
     ...WYCKOFF_SKILLS.map((s) => s.id), WYCKOFF_CHECKPOINT_ID,
   ],
 });
-// Tous les mondes guidés validés → le premier monde de CONTENU est ouvert.
+// Mondes 1-14 avancés (…+ Options validé) → le monde 15 (Faux signaux) s'ouvre.
+const W14_DONE = seed({
+  completedSkills: [
+    ...ALL_SKILLS, CHECKPOINT_ID, ...ANATOMY_DONE_IDS,
+    ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
+    ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
+    ...SR_SKILLS.map((s) => s.id), SR_CHECKPOINT_ID,
+    ...PATTERNS_SKILLS.map((s) => s.id), PATTERNS_CHECKPOINT_ID,
+    ...INDICATORS_SKILLS.map((s) => s.id), INDICATORS_CHECKPOINT_ID,
+    ...VOLUME_SKILLS.map((s) => s.id), VOLUME_CHECKPOINT_ID,
+    ...PRICEACTION_SKILLS.map((s) => s.id), PRICEACTION_CHECKPOINT_ID,
+    ...RISK_SKILLS.map((s) => s.id), RISK_CHECKPOINT_ID,
+    ...PSYCHOLOGY_SKILLS.map((s) => s.id), PSYCHOLOGY_CHECKPOINT_ID,
+    ...SMC_SKILLS.map((s) => s.id), SMC_CHECKPOINT_ID,
+    ...WYCKOFF_SKILLS.map((s) => s.id), WYCKOFF_CHECKPOINT_ID,
+    ...OPTIONS_SKILLS.map((s) => s.id), OPTIONS_CHECKPOINT_ID,
+  ],
+});
+// Tous les modules guidés validés → le parcours ENTIER est terminé (15/15).
 const GUIDED_ALL_DONE = seed({ completedSkills: ALL_GUIDED_DONE_IDS });
-const CONTENT_EXPLORED = seed({ completedSkills: ALL_GUIDED_DONE_IDS, learning: { conceptsExplored: CONTENT_SLUGS } });
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -644,30 +661,32 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     await act(async () => r.unmount());
   });
 
-  // ─── Monde de contenu avec concepts (premier monde NON guidé — dynamique) ──
-  it('contenu déverrouillé : aucune fausse leçon, concepts canoniques, nav /concept/[slug], consulté ≠ maîtrisé', async () => {
-    await persist(GUIDED_ALL_DONE); // tous les modules guidés validés → premier monde de contenu ouvert
-    const r = await mount(CONTENT_WORLD.id);
-    // Message honnête (pas de leçon inexistante).
-    expect(hasTextIncluding(r.root, 'n’est pas la maîtriser')).toBe(true);
-    // Concepts issus de la source canonique (titres réels).
-    const c0 = conceptsByWorld(V5_CONCEPTS, CONTENT_WORLD.id)[0];
-    expect(hasText(r.root, c0.title)).toBe(true);
-    // Prochaine étape = explorer la première fiche.
-    const cta = ctaWithHint(r.root, 'Explorer les notions');
+  // ─── 15/15 (LOT 4-Z) : plus aucun monde de contenu — le parcours entier est guidé ──
+  it('guidé Faux signaux (monde 15, LOT 4-Z) : ses 2 compétences + checkpoint PROPRE surfacent, prochaine étape correcte', async () => {
+    // Mondes 1-14 validés → le monde 15 (Faux signaux) est « en cours ».
+    await persist(W14_DONE);
+    const r = await mount('world.false-signals');
+    expect(hasText(r.root, 'Laboratoire de faux signaux')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    for (const s of FALSESIGNALS_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    expect(hasTextIncluding(r.root, FALSESIGNALS_CHECKPOINT_TITLE)).toBe(true);
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
     expect(cta).toBeDefined();
     act(() => (cta!.props.onPress as () => void)());
-    expect(pushes()).toContain(`/concept/${c0.slug}`);
+    expect(pushes()).toContain(`/session/${FALSESIGNALS_SKILLS[0].id}`);
     await act(async () => r.unmount());
   });
 
-  it('contenu entièrement consulté : « exploré » (jamais « terminé »), suite = monde suivant si ouvert', async () => {
-    await persist(CONTENT_EXPLORED);
-    const r = await mount(CONTENT_WORLD.id);
-    expect(hasText(r.root, 'Exploré')).toBe(true);
-    expect(hasText(r.root, 'Terminé')).toBe(false); // un monde de contenu n’est jamais « terminé »
-    // Marque « consultée » présente (consultation distincte de la maîtrise).
-    expect(hasTextIncluding(r.root, 'pas encore maîtrisée')).toBe(true);
+  it('15/15 : tous les modules validés → le DERNIER monde est « Terminé » (aucune impasse, aucun monde de contenu)', async () => {
+    // Plus aucun monde non guidé : chaque monde se termine par la PREUVE, jamais par la lecture.
+    expect(SORTED.every((w) => isGuidedWorld(w.id))).toBe(true);
+    await persist(GUIDED_ALL_DONE);
+    const r = await mount(LAST_WORLD.id);
+    expect(hasText(r.root, 'Terminé')).toBe(true);
+    expect(hasText(r.root, 'Module validé')).toBe(true);
     await act(async () => r.unmount());
   });
 

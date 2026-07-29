@@ -13,6 +13,7 @@ export * from './psychologyModuleScenarios';
 export * from './smcModuleScenarios';
 export * from './wyckoffModuleScenarios';
 export * from './optionsModuleScenarios';
+export * from './falseSignalsModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';
