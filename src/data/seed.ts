@@ -56,6 +56,17 @@ import {
   ANATOMY_SKILL_CONCEPT_ID,
   ANATOMY_SKILL_CONCEPT_SLUG,
 } from './anatomyModuleScenarios';
+import {
+  PATTERNS_SKILLS,
+  PATTERNS_MODULE_ID,
+  PATTERNS_MODULE_TITLE,
+  PATTERNS_MODULE_WORLD_ID,
+  PATTERNS_CHECKPOINT_ID,
+  PATTERNS_CHECKPOINT_TITLE,
+  PATTERNS_MODULE_EXERCISES_BY_SKILL,
+  PATTERNS_SKILL_CONCEPT_ID,
+  PATTERNS_SKILL_CONCEPT_SLUG,
+} from './patternsModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -731,6 +742,100 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-Q — Module guidé « Lire les figures » (world.patterns) ──
+  'skill.patterns.double': [
+    {
+      id: 'lesson.patterns-double',
+      slug: 'double-creux-lecture',
+      title: 'Le double creux : deux planchers, une ligne de cou',
+      skillId: 'skill.patterns.double',
+      objective: 'Reconnaître un double creux et attendre sa confirmation.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Deux fois de suite, le prix rebondit au même niveau : le double creux. Entre les deux, un sommet — la ligne de cou.' },
+        { id: 's1', kind: 'observe', body: 'Repère deux creux au même niveau, puis trace la ligne de cou sur le sommet intermédiaire.' },
+        { id: 's2', kind: 'visual', conceptRef: 'double-creux' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'double-creux', body: 'La figure ne vaut que confirmée : la clôture au-dessus de la ligne de cou est l’événement, pas les creux eux-mêmes.' },
+        { id: 's4', kind: 'falseSignal', body: 'Un franchissement de la ligne de cou sans participation, aussitôt rendu, est un faux signal classique.' },
+        { id: 's5', kind: 'summary', body: 'Double creux = deux planchers + ligne de cou ; confirmé au-dessus de la ligne de cou, invalidé sous les creux.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui confirme un double creux ?', back: 'Une clôture au-dessus de la ligne de cou (le sommet intermédiaire).' } },
+      ],
+      commonMistake: 'Jouer la figure dès le second creux, sans attendre la ligne de cou.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.patterns.triangle': [
+    {
+      id: 'lesson.patterns-triangle',
+      slug: 'triangle-ascendant-lecture',
+      title: 'Le triangle ascendant : la compression',
+      skillId: 'skill.patterns.triangle',
+      objective: 'Lire la compression d’un triangle et attendre sa résolution.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une résistance plate, des creux de plus en plus hauts : le prix se comprime. C’est le triangle ascendant.' },
+        { id: 's1', kind: 'observe', body: 'Repère la résistance horizontale testée plusieurs fois et la ligne montante des creux.' },
+        { id: 's2', kind: 'visual', conceptRef: 'triangle-ascendant' },
+        { id: 's3', kind: 'explain', body: 'La pression acheteuse monte, mais rien n’est joué : seule une clôture franche hors du triangle résout la figure — dans un sens comme dans l’autre.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une fausse sortie au-dessus de la résistance sans participation, aussitôt annulée, piège les impatients.' },
+        { id: 's5', kind: 'summary', body: 'Triangle ascendant = compression sous résistance ; seule la résolution en clôture compte, jamais l’anticipation.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui résout un triangle ascendant ?', back: 'Une clôture franche hors du triangle — idéalement au-dessus de la résistance, avec retest.' } },
+      ],
+      commonMistake: 'Anticiper la sortie avant la clôture hors du triangle.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.patterns.flag': [
+    {
+      id: 'lesson.patterns-flag',
+      slug: 'drapeau-haussier-lecture',
+      title: 'Le drapeau : la pause qui continue',
+      skillId: 'skill.patterns.flag',
+      objective: 'Lire une consolidation de continuation : mât, canal, reprise.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une forte impulsion (le mât), le prix souffle dans un petit canal incliné : le drapeau.' },
+        { id: 's1', kind: 'observe', body: 'Repère le mât (l’impulsion), puis le canal court et contenu de la consolidation.' },
+        { id: 's2', kind: 'visual', conceptRef: 'drapeau-haussier' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'drapeau-haussier', body: 'L’hypothèse de continuation se joue à la sortie HAUTE du canal — pas pendant la pause.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une sortie haute sans participation, qui retombe aussitôt dans le canal, n’est pas une continuation.' },
+        { id: 's5', kind: 'summary', body: 'Drapeau = mât + canal court ; confirmé à la sortie haute, invalidé sous le bas du canal.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’invalide un drapeau haussier ?', back: 'Une clôture sous le bas du canal, effaçant une bonne part du mât.' } },
+      ],
+      commonMistake: 'Confondre toute consolidation avec un drapeau : le canal doit rester court et contenu.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.patterns.reversal': [
+    {
+      id: 'lesson.patterns-reversal',
+      slug: 'epaule-tete-epaule-lecture',
+      title: 'L’épaule-tête-épaule : le retournement majeur',
+      skillId: 'skill.patterns.reversal',
+      objective: 'Reconnaître l’ÉTÉ, sa ligne de cou et sa confirmation.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Trois sommets, le central plus haut que les deux autres : l’épaule-tête-épaule, figure de retournement majeure.' },
+        { id: 's1', kind: 'observe', body: 'Repère les trois sommets (épaule, tête, épaule) puis trace la ligne de cou sous les creux intermédiaires.' },
+        { id: 's2', kind: 'visual', conceptRef: 'epaule-tete-epaule' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'epaule-tete-epaule', body: 'La figure ne se joue PAS à l’épaule droite : tout se décide à la clôture sous la ligne de cou.' },
+        { id: 's4', kind: 'explain', body: 'La confirmation se lit sous la ligne de cou, idéalement retestée par l’arrière ; une reprise au-dessus l’invalide.' },
+        { id: 's5', kind: 'falseSignal', body: 'Une cassure de la ligne de cou sans participation, aussitôt rendue, est un faux signal — le retournement n’est jamais garanti.' },
+        { id: 's6', kind: 'summary', body: 'ÉTÉ = trois sommets + ligne de cou ; confirmée sous la ligne de cou, jamais garantie.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Où se confirme une épaule-tête-épaule ?', back: 'Sous la ligne de cou, en clôture — idéalement retestée par l’arrière.' } },
+      ],
+      commonMistake: 'Jouer la figure dès l’épaule droite, avant la cassure de la ligne de cou.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -829,6 +934,11 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.anatomy.candle': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.candle'],
   'skill.anatomy.timeframe': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.timeframe'],
   'skill.anatomy.scale': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.scale'],
+  // LOT 4-Q — module « Lire les figures » : exercices dérivés des scénarios.
+  'skill.patterns.double': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.double'],
+  'skill.patterns.triangle': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.triangle'],
+  'skill.patterns.flag': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.flag'],
+  'skill.patterns.reversal': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.reversal'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -846,6 +956,8 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...SR_SKILL_CONCEPT_ID,
   // LOT 4-P — compétences du module « Lire un graphique de près » (concepts réels de world.anatomy).
   ...ANATOMY_SKILL_CONCEPT_ID,
+  // LOT 4-Q — compétences du module « Lire les figures » (concepts réels de world.patterns).
+  ...PATTERNS_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -994,6 +1106,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: ANATOMY_CHECKPOINT_ID,
     checkpointTitle: ANATOMY_CHECKPOINT_TITLE,
   },
+  // LOT 4-Q — 6e module guidé réel : « Lire les figures » (monde 6, world.patterns).
+  // Quatre familles ancrées sur des concepts réels ; les 9 autres figures restent des fiches.
+  {
+    id: PATTERNS_MODULE_ID,
+    title: PATTERNS_MODULE_TITLE,
+    worldId: PATTERNS_MODULE_WORLD_ID,
+    skills: PATTERNS_SKILLS,
+    checkpointId: PATTERNS_CHECKPOINT_ID,
+    checkpointTitle: PATTERNS_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1069,6 +1191,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...STRUCTURE_SKILL_CONCEPT_SLUG,
   ...SR_SKILL_CONCEPT_SLUG,
   ...ANATOMY_SKILL_CONCEPT_SLUG,
+  ...PATTERNS_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
