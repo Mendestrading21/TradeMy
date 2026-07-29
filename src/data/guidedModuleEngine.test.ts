@@ -41,6 +41,9 @@ import {
   VOLUME_MODULE_ID,
   VOLUME_CHECKPOINT_ID,
   VOLUME_CHECKPOINT_TITLE,
+  PRICEACTION_MODULE_ID,
+  PRICEACTION_CHECKPOINT_ID,
+  PRICEACTION_CHECKPOINT_TITLE,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -127,7 +130,7 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
 
   it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
     // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
-    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID, PATTERNS_MODULE_ID, INDICATORS_MODULE_ID, VOLUME_MODULE_ID]);
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID, ANATOMY_MODULE_ID, PATTERNS_MODULE_ID, INDICATORS_MODULE_ID, VOLUME_MODULE_ID, PRICEACTION_MODULE_ID]);
     expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
     expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
     expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
@@ -201,5 +204,16 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     const cp = checkpointExercises(VOLUME_CHECKPOINT_ID, 0, 2);
     expect(cp.length).toBeGreaterThan(0);
     expect(cp.every((e) => e.skillId.startsWith('skill.volume.'))).toBe(true);
+  });
+
+  it('module RÉEL Price action (LOT 4-T) : 9e module (3 compétences), checkpoint PROPRE et indépendant', () => {
+    expect(isCheckpoint(PRICEACTION_CHECKPOINT_ID)).toBe(true);
+    expect(
+      new Set([CHECKPOINT_ID, CANDLE_CHECKPOINT_ID, STRUCTURE_CHECKPOINT_ID, SR_CHECKPOINT_ID, ANATOMY_CHECKPOINT_ID, PATTERNS_CHECKPOINT_ID, INDICATORS_CHECKPOINT_ID, VOLUME_CHECKPOINT_ID, PRICEACTION_CHECKPOINT_ID]).size,
+    ).toBe(9);
+    expect(skillById(PRICEACTION_CHECKPOINT_ID)).toEqual({ id: PRICEACTION_CHECKPOINT_ID, name: PRICEACTION_CHECKPOINT_TITLE });
+    const cp = checkpointExercises(PRICEACTION_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    expect(cp.every((e) => e.skillId.startsWith('skill.priceaction.'))).toBe(true);
   });
 });

@@ -7,6 +7,7 @@ export * from './anatomyModuleScenarios';
 export * from './patternsModuleScenarios';
 export * from './indicatorsModuleScenarios';
 export * from './volumeModuleScenarios';
+export * from './priceActionModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';

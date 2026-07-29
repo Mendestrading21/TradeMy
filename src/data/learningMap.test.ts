@@ -23,6 +23,7 @@ import { ANATOMY_SKILLS, ANATOMY_CHECKPOINT_ID } from './anatomyModuleScenarios'
 import { PATTERNS_SKILLS, PATTERNS_CHECKPOINT_ID } from './patternsModuleScenarios';
 import { INDICATORS_SKILLS, INDICATORS_CHECKPOINT_ID } from './indicatorsModuleScenarios';
 import { VOLUME_SKILLS, VOLUME_CHECKPOINT_ID } from './volumeModuleScenarios';
+import { PRICEACTION_SKILLS, PRICEACTION_CHECKPOINT_ID } from './priceActionModuleScenarios';
 
 const EMPTY: LearningProgressInput = { completedSkills: [], exploredSlugs: [] };
 const WORLD1_DONE: LearningProgressInput = {
@@ -33,8 +34,8 @@ const WORLD1_DONE: LearningProgressInput = {
 const foundations = WORLDS.find((w) => w.id === 'world.foundations')!;
 
 describe('learningMap — hiérarchie unique', () => {
-  it('huit modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6), Indicateurs (7) et Volume (8), chacun son checkpoint propre', () => {
-    expect(GUIDED_MODULES).toHaveLength(8);
+  it('neuf modules guidés : Fondations (1), Anatomie (2), Chandeliers (3), Structure (4), Niveaux (5), Figures (6), Indicateurs (7), Volume (8) et Price action (9), chacun son checkpoint propre', () => {
+    expect(GUIDED_MODULES).toHaveLength(9);
     const foundationsModule = GUIDED_MODULES.find((m) => m.worldId === 'world.foundations')!;
     expect(foundationsModule).toBeDefined();
     expect(foundationsModule.skillIds).toEqual(SKILLS.map((s) => s.id));
@@ -67,6 +68,10 @@ describe('learningMap — hiérarchie unique', () => {
     expect(volumeModule).toBeDefined();
     expect(volumeModule.skillIds).toEqual(VOLUME_SKILLS.map((s) => s.id));
     expect(volumeModule.checkpointId).toBe(VOLUME_CHECKPOINT_ID);
+    const priceActionModule = GUIDED_MODULES.find((m) => m.worldId === 'world.price-action')!;
+    expect(priceActionModule).toBeDefined();
+    expect(priceActionModule.skillIds).toEqual(PRICEACTION_SKILLS.map((s) => s.id));
+    expect(priceActionModule.checkpointId).toBe(PRICEACTION_CHECKPOINT_ID);
     // Chaque monde guidé est reconnu ; les checkpoints sont PROPRES (jamais partagés).
     expect(isGuidedWorld('world.foundations')).toBe(true);
     expect(isGuidedWorld('world.candles')).toBe(true);
@@ -76,16 +81,17 @@ describe('learningMap — hiérarchie unique', () => {
     expect(isGuidedWorld('world.patterns')).toBe(true);
     expect(isGuidedWorld('world.indicators')).toBe(true);
     expect(isGuidedWorld('world.volume')).toBe(true);
-    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators', 'world.volume']) {
+    expect(isGuidedWorld('world.price-action')).toBe(true);
+    for (const wid of ['world.foundations', 'world.anatomy', 'world.candles', 'world.structure', 'world.support-resistance', 'world.patterns', 'world.indicators', 'world.volume', 'world.price-action']) {
       expect(guidedModulesForWorld(wid)).toHaveLength(1);
     }
-    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(8);
-    // Les 7 autres mondes restent des collections de notions (aucun module guidé).
+    expect(new Set(GUIDED_MODULES.map((m) => m.checkpointId)).size).toBe(9);
+    // Les 6 autres mondes restent des collections de notions (aucun module guidé).
     const guidedWorldIds = new Set(GUIDED_MODULES.map((m) => m.worldId));
-    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(7);
-    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..8) — la progression reste linéaire.
+    expect(WORLDS.filter((w) => !guidedWorldIds.has(w.id))).toHaveLength(6);
+    // Les mondes guidés forment un PRÉFIXE du parcours (ordres 1..9) — la progression reste linéaire.
     const guidedOrders = WORLDS.filter((w) => guidedWorldIds.has(w.id)).map((w) => w.order).sort((a, b) => a - b);
-    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(guidedOrders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   it('nouvel utilisateur : seul le monde 1 est ouvert (en cours), le reste verrouillé', () => {
