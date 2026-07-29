@@ -6,8 +6,9 @@
  * - Les prix sont des **hypothèses configurables**, pas un engagement.
  * - **Aucun achat réel** n'est effectué : l'activation est une simulation locale
  *   (drapeau `demo`). Aucune donnée de paiement, aucun Stripe, aucun abonnement importé.
- * - Le paywall ne s'affiche qu'après une première interaction et une démonstration de
- *   valeur (déclenché par un accès à une fonctionnalité premium), jamais au démarrage.
+ * - **v1 gratuite (ADR-110)** : aucun paywall n'est affiché et aucun écran ne verrouille de
+ *   fonctionnalité. Ce modèle pur est conservé (testé) pour le jour où une monétisation réelle
+ *   serait décidée — décision documentée requise avant tout réaffichage d'une offre.
  */
 
 export type PlanId = 'founder' | 'monthly' | 'annual';

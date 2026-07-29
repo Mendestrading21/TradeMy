@@ -43,7 +43,7 @@ export default function Glossaire() {
 
   return (
     <Screen>
-      <Text variant="h1">Glossaire 📖</Text>
+      <Text variant="h1">Glossaire</Text>
       <Text variant="body" color={theme.colors.textSecondary}>
         Le vocabulaire des marchés, expliqué simplement.
       </Text>

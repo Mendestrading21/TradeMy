@@ -30,7 +30,7 @@ export default function Quiz() {
 
   return (
     <Screen>
-      <Text variant="h1">Quiz éclair 🎯</Text>
+      <Text variant="h1">Quiz éclair</Text>
       <Text variant="body" color={theme.colors.textSecondary}>
         Une session de {DEMO_EXERCISES.length} exercices variés sur « {DEMO_SKILL.name} ».
       </Text>
@@ -75,7 +75,7 @@ export default function Quiz() {
         accessibilityHint="Lancer les exercices"
       />
       <Button
-        label="Quiz visuel 🔍"
+        label="Quiz visuel"
         variant="secondary"
         onPress={() => router.push('/reconnaissance')}
         accessibilityHint="Quiz de lecture des figures : nom, sens, famille — 3 niveaux de difficulté"

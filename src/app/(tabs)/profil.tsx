@@ -33,7 +33,7 @@ import { useNow } from '@/lib/useNow';
 /**
  * Écran PROFIL (LOT 4-D — application du canon TradeMy Learning Glass).
  *
- * Présentation UNIQUEMENT : cet écran LIT les providers (progression, profil d'onboarding, premium,
+ * Présentation UNIQUEMENT : cet écran LIT les providers (progression, profil d'onboarding,
  * consentement) et n'expose que des PRÉFÉRENCES réelles (consentement analytics, choix de guide,
  * réinitialisation). Il ne modifie ni le moteur SR/maîtrise, ni la persistance, ni les routes, ni un
  * quelconque système de compte/abonnement. Aucune métrique inventée : chaque valeur a une source réelle.
@@ -54,7 +54,7 @@ function formatJoined(iso?: string | null): string | null {
 
 export default function Profil() {
   const router = useRouter();
-  const { state, profile, premium, ready, analyticsEnabled, setAnalyticsEnabled, setGuide, reset } = useProgress();
+  const { state, profile, ready, analyticsEnabled, setAnalyticsEnabled, setGuide, reset } = useProgress();
   const reduced = useReducedMotion();
   const online = useConnectivity();
   const now = useNow();
@@ -304,24 +304,23 @@ export default function Profil() {
         <Button label="Voir le journal d’usage (local)" variant="secondary" onPress={() => router.push('/journal')} accessibilityHint="Voir exactement les évènements enregistrés localement" />
       </Card>
 
+      {/* v1 gratuite (ADR-110) : plus d'offre affichée — un rappel honnête de l'accès libre. */}
       <Card elevated>
         <View style={styles.sectionLabel}>
-          <TrademyIcon name="star" size={16} color={theme.colors.reward} />
-          <Text variant="label" color={theme.colors.reward}>
-            TRADEMY PREMIUM
+          <TrademyIcon name="unlocked" size={16} color={theme.colors.primaryBright} />
+          <Text variant="label" color={theme.colors.primaryBright}>
+            ACCÈS LIBRE
           </Text>
-          {premium.active ? <Chip iconName="check" label="Actif" color={theme.colors.reward} accessibilityLabel="Premium actif" /> : null}
         </View>
         <Text variant="body" color={theme.colors.textSecondary}>
-          {premium.active
-            ? 'Merci ! Tout le contenu premium est débloqué.'
-            : 'Tous les mondes, le labo complet, les statistiques détaillées et les révisions illimitées.'}
+          Pendant la phase de test, Trademy est entièrement gratuit : statistiques complètes, deck de
+          révision, laboratoire — tout est débloqué.
         </Text>
         <Button
-          label={premium.active ? 'Gérer mon accès' : 'Découvrir Premium'}
-          variant={premium.active ? 'secondary' : 'reward'}
+          label="En savoir plus"
+          variant="secondary"
           onPress={() => router.push('/premium')}
-          accessibilityHint="Ouvrir l’offre Premium"
+          accessibilityHint="Ce qui est inclus dans l’accès libre"
         />
       </Card>
 

@@ -8,7 +8,7 @@ export default function Lecons() {
 
   return (
     <Screen>
-      <Text variant="h1">Leçons 📚</Text>
+      <Text variant="h1">Leçons</Text>
       <Text variant="body" color={theme.colors.textSecondary}>
         Module pilote « Lire un graphique » — {SKILLS.length} compétences.
       </Text>
@@ -39,7 +39,7 @@ export default function Lecons() {
       ))}
 
       <Card>
-        <Text variant="title">🧪 Envie de t’exercer sur un vrai graphique ?</Text>
+        <Text variant="title">Envie de t’exercer sur un vrai graphique ?</Text>
         <Text variant="body" color={theme.colors.textSecondary}>
           L’onglet Laboratoire présente une figure en chandeliers avec sa zone de
           confirmation et son invalidation.

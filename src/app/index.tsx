@@ -39,12 +39,7 @@ export default function Landing() {
           label={onboarded ? 'Reprendre' : 'Commencer'}
           onPress={() => router.push(onboarded ? '/(tabs)' : '/onboarding')}
         />
-        <Button
-          label="J’ai déjà un compte"
-          variant="ghost"
-          disabled
-          disabledReason="Comptes & connexion : prévus en P2."
-        />
+        {/* « Comptes & connexion » (P2) : aucun bouton tant que la fonction n'existe pas — zéro bouton mort. */}
         <Disclaimer />
       </View>
     </Screen>
