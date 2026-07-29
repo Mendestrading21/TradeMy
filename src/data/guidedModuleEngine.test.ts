@@ -26,6 +26,9 @@ import {
   STRUCTURE_MODULE_ID,
   STRUCTURE_CHECKPOINT_ID,
   STRUCTURE_CHECKPOINT_TITLE,
+  SR_MODULE_ID,
+  SR_CHECKPOINT_ID,
+  SR_CHECKPOINT_TITLE,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -112,7 +115,7 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
 
   it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
     // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
-    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID]);
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID, SR_MODULE_ID]);
     expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
     expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
     expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
@@ -136,5 +139,14 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     expect(cp.every((e) => e.skillId.startsWith('skill.structure.'))).toBe(true);
     // Les checkpoints des autres modules ne « fuient » pas dans celui-ci.
     expect(checkpointExercises(CANDLE_CHECKPOINT_ID, 0, 2).every((e) => e.skillId.startsWith('skill.structure.'))).toBe(false);
+  });
+
+  it('module RÉEL Niveaux (LOT 4-O) : 4e module (3 compétences), checkpoint PROPRE et indépendant', () => {
+    expect(isCheckpoint(SR_CHECKPOINT_ID)).toBe(true);
+    expect(new Set([CHECKPOINT_ID, CANDLE_CHECKPOINT_ID, STRUCTURE_CHECKPOINT_ID, SR_CHECKPOINT_ID]).size).toBe(4);
+    expect(skillById(SR_CHECKPOINT_ID)).toEqual({ id: SR_CHECKPOINT_ID, name: SR_CHECKPOINT_TITLE });
+    const cp = checkpointExercises(SR_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    expect(cp.every((e) => e.skillId.startsWith('skill.sr.'))).toBe(true);
   });
 });

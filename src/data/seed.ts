@@ -34,6 +34,17 @@ import {
   STRUCTURE_SKILL_CONCEPT_ID,
   STRUCTURE_SKILL_CONCEPT_SLUG,
 } from './structureModuleScenarios';
+import {
+  SR_SKILLS,
+  SR_MODULE_ID,
+  SR_MODULE_TITLE,
+  SR_MODULE_WORLD_ID,
+  SR_CHECKPOINT_ID,
+  SR_CHECKPOINT_TITLE,
+  SR_MODULE_EXERCISES_BY_SKILL,
+  SR_SKILL_CONCEPT_ID,
+  SR_SKILL_CONCEPT_SLUG,
+} from './srModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -568,6 +579,77 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-O — Module guidé « Lire les niveaux » (world.support-resistance) ──
+  'skill.sr.zones': [
+    {
+      id: 'lesson.sr-zones',
+      slug: 'zones-support-resistance',
+      title: 'Support et résistance : des zones, pas des lignes',
+      skillId: 'skill.sr.zones',
+      objective: 'Identifier une zone de support ou de résistance et son rôle.',
+      difficulty: 'beginner',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le marché a de la mémoire : certains niveaux font revenir les acheteurs (support) ou les vendeurs (résistance).' },
+        { id: 's1', kind: 'observe', body: 'Cherche plusieurs touches au même niveau, avec des réactions visibles du prix : rejets, pauses, rebonds.' },
+        { id: 's2', kind: 'visual', conceptRef: 'support-resistance' },
+        { id: 's3', kind: 'explain', body: 'Raisonne en ZONES, jamais en lignes exactes : le marché ne réagit pas au pixel près. La réaction du prix à l’approche de la zone est l’information.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une mèche qui dépasse la zone sans clôture au-delà n’invalide pas le niveau : il faut une clôture nette, sans retour immédiat.' },
+        { id: 's5', kind: 'summary', body: 'Support = plancher, résistance = plafond ; des zones de mémoire, jamais garanties, invalidées par une clôture nette au-delà.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Support ou résistance : ligne ou zone ?', back: 'Une zone : le marché raisonne rarement au pixel près.' } },
+      ],
+      commonMistake: 'Tracer des lignes trop précises au lieu de zones.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.sr.flip': [
+    {
+      id: 'lesson.sr-flip',
+      slug: 'polarite-flip-lecture',
+      title: 'La polarité : quand un niveau change de rôle',
+      skillId: 'skill.sr.flip',
+      objective: 'Comprendre qu’un niveau cassé peut changer de rôle (flip).',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Un support franchi ne disparaît pas : il change souvent de rôle et agit en résistance au retour du prix. C’est la polarité, ou « flip ».' },
+        { id: 's1', kind: 'observe', body: 'Cherche un niveau clairement franchi et confirmé, puis un retour du prix vers ce même niveau (retest).' },
+        { id: 's2', kind: 'visual', conceptRef: 'polarite-flip' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'polarite-flip', body: 'Le flip reste une hypothèse tant que le retest n’a pas réagi : ne le tiens jamais pour acquis.' },
+        { id: 's4', kind: 'explain', body: 'La confirmation se lit à la réaction du prix au retest, côté opposé au rôle initial ; un retour franc de l’ancien côté annule le flip.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un retest qui traverse le niveau sans réaction est un flip non tenu : l’hypothèse tombe.' },
+        { id: 's6', kind: 'summary', body: 'Flip = niveau cassé qui change de rôle, confirmé au retest — une hypothèse à vérifier, jamais une certitude.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’un flip de polarité ?', back: 'Un niveau cassé qui change de rôle : un support devient résistance (ou l’inverse), confirmé au retest.' } },
+      ],
+      commonMistake: 'Attendre un flip comme une certitude plutôt qu’une hypothèse.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.sr.retest': [
+    {
+      id: 'lesson.sr-retest',
+      slug: 'retest-lecture',
+      title: 'Le retest : le niveau repasse son examen',
+      skillId: 'skill.sr.retest',
+      objective: 'Lire le retour du prix sur un niveau cassé — qui confirme ou invalide.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une cassure, le prix revient souvent tester le niveau franchi : le retest. C’est là que le niveau repasse son examen.' },
+        { id: 's1', kind: 'observe', body: 'Vérifie d’abord que le niveau a réellement cassé — pas juste été effleuré — puis observe le retour du prix.' },
+        { id: 's2', kind: 'visual', conceptRef: 'retest-de-niveau' },
+        { id: 's3', kind: 'explain', body: 'Un retest qui tient renforce l’hypothèse de continuation ; un retour franc de l’autre côté l’invalide. Les deux issues existent.' },
+        { id: 's4', kind: 'falseSignal', body: 'Prendre un simple contact pour une cassure suivie de retest est l’erreur classique : sans cassure réelle, pas de retest.' },
+        { id: 's5', kind: 'summary', body: 'Retest = retour sur un niveau cassé ; il peut confirmer comme invalider — jamais garantir.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’un retest ?', back: 'Le retour du prix sur un niveau cassé pour le tester à nouveau.' } },
+      ],
+      commonMistake: 'Oublier que le retest peut invalider, pas seulement confirmer.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -658,6 +740,10 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.structure.downtrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.downtrend'],
   'skill.structure.range': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.range'],
   'skill.structure.break': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.break'],
+  // LOT 4-O — module « Lire les niveaux » : exercices dérivés des scénarios (une vérité par item).
+  'skill.sr.zones': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.zones'],
+  'skill.sr.flip': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.flip'],
+  'skill.sr.retest': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.retest'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -671,6 +757,8 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...CANDLE_SKILL_CONCEPT_ID,
   // LOT 4-N — compétences du module « Lire la structure » (concepts réels de world.structure).
   ...STRUCTURE_SKILL_CONCEPT_ID,
+  // LOT 4-O — compétences du module « Lire les niveaux » (concepts réels de world.support-resistance).
+  ...SR_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -799,6 +887,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: STRUCTURE_CHECKPOINT_ID,
     checkpointTitle: STRUCTURE_CHECKPOINT_TITLE,
   },
+  // LOT 4-O — 4e module guidé réel : « Lire les niveaux » (monde 5, world.support-resistance).
+  // Trois compétences (le monde compte trois concepts réels — aucun objectif inventé).
+  {
+    id: SR_MODULE_ID,
+    title: SR_MODULE_TITLE,
+    worldId: SR_MODULE_WORLD_ID,
+    skills: SR_SKILLS,
+    checkpointId: SR_CHECKPOINT_ID,
+    checkpointTitle: SR_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -872,6 +970,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   // LOT 4-M — lien « Découvrir la notion » des compétences Chandeliers vers leur fiche concept.
   ...CANDLE_SKILL_CONCEPT_SLUG,
   ...STRUCTURE_SKILL_CONCEPT_SLUG,
+  ...SR_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
