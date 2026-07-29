@@ -59,6 +59,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | 5e module guidé « Lire un graphique de près » (`world.anatomy`) : mondes 1-5 = préfixe entièrement guidé ; le monde 2 se termine par la PREUVE (plus par la lecture) ; tests « monde de contenu » rebasés dynamiquement ; compteurs à 18 compétences (LOT 4-P) | [ADR-113](./ADR-113-trademy-lot4p-guided-anatomy.md) |
 | 6e module guidé « Lire les figures » (`world.patterns`) : 4 familles → concepts réels (double creux, triangle ascendant, drapeau, ÉTÉ), placements de plancher honnêtes (double + drapeau seuls), checkpoint propre distinct du skill Fondations, préfixe 1..6, compteurs à 22 compétences (LOT 4-Q) | [ADR-114](./ADR-114-trademy-lot4q-guided-patterns.md) |
 | 7e module guidé « Lire les indicateurs » (`world.indicators`) : 4 compétences → 4 concepts réels (RSI, MACD, Bollinger, divergence), objectifs honnêtes (seule la divergence documente une invalidation → 5 exercices pour elle, aucun placement), checkpoint propre, préfixe 1..7, compteurs à 26 compétences (LOT 4-R) | [ADR-115](./ADR-115-trademy-lot4r-guided-indicators.md) |
+| Programme « Visual Max » (LOTS V1-V6) : avatars 3D partout (fin du vectoriel 2D), célébration 3D de fin de session (asset réparé), fiche concept « détail à la demande », étape observe visuelle, défrange des 8 renders — renders + motion, jamais de 3D temps réel | [ADR-116](./ADR-116-trademy-visual-max.md) |
 
 ## Fondations toujours actives
 
