@@ -89,6 +89,17 @@ import {
   VOLUME_SKILL_CONCEPT_ID,
   VOLUME_SKILL_CONCEPT_SLUG,
 } from './volumeModuleScenarios';
+import {
+  PRICEACTION_SKILLS,
+  PRICEACTION_MODULE_ID,
+  PRICEACTION_MODULE_TITLE,
+  PRICEACTION_MODULE_WORLD_ID,
+  PRICEACTION_CHECKPOINT_ID,
+  PRICEACTION_CHECKPOINT_TITLE,
+  PRICEACTION_MODULE_EXERCISES_BY_SKILL,
+  PRICEACTION_SKILL_CONCEPT_ID,
+  PRICEACTION_SKILL_CONCEPT_SLUG,
+} from './priceActionModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1023,6 +1034,76 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-T — Module guidé « Lire la price action » (world.price-action) ──
+  'skill.priceaction.reading': [
+    {
+      id: 'lesson.priceaction-reading',
+      slug: 'price-action-lecture',
+      title: 'Le prix nu : zones, structure, réactions',
+      skillId: 'skill.priceaction.reading',
+      objective: 'Lire le comportement du prix avant tout indicateur.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Pas d’indicateur ici : seulement le prix. Ses zones de réaction et sa structure racontent déjà l’essentiel.' },
+        { id: 's1', kind: 'observe', body: 'Repère les zones où le prix a déjà réagi, puis la structure (sommets et creux).' },
+        { id: 's2', kind: 'visual', conceptRef: 'price-action' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'price-action', body: 'Une bougie ne se lit JAMAIS isolément : c’est sa position — sur quelle zone, dans quelle structure — qui lui donne son sens.' },
+        { id: 's4', kind: 'falseSignal', body: 'Interpréter une bougie sans regarder où elle se situe est le piège classique de la price action.' },
+        { id: 's5', kind: 'summary', body: 'Price action = zones + structure + réactions ; la confirmation vient de la réaction du prix aux niveaux.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que lit la price action ?', back: 'Le prix lui-même : ses zones de réaction et sa structure — avant tout indicateur.' } },
+      ],
+      commonMistake: 'Interpréter une bougie sans regarder où elle se situe.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.priceaction.wick': [
+    {
+      id: 'lesson.priceaction-wick',
+      slug: 'meche-de-rejet-lecture',
+      title: 'La mèche de rejet : repoussé de la zone',
+      skillId: 'skill.priceaction.wick',
+      objective: 'Lire une longue mèche comme un rejet — sur une zone seulement.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une longue mèche raconte une bataille : le prix a exploré une zone… et en a été repoussé.' },
+        { id: 's1', kind: 'observe', body: 'Repère la longue mèche, puis vérifie OÙ elle se produit : sur une zone connue ?' },
+        { id: 's2', kind: 'visual', conceptRef: 'meche-de-rejet' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'meche-de-rejet', body: 'Le rejet ne vaut que par sa zone : une longue mèche en plein vide n’est que du bruit.' },
+        { id: 's4', kind: 'falseSignal', body: 'Longue mèche sans zone : bruit plutôt que rejet — le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Mèche longue + zone connue = rejet à surveiller ; mèche sans zone = bruit.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Quand une longue mèche est-elle un rejet ?', back: 'Quand elle se produit sur une zone connue — sans zone, c’est du bruit.' } },
+      ],
+      commonMistake: 'Prendre toute longue mèche pour un rejet, où qu’elle soit.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.priceaction.impulse': [
+    {
+      id: 'lesson.priceaction-impulse',
+      slug: 'impulsion-correction-lecture',
+      title: 'Impulsion et correction : le rythme du prix',
+      skillId: 'skill.priceaction.impulse',
+      objective: 'Distinguer la poussée (impulsion) de la respiration (correction).',
+      difficulty: 'intermediate',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le prix n’avance pas en ligne droite : il pousse (impulsion), puis respire (correction), puis pousse encore.' },
+        { id: 's1', kind: 'observe', body: 'Repère la poussée dynamique, puis le repli plus lent et contenu qui la suit.' },
+        { id: 's2', kind: 'visual', conceptRef: 'impulsion-et-correction' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'impulsion-et-correction', body: 'Tant que la correction reste partielle, le rythme tient. Une correction trop profonde raconte autre chose.' },
+        { id: 's4', kind: 'falseSignal', body: 'Confondre une correction profonde avec une simple respiration est le piège classique du rythme.' },
+        { id: 's5', kind: 'summary', body: 'Impulsion = poussée ; correction = respiration contenue ; l’ampleur relative se surveille toujours.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Impulsion vs correction ?', back: 'La poussée dynamique vs la respiration plus lente et contenue qui la suit.' } },
+      ],
+      commonMistake: 'Confondre une correction profonde avec une simple respiration.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1133,6 +1214,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.volume.participation': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.participation'],
   'skill.volume.vwap': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.vwap'],
   'skill.volume.profile': VOLUME_MODULE_EXERCISES_BY_SKILL['skill.volume.profile'],
+  'skill.priceaction.reading': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.reading'],
+  'skill.priceaction.wick': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.wick'],
+  'skill.priceaction.impulse': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.impulse'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1154,6 +1238,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...PATTERNS_SKILL_CONCEPT_ID,
   ...INDICATORS_SKILL_CONCEPT_ID,
   ...VOLUME_SKILL_CONCEPT_ID,
+  ...PRICEACTION_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1332,6 +1417,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: VOLUME_CHECKPOINT_ID,
     checkpointTitle: VOLUME_CHECKPOINT_TITLE,
   },
+  // LOT 4-T — 9e module guidé réel : « Lire la price action » (monde 9, world.price-action).
+  // Le prix raconte tout avant l'indicateur : zones, mèches de rejet, rythme impulsion/correction.
+  {
+    id: PRICEACTION_MODULE_ID,
+    title: PRICEACTION_MODULE_TITLE,
+    worldId: PRICEACTION_MODULE_WORLD_ID,
+    skills: PRICEACTION_SKILLS,
+    checkpointId: PRICEACTION_CHECKPOINT_ID,
+    checkpointTitle: PRICEACTION_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1410,6 +1505,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...PATTERNS_SKILL_CONCEPT_SLUG,
   ...INDICATORS_SKILL_CONCEPT_SLUG,
   ...VOLUME_SKILL_CONCEPT_SLUG,
+  ...PRICEACTION_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
