@@ -111,6 +111,17 @@ import {
   RISK_SKILL_CONCEPT_ID,
   RISK_SKILL_CONCEPT_SLUG,
 } from './riskModuleScenarios';
+import {
+  PSYCHOLOGY_SKILLS,
+  PSYCHOLOGY_MODULE_ID,
+  PSYCHOLOGY_MODULE_TITLE,
+  PSYCHOLOGY_MODULE_WORLD_ID,
+  PSYCHOLOGY_CHECKPOINT_ID,
+  PSYCHOLOGY_CHECKPOINT_TITLE,
+  PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL,
+  PSYCHOLOGY_SKILL_CONCEPT_ID,
+  PSYCHOLOGY_SKILL_CONCEPT_SLUG,
+} from './psychologyModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1185,6 +1196,53 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-V — Module guidé « Déjouer ses biais » (world.psychology) ─
+  'skill.psychology.fomo': [
+    {
+      id: 'lesson.psychology-fomo',
+      slug: 'fomo-lecture',
+      title: 'Le FOMO : entrer trop tard coûte cher',
+      skillId: 'skill.psychology.fomo',
+      objective: 'Reconnaître le FOMO et le désamorcer par un plan préparé à l’avance.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le FOMO (peur de rater) pousse à entrer parce que « ça s’envole » — après l’accélération, près d’un extrême, sans plan.' },
+        { id: 's1', kind: 'observe', body: 'Repère l’accélération déjà bien avancée, puis l’essoufflement qui suit souvent quand tout le monde est entré.' },
+        { id: 's2', kind: 'visual', conceptRef: 'fomo' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'fomo', body: 'Le problème n’est pas le sens du mouvement : c’est l’entrée impulsive, sans plan ni invalidation.' },
+        { id: 's4', kind: 'falseSignal', body: 'Prendre l’accélération pour une invitation à entrer sans plan est le piège classique du FOMO.' },
+        { id: 's5', kind: 'summary', body: 'FOMO = entrée tardive sur l’émotion ; la parade = un plan défini AVANT le mouvement, avec une invalidation claire.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce que le FOMO ?', back: 'La peur de rater un mouvement, qui pousse à entrer trop tard, sans plan ni invalidation.' } },
+      ],
+      commonMistake: 'Entrer près d’un extrême juste pour « ne pas rater ».',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.psychology.discipline': [
+    {
+      id: 'lesson.psychology-discipline',
+      slug: 'discipline-lecture',
+      title: 'Discipline : le processus prime sur l’issue',
+      skillId: 'skill.psychology.discipline',
+      objective: 'Comprendre pourquoi suivre un plan prime sur l’issue d’une seule idée.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'La discipline exécute un processus décidé à froid : contexte attendu, niveau, confirmation, invalidation et taille — pas l’émotion du moment.' },
+        { id: 's1', kind: 'observe', body: 'Repère le contexte attendu par un plan : le niveau cassé, puis retesté — c’est LÀ que le plan prévoit d’agir.' },
+        { id: 's2', kind: 'visual', conceptRef: 'discipline' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'discipline', body: 'Une idée isolée dépend du hasard ; c’est la qualité du processus, répété, qui compte.' },
+        { id: 's4', kind: 'falseSignal', body: 'Prendre une réussite chanceuse hors plan pour une bonne décision est le piège classique : le résultat ne valide pas le processus.' },
+        { id: 's5', kind: 'summary', body: 'Décision = plan à froid + contexte + confirmation ; on juge le processus, jamais l’issue d’une seule idée.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Sur quoi juger une décision de trading ?', back: 'Sur la qualité du processus (le plan suivi), pas sur le résultat d’une seule idée.' } },
+      ],
+      commonMistake: 'Juger une décision sur son seul résultat plutôt que sur le processus.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1301,6 +1359,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.risk.reward': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.reward'],
   'skill.risk.stop': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.stop'],
   'skill.risk.sizing': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.sizing'],
+  // LOT 4-V — module guidé Psychologie : exercices dérivés des scénarios (source unique).
+  'skill.psychology.fomo': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.fomo'],
+  'skill.psychology.discipline': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.discipline'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1324,6 +1385,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...VOLUME_SKILL_CONCEPT_ID,
   ...PRICEACTION_SKILL_CONCEPT_ID,
   ...RISK_SKILL_CONCEPT_ID,
+  ...PSYCHOLOGY_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1522,6 +1584,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: RISK_CHECKPOINT_ID,
     checkpointTitle: RISK_CHECKPOINT_TITLE,
   },
+  // LOT 4-V — 11e module guidé réel : « Déjouer ses biais » (monde 11, world.psychology).
+  // La décision se juge sur le processus, pas sur l'issue d'une seule idée — FOMO et discipline.
+  {
+    id: PSYCHOLOGY_MODULE_ID,
+    title: PSYCHOLOGY_MODULE_TITLE,
+    worldId: PSYCHOLOGY_MODULE_WORLD_ID,
+    skills: PSYCHOLOGY_SKILLS,
+    checkpointId: PSYCHOLOGY_CHECKPOINT_ID,
+    checkpointTitle: PSYCHOLOGY_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1602,6 +1674,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...VOLUME_SKILL_CONCEPT_SLUG,
   ...PRICEACTION_SKILL_CONCEPT_SLUG,
   ...RISK_SKILL_CONCEPT_SLUG,
+  ...PSYCHOLOGY_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
