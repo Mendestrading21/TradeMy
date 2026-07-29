@@ -20,9 +20,9 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Métrique | Registre (code) | Valeur |
 |---|---|---|
 | Concepts riches V5 | `V5_CONCEPTS` | 67 |
-| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 32 |
-| Leçons | `allLessonsFlat()` | 43 |
-| Exercices | `allExercisesFlat()` | 140 |
+| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 35 |
+| Leçons | `allLessonsFlat()` | 46 |
+| Exercices | `allExercisesFlat()` | 154 |
 | Termes de glossaire (v1) | `GLOSSARY_TERMS` | 24 |
 | Badges | `BADGES` | 23 |
 | Mondes | `WORLDS` | 15 |
@@ -30,8 +30,8 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Types de visuels rendables | `SUPPORTED_VISUAL_TYPES` | 11 |
 | Formats d'exercice | `ALL_EXERCISE_TYPES` = `supportedTypes()` | 13 / 13 |
 
-> Depuis le LOT 4-T, neuf modules guidés existent (Fondations, Anatomie, Chandeliers, Structure,
-> Niveaux, Figures, Indicateurs, Volume, Price action — les mondes 1-9 forment un préfixe
+> Depuis le LOT 4-U, dix modules guidés existent (Fondations, Anatomie, Chandeliers, Structure,
+> Niveaux, Figures, Indicateurs, Volume, Price action, Risk — les mondes 1-10 forment un préfixe
 > entièrement guidé) : les compteurs agrègent TOUS les modules via `CONTENT_MODULES` (source unique).
 
 ## Formats d'exercice — réconciliation

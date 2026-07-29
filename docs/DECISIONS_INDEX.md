@@ -62,6 +62,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Programme « Visual Max » (LOTS V1-V6) : avatars 3D partout (fin du vectoriel 2D), célébration 3D de fin de session (asset réparé), fiche concept « détail à la demande », étape observe visuelle, défrange des 8 renders — renders + motion, jamais de 3D temps réel | [ADR-116](./ADR-116-trademy-visual-max.md) |
 | 8e module guidé « Lire le volume » (`world.volume`) : 3 compétences → 3 concepts réels (volume, VWAP, profil de volume), objectifs honnêtes (seul le profil documente une invalidation — contextuelle, aucun placement), reconnaissance du profil au rendu réel de sa fiche (`visualType` étendu à volume-profile), checkpoint propre, préfixe 1..8, compteurs à 29 compétences (LOT 4-S) | [ADR-117](./ADR-117-trademy-lot4s-guided-volume.md) |
 | 9e module guidé « Lire la price action » (`world.price-action`) : 3 compétences → 3 concepts réels (prix nu, mèche de rejet, impulsion/correction), objectifs honnêtes (aucune invalidation documentée dans le monde → ni invalidate ni placement), checkpoint propre, préfixe 1..9, compteurs à 32 compétences (LOT 4-T) | [ADR-118](./ADR-118-trademy-lot4t-guided-priceaction.md) |
+| 10e module guidé « Gérer le risque » (`world.risk`) : 3 compétences → 3 concepts réels (risque/rendement, stop-loss, taille de position), le stop = plancher documenté → seul placement du module, `visualType` étendu à risk-reward, checkpoint propre, préfixe 1..10, compteurs à 35 compétences (LOT 4-U) | [ADR-119](./ADR-119-trademy-lot4u-guided-risk.md) |
 
 ## Fondations toujours actives
 

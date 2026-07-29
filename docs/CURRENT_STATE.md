@@ -206,8 +206,8 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 > **Programme « guider tous les mondes » en cours** (autorisation propriétaire du 29/07/2026 : un
 > lot par monde, gate verte à chaque fusion). Modules guidés : Fondations, Anatomie (ADR-113),
 > Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112), Figures (ADR-114), Indicateurs
-> (ADR-115), Volume (ADR-117), Price action (LOT 4-T, ADR-118) — **9 mondes guidés sur 15**
-> (préfixe 1-9 entièrement guidé), 6 restent des collections de notions.
+> (ADR-115), Volume (ADR-117), Price action (ADR-118), Risk (LOT 4-U, ADR-119) — **10 mondes
+> guidés sur 15** (préfixe 1-10 entièrement guidé), 5 restent des collections de notions.
 > Depuis le LOT 4-P, un monde guidé se termine par la preuve (checkpoint), plus par la seule lecture.
 
 ## Programme « Visual Max » (ADR-116) — 29/07/2026, livré

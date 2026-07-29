@@ -77,7 +77,7 @@ describe('repoTruth — vérité du dépôt', () => {
   it('pins structurels (un changement = un lot dédié, pas une dérive)', () => {
     // Compteurs structurels stables : leur évolution passe par un lot explicite du programme.
     // LOT 4-M : 4 compétences Fondations + 4 compétences Chandeliers = 8 (2e module guidé réel).
-    expect(REPO_TRUTH.skills).toBe(32);
+    expect(REPO_TRUTH.skills).toBe(35);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);

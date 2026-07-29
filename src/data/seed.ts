@@ -100,6 +100,17 @@ import {
   PRICEACTION_SKILL_CONCEPT_ID,
   PRICEACTION_SKILL_CONCEPT_SLUG,
 } from './priceActionModuleScenarios';
+import {
+  RISK_SKILLS,
+  RISK_MODULE_ID,
+  RISK_MODULE_TITLE,
+  RISK_MODULE_WORLD_ID,
+  RISK_CHECKPOINT_ID,
+  RISK_CHECKPOINT_TITLE,
+  RISK_MODULE_EXERCISES_BY_SKILL,
+  RISK_SKILL_CONCEPT_ID,
+  RISK_SKILL_CONCEPT_SLUG,
+} from './riskModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1104,6 +1115,76 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-U — Module guidé « Gérer le risque » (world.risk) ───────
+  'skill.risk.reward': [
+    {
+      id: 'lesson.risk-reward',
+      slug: 'risque-rendement-lecture',
+      title: 'Risque et rendement : comparer avant d’entrer',
+      skillId: 'skill.risk.reward',
+      objective: 'Comparer la distance au stop à la distance à la cible — avant l’entrée.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Un scénario éducatif a trois repères : l’entrée théorique, le stop (l’invalidation) et l’objectif pédagogique. Deux distances à comparer.' },
+        { id: 's1', kind: 'observe', body: 'Mesure la distance entrée→stop (le risque), puis entrée→cible (le rendement visé).' },
+        { id: 's2', kind: 'visual', conceptRef: 'risque-rendement' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'risque-rendement', body: 'Le rapport se lit AVANT l’entrée : le stop borne la perte, la cible situe le rendement — jamais l’inverse.' },
+        { id: 's4', kind: 'falseSignal', body: 'Élargir le stop après coup pour « laisser une chance » fait exploser le risque prévu : le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Risque = entrée→stop ; rendement = entrée→cible ; la comparaison se fait avant, le stop ne bouge pas après.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que compare le rapport risque/rendement ?', back: 'La distance entrée→stop (le risque) à la distance entrée→cible (le rendement visé) — avant l’entrée.' } },
+      ],
+      commonMistake: 'Élargir le stop après coup pour « laisser une chance ».',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.risk.stop': [
+    {
+      id: 'lesson.risk-stop',
+      slug: 'stop-loss-lecture',
+      title: 'Le stop : l’invalidation qui borne la perte',
+      skillId: 'skill.risk.stop',
+      objective: 'Placer un stop comme niveau d’invalidation, défini avant l’entrée.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le stop n’est pas une punition : c’est le niveau qui, franchi, annule l’idée — et borne la perte à un montant décidé à l’avance.' },
+        { id: 's1', kind: 'observe', body: 'Repère le creux structurel sous l’entrée théorique : c’est là que l’idée serait invalidée.' },
+        { id: 's2', kind: 'visual', conceptRef: 'stop-loss' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'stop-loss', body: 'Le stop se définit AVANT l’entrée, sur la structure — s’il est touché, l’idée est abandonnée, point.' },
+        { id: 's4', kind: 'falseSignal', body: 'Déplacer le stop plus loin pour éviter d’être sorti fait dérailler le risque prévu : le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Stop = invalidation structurelle définie avant l’entrée ; touché → idée abandonnée, perte limitée.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Quand le stop se définit-il ?', back: 'AVANT l’entrée, sur la structure — et il ne se déplace pas après coup.' } },
+      ],
+      commonMistake: 'Déplacer le stop plus loin pour éviter d’être sorti.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.risk.sizing': [
+    {
+      id: 'lesson.risk-sizing',
+      slug: 'taille-de-position-lecture',
+      title: 'La taille de position : le risque décide, pas l’envie',
+      skillId: 'skill.risk.sizing',
+      objective: 'Dimensionner une position depuis le risque accepté et la distance au stop.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'La taille ne se choisit pas à l’envie : elle se CALCULE — risque accepté (une petite part du capital) divisé par la distance au stop.' },
+        { id: 's1', kind: 'observe', body: 'Compare deux scénarios éducatifs : même risque accepté, stops à des distances différentes — les tailles diffèrent.' },
+        { id: 's2', kind: 'visual', conceptRef: 'taille-de-position' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'taille-de-position', body: 'Plus le stop est loin, plus la taille est petite — à risque constant. La méthode ne change jamais.' },
+        { id: 's4', kind: 'falseSignal', body: 'Doubler la taille après des pertes pour « se refaire » (revenge trading) est le piège le plus coûteux.' },
+        { id: 's5', kind: 'summary', body: 'Taille = risque accepté ÷ distance au stop ; gains ou pertes récentes n’y changent rien.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Comment se calcule la taille de position ?', back: 'Risque accepté (petite part du capital) divisé par la distance entrée→stop.' } },
+      ],
+      commonMistake: 'Doubler la taille après des pertes pour « se refaire ».',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1217,6 +1298,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.priceaction.reading': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.reading'],
   'skill.priceaction.wick': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.wick'],
   'skill.priceaction.impulse': PRICEACTION_MODULE_EXERCISES_BY_SKILL['skill.priceaction.impulse'],
+  'skill.risk.reward': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.reward'],
+  'skill.risk.stop': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.stop'],
+  'skill.risk.sizing': RISK_MODULE_EXERCISES_BY_SKILL['skill.risk.sizing'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1239,6 +1323,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...INDICATORS_SKILL_CONCEPT_ID,
   ...VOLUME_SKILL_CONCEPT_ID,
   ...PRICEACTION_SKILL_CONCEPT_ID,
+  ...RISK_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1427,6 +1512,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: PRICEACTION_CHECKPOINT_ID,
     checkpointTitle: PRICEACTION_CHECKPOINT_TITLE,
   },
+  // LOT 4-U — 10e module guidé réel : « Gérer le risque » (monde 10, world.risk).
+  // Le risque se décide AVANT l'entrée : stop = invalidation, taille = risque accepté ÷ distance.
+  {
+    id: RISK_MODULE_ID,
+    title: RISK_MODULE_TITLE,
+    worldId: RISK_MODULE_WORLD_ID,
+    skills: RISK_SKILLS,
+    checkpointId: RISK_CHECKPOINT_ID,
+    checkpointTitle: RISK_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1506,6 +1601,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...INDICATORS_SKILL_CONCEPT_SLUG,
   ...VOLUME_SKILL_CONCEPT_SLUG,
   ...PRICEACTION_SKILL_CONCEPT_SLUG,
+  ...RISK_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];

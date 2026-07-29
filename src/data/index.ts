@@ -8,6 +8,7 @@ export * from './patternsModuleScenarios';
 export * from './indicatorsModuleScenarios';
 export * from './volumeModuleScenarios';
 export * from './priceActionModuleScenarios';
+export * from './riskModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';
