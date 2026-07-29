@@ -122,6 +122,17 @@ import {
   PSYCHOLOGY_SKILL_CONCEPT_ID,
   PSYCHOLOGY_SKILL_CONCEPT_SLUG,
 } from './psychologyModuleScenarios';
+import {
+  SMC_SKILLS,
+  SMC_MODULE_ID,
+  SMC_MODULE_TITLE,
+  SMC_MODULE_WORLD_ID,
+  SMC_CHECKPOINT_ID,
+  SMC_CHECKPOINT_TITLE,
+  SMC_MODULE_EXERCISES_BY_SKILL,
+  SMC_SKILL_CONCEPT_ID,
+  SMC_SKILL_CONCEPT_SLUG,
+} from './smcModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1243,6 +1254,122 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-W — Module guidé « Lire le Smart Money » (world.smc) ─────
+  'skill.smc.orderblock': [
+    {
+      id: 'lesson.smc-orderblock',
+      slug: 'order-block-lecture',
+      title: 'L’order block : une zone d’intérêt, pas un signal',
+      skillId: 'skill.smc.orderblock',
+      objective: 'Repérer la dernière bougie opposée avant une impulsion et la traiter en zone à surveiller.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Avant une forte impulsion, il reste souvent une dernière bougie de sens opposé : c’est l’order block — une zone que le prix revisite souvent.' },
+        { id: 's1', kind: 'observe', body: 'Repère la forte impulsion, puis la dernière bougie opposée juste avant : c’est la zone à marquer.' },
+        { id: 's2', kind: 'visual', conceptRef: 'order-block' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'order-block', body: 'La zone ne vaut que par la réaction OBSERVÉE du prix à son retour — avec la structure, jamais seule.' },
+        { id: 's4', kind: 'falseSignal', body: 'Traiter toute bougie précédant une hausse comme un order block « magique » est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Order block = dernière bougie opposée avant l’impulsion ; zone d’intérêt à surveiller ; traversée franche sans réaction = zone invalidée.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’un order block ?', back: 'La dernière bougie de sens opposé avant une forte impulsion — une zone d’intérêt éducative, jamais un signal.' } },
+      ],
+      commonMistake: 'Traiter toute bougie avant une hausse comme un order block « magique ».',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.smc.fvg': [
+    {
+      id: 'lesson.smc-fvg',
+      slug: 'fair-value-gap-lecture',
+      title: 'Le fair value gap : le vide laissé par l’impulsion',
+      skillId: 'skill.smc.fvg',
+      objective: 'Lire le déséquilibre à trois bougies et observer le comblement sans le présumer.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une impulsion rapide laisse parfois un vide : entre le haut de la première bougie et le bas de la troisième, le prix n’a pas échangé — c’est le fair value gap.' },
+        { id: 's1', kind: 'observe', body: 'Repère les trois bougies d’impulsion et le vide entre la première et la troisième.' },
+        { id: 's2', kind: 'visual', conceptRef: 'fair-value-gap' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'fair-value-gap', body: 'Le comblement n’est jamais garanti : la zone s’observe, sa réaction se juge avec la structure.' },
+        { id: 's4', kind: 'falseSignal', body: 'Voir un FVG « décisif » dans le moindre petit gap sans impulsion est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'FVG = déséquilibre à trois bougies ; zone d’intérêt ; éloignement durable sans comblement = hypothèse abandonnée.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Comment se définit un fair value gap ?', back: 'Un déséquilibre à trois bougies : le haut de la première est sous le bas de la troisième.' } },
+      ],
+      commonMistake: 'Voir un FVG « décisif » sur le moindre petit gap sans impulsion.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.smc.choch': [
+    {
+      id: 'lesson.smc-choch',
+      slug: 'changement-de-caractere-lecture',
+      title: 'Le CHoCH : premier signe de bascule, pas une preuve',
+      skillId: 'skill.smc.choch',
+      objective: 'Reconnaître la première cassure à contre-tendance et exiger la clôture au-delà du pivot.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Quand une séquence casse pour la première fois un pivot à CONTRE-tendance, le caractère du mouvement change : c’est le CHoCH — un premier signe, pas une bascule prouvée.' },
+        { id: 's1', kind: 'observe', body: 'Suis la séquence de pivots, puis repère la première cassure à contre-tendance avec clôture au-delà.' },
+        { id: 's2', kind: 'visual', conceptRef: 'changement-de-caractere' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'changement-de-caractere', body: 'La confirmation se cherche au-delà du pivot cassé, idéalement avec de la participation ; si la tendance initiale reprend franchement, le signe est invalidé.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une mèche qui perce le pivot sans clôture au-delà ressemble à une chasse aux stops — le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'CHoCH = première cassure contre-tendance ; clôture exigée ; reprise franche de la tendance = signe abandonné.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’un changement de caractère ?', back: 'La première cassure de structure à contre-tendance, qui remet en cause la séquence en cours.' } },
+      ],
+      commonMistake: 'Valider un CHoCH sur une mèche sans clôture au-delà du pivot.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.smc.demand': [
+    {
+      id: 'lesson.smc-demand',
+      slug: 'zone-de-demande-lecture',
+      title: 'La zone de demande : le support qui a une histoire',
+      skillId: 'skill.smc.demand',
+      objective: 'Identifier la zone d’où le prix est parti à la hausse et placer son invalidation sous la base.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Quand le prix part nettement à la hausse depuis une zone, cette base devient une zone de demande : un support à surveiller au prochain retour.' },
+        { id: 's1', kind: 'observe', body: 'Repère le départ net à la hausse, puis délimite la base d’où il est parti.' },
+        { id: 's2', kind: 'visual', conceptRef: 'zone-de-demande' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'zone-de-demande', body: 'La confirmation est le rejet observé dans le sens haussier ; une clôture franche SOUS la zone invalide le scénario — c’est un plancher qui se place.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une zone déjà retestée plusieurs fois est affaiblie — la traiter comme neuve est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Demande = base d’un départ haussier net ; rejet haussier = confirmation ; clôture franche sous la zone = invalidation.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui invalide une zone de demande ?', back: 'Une clôture franche SOUS la zone : le plancher cède, le scénario éducatif s’abandonne.' } },
+      ],
+      commonMistake: 'Traiter une zone déjà retestée plusieurs fois comme une zone neuve.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.smc.supply': [
+    {
+      id: 'lesson.smc-supply',
+      slug: 'zone-d-offre-lecture',
+      title: 'La zone d’offre : la résistance qui a une histoire',
+      skillId: 'skill.smc.supply',
+      objective: 'Identifier la zone d’où le prix est parti à la baisse et reconnaître son invalidation au-dessus.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Quand le prix part nettement à la baisse depuis une zone, ce plafond devient une zone d’offre : une résistance à surveiller au prochain retour.' },
+        { id: 's1', kind: 'observe', body: 'Repère le départ net à la baisse, puis délimite le plafond d’où il est parti.' },
+        { id: 's2', kind: 'visual', conceptRef: 'zone-d-offre' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'zone-d-offre', body: 'La confirmation est le rejet observé dans le sens baissier ; une clôture franche AU-DESSUS de la zone invalide le scénario.' },
+        { id: 's4', kind: 'falseSignal', body: 'Comme pour la demande : une zone retestée plusieurs fois est affaiblie, pas renforcée.' },
+        { id: 's5', kind: 'summary', body: 'Offre = plafond d’un départ baissier net ; rejet baissier = confirmation ; clôture franche au-dessus = invalidation.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui invalide une zone d’offre ?', back: 'Une clôture franche AU-DESSUS de la zone : le scénario baissier éducatif s’abandonne.' } },
+      ],
+      commonMistake: 'Croire qu’une zone d’offre devient plus fiable à chaque retest.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1362,6 +1489,12 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   // LOT 4-V — module guidé Psychologie : exercices dérivés des scénarios (source unique).
   'skill.psychology.fomo': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.fomo'],
   'skill.psychology.discipline': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.discipline'],
+  // LOT 4-W — module guidé Smart Money : exercices dérivés des scénarios (source unique).
+  'skill.smc.orderblock': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.orderblock'],
+  'skill.smc.fvg': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.fvg'],
+  'skill.smc.choch': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.choch'],
+  'skill.smc.demand': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.demand'],
+  'skill.smc.supply': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.supply'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1386,6 +1519,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...PRICEACTION_SKILL_CONCEPT_ID,
   ...RISK_SKILL_CONCEPT_ID,
   ...PSYCHOLOGY_SKILL_CONCEPT_ID,
+  ...SMC_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1594,6 +1728,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: PSYCHOLOGY_CHECKPOINT_ID,
     checkpointTitle: PSYCHOLOGY_CHECKPOINT_TITLE,
   },
+  // LOT 4-W — 12e module guidé réel : « Lire le Smart Money » (monde 12, world.smc).
+  // Des zones d'intérêt à surveiller — la réaction observée du prix fait foi, jamais la zone seule.
+  {
+    id: SMC_MODULE_ID,
+    title: SMC_MODULE_TITLE,
+    worldId: SMC_MODULE_WORLD_ID,
+    skills: SMC_SKILLS,
+    checkpointId: SMC_CHECKPOINT_ID,
+    checkpointTitle: SMC_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1675,6 +1819,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...PRICEACTION_SKILL_CONCEPT_SLUG,
   ...RISK_SKILL_CONCEPT_SLUG,
   ...PSYCHOLOGY_SKILL_CONCEPT_SLUG,
+  ...SMC_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
