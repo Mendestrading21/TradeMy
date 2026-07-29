@@ -54,6 +54,7 @@ contrat (`CLAUDE.md`) priment sur un ancien programme.
 | Fiche Monde canonique : héros + prochaine étape dérivée, trail guidé / collection de notions, états verrouillé/à réviser/terminé, vérité pédagogique, a11y (LOT 4-L) | [ADR-108](./ADR-108-trademy-lot4l-world-canon.md) |
 | 2e module guidé « Lire les chandeliers » (`world.candles`) : 4 compétences → concepts réels, source de scénario unique, 3 interactions natives figure (players existants), checkpoint propre, compteurs à 8 compétences, routes pré-générées, vérité pédagogique (LOT 4-M) | [ADR-109](./ADR-109-trademy-lot4m-guided-candles.md) |
 | v1 web gratuite : retrait du paywall démo (stats + deck ouverts à tous, `/premium` → « Accès libre »), zéro bouton mort (landing), écrans secondaires au canon (emoji → icônes, loading), REPO_TRUTH régénéré, `gh-pages` supprimée | [ADR-110](./ADR-110-trademy-v1-web-gratuite.md) |
+| 3e module guidé « Lire la structure » (`world.structure`) : 4 compétences → concepts réels (HH/HL, LH/LL, range, BOS), source de scénario unique, placement de plancher honnête (uptrend seul), checkpoint propre, compteurs à 12 compétences (LOT 4-N) | [ADR-111](./ADR-111-trademy-lot4n-guided-structure.md) |
 
 ## Fondations toujours actives
 

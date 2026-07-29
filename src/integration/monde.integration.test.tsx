@@ -59,7 +59,7 @@ jest.mock('expo-router', () => {
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
 import { ProgressProvider } from '@/data';
-import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE } from '@/data';
+import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -91,6 +91,11 @@ const GUIDED_DUE = seed({ completedSkills: [ALL_SKILLS[0]], skills: { [ALL_SKILL
 const ALL_SKILLS_DONE = seed({ completedSkills: [...ALL_SKILLS] }); // checkpoint restant
 const W1_DONE = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID] });
 const W2_EXPLORED = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], learning: { conceptsExplored: WORLD2_SLUGS } });
+// Mondes 1-3 avancés (Fondations + Chandeliers validés par la preuve) → le monde 4 (Structure) s'ouvre.
+const W3_DONE = seed({
+  completedSkills: [...ALL_SKILLS, CHECKPOINT_ID, ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID],
+  learning: { conceptsExplored: WORLD2_SLUGS },
+});
 
 function pressables(root: ReactTestInstance): ReactTestInstance[] {
   return root.findAll((n) => typeof n.props?.onPress === 'function', { deep: true });
@@ -250,6 +255,32 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     act(() => (cta!.props.onPress as () => void)());
     expect(pushes()).toContain(`/session/${CANDLE_SKILLS[0].id}`);
     // La notion liée d’une compétence Chandeliers est ouvrable (/concept/<slug candle>).
+    const discover = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith('Découvrir la notion liée à'));
+    expect(discover).toBeDefined();
+    act(() => (discover!.props.onPress as () => void)());
+    expect(pushes().some((p) => typeof p === 'string' && p.startsWith('/concept/'))).toBe(true);
+    await act(async () => r.unmount());
+  });
+
+  it('guidé Structure (monde 4, LOT 4-N) : ses 4 compétences + checkpoint PROPRE surfacent, prochaine étape correcte', async () => {
+    // Mondes 1-3 avancés → le monde 4 (Tendances et structure) est « en cours ».
+    await persist(W3_DONE);
+    const r = await mount('world.structure');
+    expect(hasText(r.root, 'Tendances et structure')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    // Les 4 compétences du module Structure surfacent (nœuds de la carte du monde).
+    for (const s of STRUCTURE_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    // Le checkpoint PROPRE du module surface (jamais ceux de Fondations ou des Chandeliers).
+    expect(hasTextIncluding(r.root, STRUCTURE_CHECKPOINT_TITLE)).toBe(true);
+    // La prochaine étape = 1re compétence Structure → /session/skill.structure.uptrend.
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${STRUCTURE_SKILLS[0].id}`);
+    // La notion liée d'une compétence Structure est ouvrable (/concept/<slug structure>).
     const discover = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith('Découvrir la notion liée à'));
     expect(discover).toBeDefined();
     act(() => (discover!.props.onPress as () => void)());

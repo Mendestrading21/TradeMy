@@ -20,9 +20,9 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Métrique | Registre (code) | Valeur |
 |---|---|---|
 | Concepts riches V5 | `V5_CONCEPTS` | 67 |
-| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 8 |
-| Leçons | `allLessonsFlat()` | 19 |
-| Exercices | `allExercisesFlat()` | 47 |
+| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 12 |
+| Leçons | `allLessonsFlat()` | 23 |
+| Exercices | `allExercisesFlat()` | 63 |
 | Termes de glossaire (v1) | `GLOSSARY_TERMS` | 24 |
 | Badges | `BADGES` | 23 |
 | Mondes | `WORLDS` | 15 |
@@ -30,8 +30,8 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Types de visuels rendables | `SUPPORTED_VISUAL_TYPES` | 11 |
 | Formats d'exercice | `ALL_EXERCISE_TYPES` = `supportedTypes()` | 13 / 13 |
 
-> Depuis le LOT 4-M, deux modules guidés existent (Fondations + Chandeliers) : les compteurs
-> compétences/leçons/exercices agrègent TOUS les modules via `CONTENT_MODULES` (source unique).
+> Depuis le LOT 4-N, trois modules guidés existent (Fondations + Chandeliers + Structure) : les
+> compteurs compétences/leçons/exercices agrègent TOUS les modules via `CONTENT_MODULES` (source unique).
 
 ## Formats d'exercice — réconciliation
 
