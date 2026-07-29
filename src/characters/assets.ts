@@ -21,4 +21,4 @@ export type ImageName = keyof typeof IMAGES;
 export const FIGURES = IMAGES;
 export type FigureName = ImageName;
 
-// Les avatars ronds sont **vectoriels** (src/characters/vector) : nets à toute taille.
+// Les avatars ronds cadrent la TÊTE de ces renders (MascotAvatar) : mêmes personnages partout.
