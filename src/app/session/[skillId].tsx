@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { Screen, Text, Card, Button, ProgressBar, StateView, FeedbackPanel, StatTile, TrademyIcon, theme, type TrademyIconName } from '@/design-system';
 import { RESULT_STAT_ACCENT, RESULT_ICON_ACCENT } from '@/design-system/resultAccents';
-import { CharacterScene, characterLine, useMascotReactions, resolveWithGuide } from '@/characters';
+import { CharacterScene, MascotFigure, characterLine, useMascotReactions, resolveWithGuide } from '@/characters';
 import { useConnectivity } from '@/lib/connectivity';
 import { ExercisePlayer, gradeExercise, exerciseFormatLabel, type GradeResult, type Exercise } from '@/engines/exercise';
 import {
@@ -567,8 +567,17 @@ function Results({
           </View>
         ) : null}
 
-        {/* Scène de personnage VECTORIELLE (nette, sans artefact) — remplace la figure « celebrate »
-            dont l'asset PNG portait un damier de transparence. Taille proportionnée au palier. */}
+        {/* Célébration 3D : en cas de réussite, le duo « celebrate » (asset réparé — le damier de
+            transparence a été retiré des pixels) rebondit au-dessus de la scène de dialogue.
+            Décorative : la scène de personnage porte le texte et l'état accessibles. */}
+        {summary.tier !== 'retry' ? (
+          <MascotFigure
+            name="celebrate"
+            gesture="celebrate"
+            height={summary.tier === 'perfect' ? 170 : 140}
+            decorative
+          />
+        ) : null}
         <CharacterScene
           character={mascotCharacter}
           state={mascotState}
