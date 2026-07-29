@@ -32,16 +32,37 @@ function StepLabel({ meta }: { meta: LessonStepMeta }) {
 /**
  * Rendu d'une étape de leçon (texte, flashcard, visuel SVG, graphique bougies, hypothèse Toto/Bobo).
  * Composant partagé entre l'écran leçon (`/lesson/[id]`) et la phase « Apprendre » de la session.
+ * `conceptSlug` (optionnel) : fiche concept de la COMPÉTENCE porteuse — sert de repli aux étapes
+ * sans `conceptRef` propre pour rendre le graphique réel (LOT V5 : observer, c'est regarder).
  */
-export function LessonStepView({ step }: { step: LessonStep }) {
+export function LessonStepView({ step, conceptSlug }: { step: LessonStep; conceptSlug?: string }) {
   const router = useRouter();
 
   if (step.kind === 'flashcard' && step.flashcard) {
     return <Flashcard front={step.flashcard.front} back={step.flashcard.back} />;
   }
 
+  // LOT V5 — l'étape « observe » MONTRE ce qu'elle demande d'observer : le visuel réel du concept
+  // (dataset de la fiche) au-dessus de la consigne d'une ligne. Repli texte si aucun visuel.
+  if (step.kind === 'observe') {
+    const concept = conceptBySlug(V5_CONCEPTS, step.conceptRef ?? conceptSlug ?? '');
+    if (concept?.visualSpec) {
+      return (
+        <View style={styles.stepStack}>
+          <VisualCard spec={concept.visualSpec} title={STEP_META.observe.label} />
+          {step.body ? (
+            <Card>
+              <StepLabel meta={STEP_META.observe} />
+              <Text variant="body">{step.body}</Text>
+            </Card>
+          ) : null}
+        </View>
+      );
+    }
+  }
+
   if (step.kind === 'visual') {
-    const concept = step.conceptRef ? conceptBySlug(V5_CONCEPTS, step.conceptRef) : undefined;
+    const concept = conceptBySlug(V5_CONCEPTS, step.conceptRef ?? conceptSlug ?? '');
     if (concept?.visualSpec) {
       return (
         <View style={styles.stepStack}>

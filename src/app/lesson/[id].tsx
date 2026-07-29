@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { Screen, Text, Card, Button, Chip, EmptyState, StateView, theme } from '@/design-system';
 import { CharacterScene } from '@/characters';
-import { allLessons } from '@/data';
+import { allLessons, conceptSlugForSkill } from '@/data';
 import { LessonStepView } from '@/components/LessonStepView';
 import { analytics } from '@/analytics';
 
@@ -86,7 +86,7 @@ export default function LessonScreen() {
       <CharacterScene character="toto" state="explain" size={64} speech="On y va pas à pas, tu vas voir." />
 
       {lesson.steps.map((step) => (
-        <LessonStepView key={step.id} step={step} />
+        <LessonStepView key={step.id} step={step} conceptSlug={conceptSlugForSkill(lesson.skillId)} />
       ))}
 
       {lesson.commonMistake ? (

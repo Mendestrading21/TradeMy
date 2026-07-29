@@ -303,7 +303,7 @@ export default function Session() {
           <CharacterScene character={reaction.character} state={reaction.state} size={56} speech={speech} />
         ) : null}
 
-        <LessonStepView key={step.id} step={step} />
+        <LessonStepView key={step.id} step={step} conceptSlug={conceptSlugForSkill(skillId)} />
 
         {isLast && lessons.length > 1 ? (
           <Card>
