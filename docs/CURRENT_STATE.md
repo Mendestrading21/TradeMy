@@ -207,8 +207,8 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
 > lot par monde, gate verte à chaque fusion). Modules guidés : Fondations, Anatomie (ADR-113),
 > Chandeliers (ADR-109), Structure (ADR-111), Niveaux (ADR-112), Figures (ADR-114), Indicateurs
 > (ADR-115), Volume (ADR-117), Price action (ADR-118), Risk (ADR-119), Psychologie (ADR-120),
-> SMC (LOT 4-W, ADR-121) — **12 mondes guidés sur 15** (préfixe 1-12 entièrement guidé), 3 restent
-> des collections de notions.
+> SMC (ADR-121), Wyckoff (LOT 4-X, ADR-122) — **13 mondes guidés sur 15** (préfixe 1-13
+> entièrement guidé), 2 restent des collections de notions.
 > Depuis le LOT 4-P, un monde guidé se termine par la preuve (checkpoint), plus par la seule lecture.
 
 ## Programme « Visual Max » (ADR-116) — 29/07/2026, livré

@@ -133,6 +133,17 @@ import {
   SMC_SKILL_CONCEPT_ID,
   SMC_SKILL_CONCEPT_SLUG,
 } from './smcModuleScenarios';
+import {
+  WYCKOFF_SKILLS,
+  WYCKOFF_MODULE_ID,
+  WYCKOFF_MODULE_TITLE,
+  WYCKOFF_MODULE_WORLD_ID,
+  WYCKOFF_CHECKPOINT_ID,
+  WYCKOFF_CHECKPOINT_TITLE,
+  WYCKOFF_MODULE_EXERCISES_BY_SKILL,
+  WYCKOFF_SKILL_CONCEPT_ID,
+  WYCKOFF_SKILL_CONCEPT_SLUG,
+} from './wyckoffModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1370,6 +1381,53 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-X — Module guidé « Lire les phases Wyckoff » (world.wyckoff) ─
+  'skill.wyckoff.accumulation': [
+    {
+      id: 'lesson.wyckoff-accumulation',
+      slug: 'wyckoff-accumulation-lecture',
+      title: 'L’accumulation : la base où l’offre s’épuise',
+      skillId: 'skill.wyckoff.accumulation',
+      objective: 'Lire une base en range comme accumulation possible et placer son invalidation sous la zone.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une baisse, le prix construit parfois une longue base en range : l’offre s’y épuise progressivement — c’est l’accumulation, souvent suivie d’une sortie par le haut.' },
+        { id: 's1', kind: 'observe', body: 'Repère la longue base horizontale, ses bords (haut et bas), et l’épuisement des poussées baissières.' },
+        { id: 's2', kind: 'visual', conceptRef: 'wyckoff-accumulation' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'wyckoff-accumulation', body: 'La sortie se confirme par le HAUT de la base, avec la structure et la participation ; une rupture par le BAS invalide le scénario.' },
+        { id: 's4', kind: 'falseSignal', body: 'La fausse sortie par le haut, aussitôt ramenée dans la base, est le piège classique de l’accumulation.' },
+        { id: 's5', kind: 'summary', body: 'Accumulation = base en range où l’offre s’épuise ; sortie confirmée par le haut ; rupture par le bas = invalidation.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui invalide une accumulation ?', back: 'Une rupture par le bas de la zone d’accumulation : le scénario éducatif s’abandonne.' } },
+      ],
+      commonMistake: 'Prendre une fausse sortie par le haut pour une sortie confirmée.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.wyckoff.distribution': [
+    {
+      id: 'lesson.wyckoff-distribution',
+      slug: 'distribution-wyckoff-lecture',
+      title: 'La distribution : le range qui plafonne une hausse',
+      skillId: 'skill.wyckoff.distribution',
+      objective: 'Reconnaître une distribution possible par son contexte — jamais un range seul.',
+      difficulty: 'advanced',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une hausse, un range en sommet peut être une distribution : l’offre y absorbe progressivement la demande.' },
+        { id: 's1', kind: 'observe', body: 'Vérifie le contexte (une hausse précède), puis observe le plafonnement : les poussées ne tiennent plus.' },
+        { id: 's2', kind: 'visual', conceptRef: 'distribution-wyckoff' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'distribution-wyckoff', body: 'Le contexte décide : un range sans hausse préalable n’est pas une distribution — la prudence prime.' },
+        { id: 's4', kind: 'falseSignal', body: 'Voir de la distribution dans tout range, sans contexte, est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Distribution = range EN SOMMET où l’offre absorbe la demande ; le contexte est indispensable.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’une distribution (Wyckoff) ?', back: 'Un range en sommet où l’offre absorbe progressivement la demande — lisible seulement dans son contexte.' } },
+      ],
+      commonMistake: 'Voir de la distribution dans tout range, sans contexte.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1495,6 +1553,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.smc.choch': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.choch'],
   'skill.smc.demand': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.demand'],
   'skill.smc.supply': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.supply'],
+  // LOT 4-X — module guidé Wyckoff : exercices dérivés des scénarios (source unique).
+  'skill.wyckoff.accumulation': WYCKOFF_MODULE_EXERCISES_BY_SKILL['skill.wyckoff.accumulation'],
+  'skill.wyckoff.distribution': WYCKOFF_MODULE_EXERCISES_BY_SKILL['skill.wyckoff.distribution'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1520,6 +1581,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...RISK_SKILL_CONCEPT_ID,
   ...PSYCHOLOGY_SKILL_CONCEPT_ID,
   ...SMC_SKILL_CONCEPT_ID,
+  ...WYCKOFF_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1738,6 +1800,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: SMC_CHECKPOINT_ID,
     checkpointTitle: SMC_CHECKPOINT_TITLE,
   },
+  // LOT 4-X — 13e module guidé réel : « Lire les phases Wyckoff » (monde 13, world.wyckoff).
+  // Accumulation (base où l'offre s'épuise) et distribution (sommet où elle absorbe) — le contexte décide.
+  {
+    id: WYCKOFF_MODULE_ID,
+    title: WYCKOFF_MODULE_TITLE,
+    worldId: WYCKOFF_MODULE_WORLD_ID,
+    skills: WYCKOFF_SKILLS,
+    checkpointId: WYCKOFF_CHECKPOINT_ID,
+    checkpointTitle: WYCKOFF_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1820,6 +1892,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...RISK_SKILL_CONCEPT_SLUG,
   ...PSYCHOLOGY_SKILL_CONCEPT_SLUG,
   ...SMC_SKILL_CONCEPT_SLUG,
+  ...WYCKOFF_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
