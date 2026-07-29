@@ -24,7 +24,11 @@ const FIXED_NOW = Date.UTC(2026, 0, 15, 8, 30, 0);
 const TIMEZONE = 'Europe/Zurich';
 const DAY = 86_400_000;
 const seed = (o) => JSON.stringify({ onboarded: true, schemaVersion: 8, completedSkills: [], totalXp: 0, streakDays: 0, coins: 0, learning: { conceptsExplored: [] }, skills: {}, targets: {}, ...o });
-const FOND_DONE = ['skill.actions', 'skill.trend', 'skill.candles', 'skill.patterns', 'checkpoint.read-chart'];
+// Mondes 1 ET 2 validés (le monde 2 est guidé depuis le LOT 4-P) → le monde 3 est « en cours ».
+const FOND_DONE = [
+  'skill.actions', 'skill.trend', 'skill.candles', 'skill.patterns', 'checkpoint.read-chart',
+  'skill.anatomy.candle', 'skill.anatomy.timeframe', 'skill.anatomy.scale', 'checkpoint.anatomy',
+];
 const ANAT = ['anatomie-bougie', 'unite-de-temps', 'echelle-des-prix'];
 const CANDLE_IDS = ['skill.candle.pressure', 'skill.candle.rejection', 'skill.candle.indecision', 'skill.candle.reversal'];
 const dueSkill = (id) => ({ skillId: id, xp: 10, mastery: 0.5, confidence: 0.5, review: { repetitions: 1, easiness: 2.5, intervalDays: 1, dueAt: FIXED_NOW - DAY }, errorTags: {} });

@@ -18,9 +18,12 @@ describe('Unité pilote « Comprendre un chandelier » — modèle officiel', ()
     expect(covered.has(objectiveId(C, 'recognize'))).toBe(true);
     expect(covered.has(objectiveId(C, 'interpret'))).toBe(true);
     expect(covered.has(objectiveId(C, 'avoid-false-signal'))).toBe(true);
-    // exercisableObjectiveIds (base de la couverture/maîtrise) reflète ces objectifs.
+    // exercisableObjectiveIds (base de la couverture/maîtrise) contient ces objectifs.
+    // Depuis le LOT 4-P, le concept porte AUSSI `confirm`, exercé par le module Anatomie
+    // (skill.anatomy.candle) : l'ensemble global est l'union des deux compétences.
     const exObj = new Set(exercisableObjectiveIds(C));
-    expect(exObj).toEqual(covered);
+    for (const oid of covered) expect(exObj.has(oid as string)).toBe(true);
+    expect(exObj).toEqual(new Set([...covered, objectiveId(C, 'confirm')]));
   });
 
   it('propose 4 MÉCANIQUES utilisateur réellement distinctes (pas des QCM déguisés)', () => {

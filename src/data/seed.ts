@@ -45,6 +45,17 @@ import {
   SR_SKILL_CONCEPT_ID,
   SR_SKILL_CONCEPT_SLUG,
 } from './srModuleScenarios';
+import {
+  ANATOMY_SKILLS,
+  ANATOMY_MODULE_ID,
+  ANATOMY_MODULE_TITLE,
+  ANATOMY_MODULE_WORLD_ID,
+  ANATOMY_CHECKPOINT_ID,
+  ANATOMY_CHECKPOINT_TITLE,
+  ANATOMY_MODULE_EXERCISES_BY_SKILL,
+  ANATOMY_SKILL_CONCEPT_ID,
+  ANATOMY_SKILL_CONCEPT_SLUG,
+} from './anatomyModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -650,6 +661,76 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-P — Module guidé « Lire un graphique de près » (world.anatomy) ──
+  'skill.anatomy.candle': [
+    {
+      id: 'lesson.anatomy-candle',
+      slug: 'corps-et-meches',
+      title: 'Le corps et les mèches',
+      skillId: 'skill.anatomy.candle',
+      objective: 'Décomposer une bougie en corps et mèches et lire ce qu’elle raconte.',
+      difficulty: 'beginner',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une bougie résume une période en quatre prix : ouverture, clôture, plus haut, plus bas. Tout le reste se lit dedans.' },
+        { id: 's1', kind: 'observe', body: 'Repère le corps (ouverture ↔ clôture) et les deux mèches (les extrêmes atteints pendant la période).' },
+        { id: 's2', kind: 'visual', conceptRef: 'anatomie-bougie' },
+        { id: 's3', kind: 'explain', body: 'Corps long = mouvement décidé ; longues mèches = hésitation ou rejet. La couleur dit le sens de la période — pas la suite.' },
+        { id: 's4', kind: 'falseSignal', body: 'Lire la couleur sans regarder la taille du corps ni les mèches mène aux contresens : une bougie décrit le passé.' },
+        { id: 's5', kind: 'summary', body: 'Corps = sens, mèches = extrêmes ; la lecture se confirme avec les bougies suivantes et le contexte.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que montre le corps d’une bougie ?', back: 'La distance ouverture ↔ clôture — donc le sens dominant de la période.' } },
+      ],
+      commonMistake: 'Croire qu’une couleur prédit la bougie suivante.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.anatomy.timeframe': [
+    {
+      id: 'lesson.anatomy-timeframe',
+      slug: 'unite-de-temps-lecture',
+      title: 'L’unité de temps : ce qu’une bougie résume',
+      skillId: 'skill.anatomy.timeframe',
+      objective: 'Comprendre qu’une bougie résume une durée choisie (l’unité de temps).',
+      difficulty: 'beginner',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une bougie n’a de sens qu’avec sa durée : 1 minute, 1 heure, 1 jour. C’est l’unité de temps.' },
+        { id: 's1', kind: 'observe', body: 'La même série paraît très différente en 5 minutes et en journalier : plus l’unité est courte, plus il y a de bruit.' },
+        { id: 's2', kind: 'visual', conceptRef: 'unite-de-temps' },
+        { id: 's3', kind: 'explain', body: 'On lit d’abord la structure sur une unité large (la tendance de fond), puis on affine sur une unité plus courte.' },
+        { id: 's4', kind: 'falseSignal', body: 'Confondre un signal de très court terme avec la tendance de fond est l’erreur classique du zoom excessif.' },
+        { id: 's5', kind: 'summary', body: 'Une bougie = une durée fixe ; le signal court doit tenir face à la structure large.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que représente une bougie ?', back: 'Une durée fixe : l’unité de temps (1 min, 1 h, 1 jour…).' } },
+      ],
+      commonMistake: 'Zoomer trop fort et perdre le contexte d’ensemble.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.anatomy.scale': [
+    {
+      id: 'lesson.anatomy-scale',
+      slug: 'echelle-des-prix-lecture',
+      title: 'L’échelle des prix : mesurer, pas impressionner',
+      skillId: 'skill.anatomy.scale',
+      objective: 'Lire l’axe des prix pour situer un mouvement dans son contexte.',
+      difficulty: 'beginner',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'L’axe vertical situe chaque bougie à son niveau de prix. C’est lui qui dit la vraie ampleur d’un mouvement.' },
+        { id: 's1', kind: 'observe', body: 'Repère les niveaux au bord du graphique et mesure l’écart réel entre deux points : c’est l’amplitude.' },
+        { id: 's2', kind: 'visual', conceptRef: 'echelle-des-prix' },
+        { id: 's3', kind: 'explain', body: 'Une même hausse paraît spectaculaire ou modeste selon l’étirement de l’échelle : on compare l’amplitude à la structure, pas à l’impression.' },
+        { id: 's4', kind: 'falseSignal', body: 'Surestimer une hausse à cause d’une échelle compressée ou étirée : l’axe change l’impression, jamais les prix.' },
+        { id: 's5', kind: 'summary', body: 'Lire les niveaux, mesurer l’amplitude réelle, la rapporter au contexte — ne jamais juger à l’œil.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'À quoi sert l’échelle des prix ?', back: 'À situer chaque bougie à son niveau et à mesurer l’amplitude réelle.' } },
+      ],
+      commonMistake: 'Juger l’ampleur à l’œil sans lire les niveaux.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -744,6 +825,10 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.sr.zones': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.zones'],
   'skill.sr.flip': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.flip'],
   'skill.sr.retest': SR_MODULE_EXERCISES_BY_SKILL['skill.sr.retest'],
+  // LOT 4-P — module « Lire un graphique de près » : exercices dérivés des scénarios.
+  'skill.anatomy.candle': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.candle'],
+  'skill.anatomy.timeframe': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.timeframe'],
+  'skill.anatomy.scale': ANATOMY_MODULE_EXERCISES_BY_SKILL['skill.anatomy.scale'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -759,6 +844,8 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...STRUCTURE_SKILL_CONCEPT_ID,
   // LOT 4-O — compétences du module « Lire les niveaux » (concepts réels de world.support-resistance).
   ...SR_SKILL_CONCEPT_ID,
+  // LOT 4-P — compétences du module « Lire un graphique de près » (concepts réels de world.anatomy).
+  ...ANATOMY_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -897,6 +984,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: SR_CHECKPOINT_ID,
     checkpointTitle: SR_CHECKPOINT_TITLE,
   },
+  // LOT 4-P — 5e module guidé réel : « Lire un graphique de près » (monde 2, world.anatomy).
+  // Le monde 2 devient guidé : il ne se « termine » plus par la seule lecture des fiches.
+  {
+    id: ANATOMY_MODULE_ID,
+    title: ANATOMY_MODULE_TITLE,
+    worldId: ANATOMY_MODULE_WORLD_ID,
+    skills: ANATOMY_SKILLS,
+    checkpointId: ANATOMY_CHECKPOINT_ID,
+    checkpointTitle: ANATOMY_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -971,6 +1068,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...CANDLE_SKILL_CONCEPT_SLUG,
   ...STRUCTURE_SKILL_CONCEPT_SLUG,
   ...SR_SKILL_CONCEPT_SLUG,
+  ...ANATOMY_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
