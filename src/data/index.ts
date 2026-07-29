@@ -5,6 +5,7 @@ export * from './structureModuleScenarios';
 export * from './srModuleScenarios';
 export * from './anatomyModuleScenarios';
 export * from './patternsModuleScenarios';
+export * from './indicatorsModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';
