@@ -1,7 +1,5 @@
-export { CharacterAvatar, type CharacterAvatarProps } from './CharacterAvatar';
-export { MascotAvatar, type MascotAvatarProps } from './MascotAvatar';
+export { MascotAvatar, AVATAR_FIGURE, type MascotAvatarProps } from './MascotAvatar';
 export { MascotFigure, type MascotFigureProps, type MascotGesture } from './MascotFigure';
-export { Toto, Bobo, type VectorFaceProps } from './vector';
 export { FIGURES, IMAGES, type FigureName, type ImageName } from './assets';
 export {
   CharacterAnimationController,

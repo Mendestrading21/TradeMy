@@ -23,7 +23,7 @@ export type CharacterAnimationControllerProps = {
 };
 
 /**
- * Point d'intégration unique pour l'animation des personnages (avatars vectoriels Toto/Bobo).
+ * Point d'intégration unique pour l'animation des personnages (avatars 3D Toto/Bobo).
  *
  * Applique des micro-animations Reanimated pilotées par le registre d'états (source unique) :
  * pop bref au changement d'état (dosé par l'intensité, durée = token motion), et flottement
