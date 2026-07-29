@@ -20,9 +20,9 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Métrique | Registre (code) | Valeur |
 |---|---|---|
 | Concepts riches V5 | `V5_CONCEPTS` | 67 |
-| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 44 |
-| Leçons | `allLessonsFlat()` | 55 |
-| Exercices | `allExercisesFlat()` | 195 |
+| Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 46 |
+| Leçons | `allLessonsFlat()` | 57 |
+| Exercices | `allExercisesFlat()` | 205 |
 | Termes de glossaire (v1) | `GLOSSARY_TERMS` | 24 |
 | Badges | `BADGES` | 23 |
 | Mondes | `WORLDS` | 15 |
@@ -30,10 +30,10 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Types de visuels rendables | `SUPPORTED_VISUAL_TYPES` | 11 |
 | Formats d'exercice | `ALL_EXERCISE_TYPES` = `supportedTypes()` | 13 / 13 |
 
-> Depuis le LOT 4-X, treize modules guidés existent (Fondations, Anatomie, Chandeliers, Structure,
-> Niveaux, Figures, Indicateurs, Volume, Price action, Risk, Psychologie, SMC, Wyckoff — les
-> mondes 1-13 forment un préfixe entièrement guidé) : les compteurs agrègent TOUS les modules via
-> `CONTENT_MODULES` (source unique).
+> Depuis le LOT 4-Y, quatorze modules guidés existent (Fondations, Anatomie, Chandeliers,
+> Structure, Niveaux, Figures, Indicateurs, Volume, Price action, Risk, Psychologie, SMC, Wyckoff,
+> Options — les mondes 1-14 forment un préfixe entièrement guidé) : les compteurs agrègent TOUS
+> les modules via `CONTENT_MODULES` (source unique).
 
 ## Formats d'exercice — réconciliation
 

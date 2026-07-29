@@ -214,7 +214,10 @@ describe('Parcours de production — roadmap, action unique, vérité pédagogiq
     const lc = labelForOrder(root, CONTENT_WORLD.order)!;
     expect(lc).toMatch(/Niveau : exploré/);
     expect(lc).not.toMatch(/Niveau : terminé/);
-    expect(labelForOrder(root, CONTENT_WORLD.order + 1)).not.toMatch(/verrouillé/); // monde suivant ouvert
+    // Le monde suivant (s'il existe) est ouvert — depuis le LOT 4-Y, le monde de contenu est le
+    // DERNIER du parcours (ordre 15) : l'assertion ne s'applique que s'il reste un monde après.
+    const next = labelForOrder(root, CONTENT_WORLD.order + 1);
+    if (next !== undefined) expect(next).not.toMatch(/verrouillé/);
     await act(async () => r.unmount());
   });
 

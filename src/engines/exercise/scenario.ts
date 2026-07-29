@@ -115,7 +115,7 @@ export interface IdentifyCandleScenario extends ScenarioBase {
   /** Variant (= id de figure) pour résoudre le rendu. */
   variant: string;
   /** Type de rendu du moteur de visuels. */
-  visualType: 'candle-anatomy' | 'candlestick-pattern' | 'chart-pattern' | 'market-structure' | 'indicator' | 'volume-profile' | 'risk-reward';
+  visualType: 'candle-anatomy' | 'candlestick-pattern' | 'chart-pattern' | 'market-structure' | 'indicator' | 'volume-profile' | 'risk-reward' | 'option-payoff';
   options: string[];
   /** Index de la bonne réponse (le nom de la figure montrée). */
   correctIndex: number;
