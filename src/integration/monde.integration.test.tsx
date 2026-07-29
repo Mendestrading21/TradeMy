@@ -59,7 +59,7 @@ jest.mock('expo-router', () => {
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
 import { ProgressProvider } from '@/data';
-import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE } from '@/data';
+import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE, CANDLE_CHECKPOINT_ID, STRUCTURE_SKILLS, STRUCTURE_CHECKPOINT_TITLE, STRUCTURE_CHECKPOINT_ID, SR_SKILLS, SR_CHECKPOINT_TITLE } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -94,6 +94,15 @@ const W2_EXPLORED = seed({ completedSkills: [...ALL_SKILLS, CHECKPOINT_ID], lear
 // Mondes 1-3 avancés (Fondations + Chandeliers validés par la preuve) → le monde 4 (Structure) s'ouvre.
 const W3_DONE = seed({
   completedSkills: [...ALL_SKILLS, CHECKPOINT_ID, ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID],
+  learning: { conceptsExplored: WORLD2_SLUGS },
+});
+// Mondes 1-4 avancés (…+ Structure validé) → le monde 5 (Supports et résistances) s'ouvre.
+const W4_DONE = seed({
+  completedSkills: [
+    ...ALL_SKILLS, CHECKPOINT_ID,
+    ...CANDLE_SKILLS.map((s) => s.id), CANDLE_CHECKPOINT_ID,
+    ...STRUCTURE_SKILLS.map((s) => s.id), STRUCTURE_CHECKPOINT_ID,
+  ],
   learning: { conceptsExplored: WORLD2_SLUGS },
 });
 
@@ -285,6 +294,27 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
     expect(discover).toBeDefined();
     act(() => (discover!.props.onPress as () => void)());
     expect(pushes().some((p) => typeof p === 'string' && p.startsWith('/concept/'))).toBe(true);
+    await act(async () => r.unmount());
+  });
+
+  it('guidé Niveaux (monde 5, LOT 4-O) : ses 3 compétences + checkpoint PROPRE surfacent, prochaine étape correcte', async () => {
+    // Mondes 1-4 avancés → le monde 5 (Supports et résistances) est « en cours ».
+    await persist(W4_DONE);
+    const r = await mount('world.support-resistance');
+    expect(hasText(r.root, 'Supports et résistances')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    // Les 3 compétences du module Niveaux surfacent (nœuds de la carte du monde).
+    for (const s of SR_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    // Le checkpoint PROPRE du module surface.
+    expect(hasTextIncluding(r.root, SR_CHECKPOINT_TITLE)).toBe(true);
+    // La prochaine étape = 1re compétence Niveaux → /session/skill.sr.zones.
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${SR_SKILLS[0].id}`);
     await act(async () => r.unmount());
   });
 
