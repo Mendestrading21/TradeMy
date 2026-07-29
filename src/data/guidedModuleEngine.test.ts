@@ -23,6 +23,9 @@ import {
   CANDLE_CHECKPOINT_ID,
   CANDLE_CHECKPOINT_TITLE,
   CANDLE_SKILLS,
+  STRUCTURE_MODULE_ID,
+  STRUCTURE_CHECKPOINT_ID,
+  STRUCTURE_CHECKPOINT_TITLE,
 } from '@/data';
 import type { ProgressState } from './repositories';
 import type { Skill } from '../engines/learning';
@@ -109,7 +112,7 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
 
   it('module RÉEL Chandeliers : 2e module, checkpoint PROPRE résolu par le moteur (indépendant de Fondations)', () => {
     // Un 2e module guidé réel existe, avec un checkpoint distinct de celui de Fondations.
-    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID]);
+    expect(CONTENT_MODULES.map((m) => m.id)).toEqual(['module.foundations.read-chart', CANDLE_MODULE_ID, STRUCTURE_MODULE_ID]);
     expect(isCheckpoint(CANDLE_CHECKPOINT_ID)).toBe(true);
     expect(CANDLE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
     expect(skillById(CANDLE_CHECKPOINT_ID)).toEqual({ id: CANDLE_CHECKPOINT_ID, name: CANDLE_CHECKPOINT_TITLE });
@@ -120,5 +123,18 @@ describe('LOT 4-M — moteur multi-module (registre canonique)', () => {
     expect(skillsForModule(CANDLE_MODULE_ID).map((s) => s.id)).toEqual(CANDLE_SKILLS.map((s) => s.id));
     // Le checkpoint Fondations validé n'affecte PAS le module Chandeliers (indépendance).
     expect(checkpointExercises(CHECKPOINT_ID, 0, 2).every((e) => e.skillId.startsWith('skill.candle.'))).toBe(false);
+  });
+
+  it('module RÉEL Structure (LOT 4-N) : 3e module, checkpoint PROPRE, indépendant des deux autres', () => {
+    expect(isCheckpoint(STRUCTURE_CHECKPOINT_ID)).toBe(true);
+    expect(STRUCTURE_CHECKPOINT_ID).not.toBe(CHECKPOINT_ID);
+    expect(STRUCTURE_CHECKPOINT_ID).not.toBe(CANDLE_CHECKPOINT_ID);
+    expect(skillById(STRUCTURE_CHECKPOINT_ID)).toEqual({ id: STRUCTURE_CHECKPOINT_ID, name: STRUCTURE_CHECKPOINT_TITLE });
+    // La revue Structure agrège des exercices des compétences du module (skillId réel conservé).
+    const cp = checkpointExercises(STRUCTURE_CHECKPOINT_ID, 0, 2);
+    expect(cp.length).toBeGreaterThan(0);
+    expect(cp.every((e) => e.skillId.startsWith('skill.structure.'))).toBe(true);
+    // Les checkpoints des autres modules ne « fuient » pas dans celui-ci.
+    expect(checkpointExercises(CANDLE_CHECKPOINT_ID, 0, 2).every((e) => e.skillId.startsWith('skill.structure.'))).toBe(false);
   });
 });

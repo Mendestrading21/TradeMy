@@ -204,7 +204,9 @@ Voir **ADR-109**. Les 13 autres mondes restent des collections de notions ; Fond
   monde 3) — 1 transition/cible, cible échouée due, aucune maîtrise prématurée, reprise idempotente.
 
 > **LOT 4-M — fusionné dans `main` le 29/07/2026 (PR #23, validation propriétaire) et déployé**
-> (CI + Pages verts). Deux modules guidés sont en ligne : Fondations et Chandeliers.
+> (CI + Pages verts). **LOT 4-N (module guidé « Lire la structure », monde 4) — ADR-111** : trois
+> modules guidés (Fondations, Chandeliers, Structure), programme « guider tous les mondes » en cours
+> (autorisation propriétaire du 29/07/2026, un lot par monde, gate verte à chaque fusion).
 
 ## v1 web gratuite (ADR-110) — 29/07/2026
 

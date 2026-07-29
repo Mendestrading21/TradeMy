@@ -23,6 +23,17 @@ import {
   CANDLE_SKILL_CONCEPT_ID,
   CANDLE_SKILL_CONCEPT_SLUG,
 } from './candleModuleScenarios';
+import {
+  STRUCTURE_SKILLS,
+  STRUCTURE_MODULE_ID,
+  STRUCTURE_MODULE_TITLE,
+  STRUCTURE_MODULE_WORLD_ID,
+  STRUCTURE_CHECKPOINT_ID,
+  STRUCTURE_CHECKPOINT_TITLE,
+  STRUCTURE_MODULE_EXERCISES_BY_SKILL,
+  STRUCTURE_SKILL_CONCEPT_ID,
+  STRUCTURE_SKILL_CONCEPT_SLUG,
+} from './structureModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -462,6 +473,101 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-N — Module guidé « Lire la structure » (world.structure) ──
+  'skill.structure.uptrend': [
+    {
+      id: 'lesson.structure-uptrend',
+      slug: 'tendance-haussiere-structure',
+      title: 'La tendance haussière : une structure, pas une opinion',
+      skillId: 'skill.structure.uptrend',
+      objective: 'Définir une tendance haussière par sa séquence HH/HL.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une tendance haussière ne se décrète pas : elle se lit dans la structure des prix, sommet après sommet, creux après creux.' },
+        { id: 's1', kind: 'observe', body: 'Cherche des sommets de plus en plus hauts (HH) et des creux de plus en plus hauts (HL), avec des retracements limités.' },
+        { id: 's2', kind: 'visual', conceptRef: 'tendance-haussiere' },
+        { id: 's3', kind: 'explain', body: 'Chaque nouveau plus-haut au-dessus du précédent confirme la structure ; chaque creux tenu au-dessus du précédent la protège.' },
+        { id: 's4', kind: 'falseSignal', body: 'Un simple rebond dans une baisse n’est pas une tendance haussière : une seule grande bougie ne fait pas une structure.' },
+        { id: 's5', kind: 'summary', body: 'Tendance haussière = séquence HH/HL intacte ; elle est invalidée quand un creux passe sous le creux précédent.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui définit une tendance haussière ?', back: 'Une structure de sommets et de creux de plus en plus hauts (HH/HL).' } },
+      ],
+      commonMistake: 'Lire la tendance sur une bougie plutôt que sur la structure.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.structure.downtrend': [
+    {
+      id: 'lesson.structure-downtrend',
+      slug: 'tendance-baissiere-structure',
+      title: 'La tendance baissière : le symétrique exact',
+      skillId: 'skill.structure.downtrend',
+      objective: 'Décrire une tendance baissière par sa séquence LH/LL.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'La baisse a la même grammaire que la hausse, inversée : des sommets et des creux de plus en plus bas.' },
+        { id: 's1', kind: 'observe', body: 'Cherche des sommets décroissants (LH), des creux décroissants (LL), et des rebonds qui échouent chacun plus bas.' },
+        { id: 's2', kind: 'visual', conceptRef: 'tendance-baissiere' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'tendance-baissiere', body: 'Tant que la suite LH/LL tient, la pression vendeuse domine : viser le creux sans changement de structure, c’est se précipiter.' },
+        { id: 's4', kind: 'explain', body: 'La structure baissière reste valable jusqu’à sa rupture : un plus haut plus haut remet la tendance en question.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un seul rebond n’est pas un retournement : sans plus haut plus haut, la structure baissière est intacte.' },
+        { id: 's6', kind: 'summary', body: 'Tendance baissière = séquence LH/LL ; elle est remise en cause par un plus haut plus haut, pas par un rebond isolé.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui remet en cause une tendance baissière ?', back: 'Un plus haut plus haut : il casse la suite de sommets décroissants.' } },
+      ],
+      commonMistake: 'Acheter le creux sans changement de structure.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.structure.range': [
+    {
+      id: 'lesson.structure-range',
+      slug: 'range-equilibre',
+      title: 'Le range : la zone d’équilibre',
+      skillId: 'skill.structure.range',
+      objective: 'Reconnaître un range et attendre une sortie confirmée.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Quand ni les acheteurs ni les vendeurs ne dominent, le prix oscille entre un plancher et un plafond : le range.' },
+        { id: 's1', kind: 'observe', body: 'Cherche des rebonds répétés sur un support, des rejets répétés sous une résistance, et l’absence de sommets/creux progressifs.' },
+        { id: 's2', kind: 'visual', conceptRef: 'range' },
+        { id: 's3', kind: 'explain', body: 'Les bornes sont des zones, pas des lignes exactes. Une sortie confirmée du range — clôture au-delà d’une borne, idéalement retestée — ouvre une nouvelle phase.' },
+        { id: 's4', kind: 'falseSignal', body: 'Une mèche au-delà d’une borne sans clôture confirmée est une fausse sortie : le prix repasse aussitôt dans la zone.' },
+        { id: 's5', kind: 'summary', body: 'Range = équilibre entre support et résistance ; seul compte ce qui le termine : une sortie franche et confirmée.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui met fin à un range ?', back: 'Une sortie franche et confirmée d’une borne (clôture au-delà, idéalement retestée).' } },
+      ],
+      commonMistake: 'Traiter les bornes comme des lignes exactes plutôt que des zones.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.structure.break': [
+    {
+      id: 'lesson.structure-break',
+      slug: 'cassure-de-structure-lecture',
+      title: 'La cassure de structure : quand la séquence cède',
+      skillId: 'skill.structure.break',
+      objective: 'Repérer une cassure de structure et rester probabiliste.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Dans une hausse, tout repose sur le dernier creux protégé. Le jour où il cède, la séquence HH/HL est rompue : c’est la cassure de structure.' },
+        { id: 's1', kind: 'observe', body: 'Cherche une séquence bien établie, puis une clôture qui casse le dernier creux protégé, avec un changement de rythme.' },
+        { id: 's2', kind: 'visual', conceptRef: 'cassure-de-structure' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'cassure-de-structure', body: 'La cassure signale que le rapport de force bascule — elle ne garantit pas un retournement : c’est une hypothèse à surveiller.' },
+        { id: 's4', kind: 'explain', body: 'La cassure se confirme sous le dernier creux protégé, idéalement avec de la participation ; une reprise au-dessus du niveau cassé l’invalide.' },
+        { id: 's5', kind: 'falseSignal', body: 'Une mèche qui perce le creux sans clôture au-delà peut n’être qu’une chasse aux stops ; un simple retracement n’est pas une cassure.' },
+        { id: 's6', kind: 'summary', body: 'Cassure de structure = rupture du dernier creux protégé, en clôture ; à confirmer, jamais garantie.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’invalide une cassure de structure baissière ?', back: 'Une reprise et une clôture au-dessus du niveau cassé, sans suite baissière.' } },
+      ],
+      commonMistake: 'Confondre un simple retracement avec une cassure de structure.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -547,6 +653,11 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.candle.rejection': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.rejection'],
   'skill.candle.indecision': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.indecision'],
   'skill.candle.reversal': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.reversal'],
+  // LOT 4-N — module « Lire la structure » : exercices dérivés des scénarios (une vérité par item).
+  'skill.structure.uptrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.uptrend'],
+  'skill.structure.downtrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.downtrend'],
+  'skill.structure.range': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.range'],
+  'skill.structure.break': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.break'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -558,6 +669,8 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.patterns': 'concept.double-bottom',
   // LOT 4-M — compétences du module « Lire les chandeliers » (concepts réels de world.candles).
   ...CANDLE_SKILL_CONCEPT_ID,
+  // LOT 4-N — compétences du module « Lire la structure » (concepts réels de world.structure).
+  ...STRUCTURE_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -676,6 +789,16 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: CANDLE_CHECKPOINT_ID,
     checkpointTitle: CANDLE_CHECKPOINT_TITLE,
   },
+  // LOT 4-N — 3e module guidé réel : « Lire la structure » (monde 4, world.structure). Checkpoint
+  // PROPRE (`checkpoint.structure`). Les 12 autres mondes restent des collections de notions.
+  {
+    id: STRUCTURE_MODULE_ID,
+    title: STRUCTURE_MODULE_TITLE,
+    worldId: STRUCTURE_MODULE_WORLD_ID,
+    skills: STRUCTURE_SKILLS,
+    checkpointId: STRUCTURE_CHECKPOINT_ID,
+    checkpointTitle: STRUCTURE_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -748,6 +871,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   'skill.patterns': 'double-creux',
   // LOT 4-M — lien « Découvrir la notion » des compétences Chandeliers vers leur fiche concept.
   ...CANDLE_SKILL_CONCEPT_SLUG,
+  ...STRUCTURE_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
