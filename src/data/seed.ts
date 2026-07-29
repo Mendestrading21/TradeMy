@@ -155,6 +155,17 @@ import {
   OPTIONS_SKILL_CONCEPT_ID,
   OPTIONS_SKILL_CONCEPT_SLUG,
 } from './optionsModuleScenarios';
+import {
+  FALSESIGNALS_SKILLS,
+  FALSESIGNALS_MODULE_ID,
+  FALSESIGNALS_MODULE_TITLE,
+  FALSESIGNALS_MODULE_WORLD_ID,
+  FALSESIGNALS_CHECKPOINT_ID,
+  FALSESIGNALS_CHECKPOINT_TITLE,
+  FALSESIGNALS_MODULE_EXERCISES_BY_SKILL,
+  FALSESIGNALS_SKILL_CONCEPT_ID,
+  FALSESIGNALS_SKILL_CONCEPT_SLUG,
+} from './falseSignalsModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -1486,6 +1497,53 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-Z — Module guidé « Déjouer les faux signaux » (world.false-signals) ─
+  'skill.falsesignals.fakeout': [
+    {
+      id: 'lesson.falsesignals-fakeout',
+      slug: 'faux-signal-lecture',
+      title: 'Le faux signal : la mèche qui ment',
+      skillId: 'skill.falsesignals.fakeout',
+      objective: 'Reconnaître la mèche qui perce sans clôture et exiger la clôture confirmée.',
+      difficulty: 'advanced',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Un niveau percé par une mèche, sans clôture au-delà, puis un retour immédiat : le faux signal (fakeout) est le piège le plus fréquent des niveaux.' },
+        { id: 's1', kind: 'observe', body: 'Repère la mèche qui perce le niveau, l’absence de clôture au-delà, puis le retour de l’autre côté.' },
+        { id: 's2', kind: 'visual', conceptRef: 'faux-signal' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'faux-signal', body: 'Le fakeout se confirme par le RETOUR sous le niveau ; une clôture confirmée AU-DELÀ invalide cette lecture — la cassure devient valide.' },
+        { id: 's4', kind: 'falseSignal', body: 'Prendre chaque mèche au-delà d’un niveau pour une cassure est le piège classique.' },
+        { id: 's5', kind: 'summary', body: 'Mèche sans clôture = pas une cassure ; retour = fakeout confirmé ; clôture au-delà = cassure valide.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui sépare une cassure valide d’un fakeout ?', back: 'La CLÔTURE confirmée au-delà du niveau — une mèche seule ne prouve rien.' } },
+      ],
+      commonMistake: 'Prendre chaque mèche au-delà d’un niveau pour une cassure.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.falsesignals.breakout': [
+    {
+      id: 'lesson.falsesignals-breakout',
+      slug: 'faux-breakout-lecture',
+      title: 'Le faux breakout : la cassure qui échoue',
+      skillId: 'skill.falsesignals.breakout',
+      objective: 'Reconnaître une cassure qui échoue et revient aussitôt dans la zone.',
+      difficulty: 'advanced',
+      estimatedMinutes: 4,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le prix franchit un niveau… puis revient aussitôt dans la zone : la cassure a échoué. C’est le faux breakout.' },
+        { id: 's1', kind: 'observe', body: 'Observe le franchissement, l’absence de poursuite, puis le retour dans la zone d’origine.' },
+        { id: 's2', kind: 'visual', conceptRef: 'faux-breakout' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'faux-breakout', body: 'L’échec d’une cassure se CONSTATE (retour dans la zone), il ne se devine pas — prudence sur toute cassure sans preuve.' },
+        { id: 's4', kind: 'falseSignal', body: 'Toute mèche au-delà d’un niveau n’est pas un fakeout : le retour dans la zone doit se constater.' },
+        { id: 's5', kind: 'summary', body: 'Franchissement sans poursuite + retour dans la zone = breakout raté ; la preuve avant la conclusion.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qu’un faux breakout ?', back: 'Une cassure qui échoue : le prix franchit un niveau puis revient aussitôt dans la zone.' } },
+      ],
+      commonMistake: 'Conclure au faux breakout avant d’avoir constaté le retour dans la zone.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -1617,6 +1675,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   // LOT 4-Y — module guidé Options : exercices dérivés des scénarios (source unique).
   'skill.options.call': OPTIONS_MODULE_EXERCISES_BY_SKILL['skill.options.call'],
   'skill.options.put': OPTIONS_MODULE_EXERCISES_BY_SKILL['skill.options.put'],
+  // LOT 4-Z — module guidé Faux signaux : exercices dérivés des scénarios (source unique).
+  'skill.falsesignals.fakeout': FALSESIGNALS_MODULE_EXERCISES_BY_SKILL['skill.falsesignals.fakeout'],
+  'skill.falsesignals.breakout': FALSESIGNALS_MODULE_EXERCISES_BY_SKILL['skill.falsesignals.breakout'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -1644,6 +1705,7 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   ...SMC_SKILL_CONCEPT_ID,
   ...WYCKOFF_SKILL_CONCEPT_ID,
   ...OPTIONS_SKILL_CONCEPT_ID,
+  ...FALSESIGNALS_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -1882,6 +1944,17 @@ export const CONTENT_MODULES: ModuleContent[] = [
     checkpointId: OPTIONS_CHECKPOINT_ID,
     checkpointTitle: OPTIONS_CHECKPOINT_TITLE,
   },
+  // LOT 4-Z — 15e et DERNIER module guidé : « Déjouer les faux signaux » (monde 15,
+  // world.false-signals). Le parcours entier (1..15) est désormais guidé : la compétence finale
+  // est de savoir quand NE PAS croire un signal — la clôture confirmée fait foi.
+  {
+    id: FALSESIGNALS_MODULE_ID,
+    title: FALSESIGNALS_MODULE_TITLE,
+    worldId: FALSESIGNALS_MODULE_WORLD_ID,
+    skills: FALSESIGNALS_SKILLS,
+    checkpointId: FALSESIGNALS_CHECKPOINT_ID,
+    checkpointTitle: FALSESIGNALS_CHECKPOINT_TITLE,
+  },
 ];
 
 /** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
@@ -1966,6 +2039,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...SMC_SKILL_CONCEPT_SLUG,
   ...WYCKOFF_SKILL_CONCEPT_SLUG,
   ...OPTIONS_SKILL_CONCEPT_SLUG,
+  ...FALSESIGNALS_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
