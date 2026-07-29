@@ -212,6 +212,38 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => r.unmount());
   });
 
+  // ── LOT V4 — détail à la demande (moins de texte affiché, plus d'interaction) ────────────────
+  it('LOT V4 — la définition complète est REPLIÉE par défaut et s’ouvre au tap (bouton accessible, état expanded)', async () => {
+    const r = await mount(RICH.slug);
+    expect(hasText(r.root, 'Définition')).toBe(true); // le titre de section reste visible
+    expect(hasText(r.root, 'En bref')).toBe(true); // la définition courte reste TOUJOURS lisible
+    expect(hasText(r.root, RICH.definitionDetailed)).toBe(false); // le pavé long attend le tap
+    const toggle = byLabel(r.root, 'Lire la définition complète');
+    expect(toggle).toBeDefined();
+    expect(toggle!.props.accessibilityState?.expanded).toBe(false);
+    act(() => (toggle!.props.onPress as () => void)());
+    expect(hasText(r.root, RICH.definitionDetailed)).toBe(true); // dépliée : texte complet
+    const opened = byLabel(r.root, 'Masquer la définition complète');
+    expect(opened).toBeDefined();
+    expect(opened!.props.accessibilityState?.expanded).toBe(true);
+    act(() => (opened!.props.onPress as () => void)()); // re-tap → repli (bouton jamais mort)
+    expect(hasText(r.root, RICH.definitionDetailed)).toBe(false);
+    act(() => r.unmount());
+  });
+
+  it('LOT V4 — flashcard : la réponse reste cachée jusqu’au tap « Révéler la réponse » (rappel actif)', async () => {
+    const r = await mount(RICH.slug);
+    const { front, back } = RICH.flashcards[0];
+    expect(hasText(r.root, front)).toBe(true); // la question s'affiche
+    expect(hasText(r.root, back)).toBe(false); // la réponse attend le tap
+    const reveal = pressables(r.root).find((n) => textNodes(n, 'Révéler la réponse').length > 0);
+    expect(reveal).toBeDefined();
+    act(() => (reveal!.props.onPress as () => void)());
+    expect(hasText(r.root, back)).toBe(true); // révélée
+    expect(pressables(r.root).some((n) => textNodes(n, 'Révéler la réponse').length > 0)).toBe(false);
+    act(() => r.unmount());
+  });
+
   it('concepts liés : chips actionnables nommées + navigation /concept/[slug]', async () => {
     const r = await mount(RICH.slug);
     const chip = byLabel(r.root, `Ouvrir ${FIRST_RELATED.title}`);
