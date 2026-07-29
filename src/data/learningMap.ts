@@ -19,7 +19,7 @@ import {
   type LearningConcept,
   type VisualSpec,
 } from './learningConcept';
-import { SKILLS, CHECKPOINT_ID } from './seed';
+import { CONTENT_MODULES } from './seed';
 
 /** Un module guidé = une suite ordonnée de compétences validée par un checkpoint. */
 export interface GuidedModule {
@@ -33,18 +33,16 @@ export interface GuidedModule {
 }
 
 /**
- * Le seul module guidé pour l'instant : le monde 1 (Fondations) accueille les 4 compétences pilotes.
- * Migrer d'autres compétences dans d'autres mondes = ajouter une entrée ici (source unique).
+ * Modules guidés DÉRIVÉS du registre canonique unique `CONTENT_MODULES` (seed) : aucune seconde
+ * source de vérité. Ajouter un module guidé = ajouter une entrée dans `CONTENT_MODULES`.
  */
-export const GUIDED_MODULES: GuidedModule[] = [
-  {
-    id: 'module.foundations.read-chart',
-    title: 'Lire un graphique',
-    worldId: 'world.foundations',
-    skillIds: SKILLS.map((s) => s.id),
-    checkpointId: CHECKPOINT_ID,
-  },
-];
+export const GUIDED_MODULES: GuidedModule[] = CONTENT_MODULES.map((m) => ({
+  id: m.id,
+  title: m.title,
+  worldId: m.worldId,
+  skillIds: m.skills.map((s) => s.id),
+  checkpointId: m.checkpointId,
+}));
 
 export function guidedModulesForWorld(worldId: string): GuidedModule[] {
   return GUIDED_MODULES.filter((m) => m.worldId === worldId);

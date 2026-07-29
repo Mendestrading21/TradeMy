@@ -6,7 +6,7 @@
  * réconciliation des formats d'exercice, résolution des références) et sert de contrôle de dérive :
  * si le contenu change, les invariants restent vrais et le compteur suit automatiquement.
  */
-import { SKILLS, getLessons, getExercises } from './seed';
+import { ALL_MODULE_SKILLS, getLessons, getExercises } from './seed';
 import { V5_CONCEPTS } from './learningContent';
 import { BADGES } from './badges';
 import { WORLDS, CATEGORIES } from './learningConcept';
@@ -15,14 +15,18 @@ import { SUPPORTED_VISUAL_TYPES } from '../engines/visual/visualDatasets';
 import { ALL_EXERCISE_TYPES, type ExerciseType } from '../engines/exercise/types';
 import { supportedTypes } from '../engines/exercise/registry';
 
-/** Tous les exercices réels du parcours (une compétence ; le point de contrôle agrège, non compté). */
+/**
+ * Tous les exercices réels du parcours, TOUS modules guidés confondus (les points de contrôle
+ * agrègent des exercices déjà comptés → non recomptés). LOT 4-M : le module « Lire les chandeliers »
+ * s'ajoute automatiquement au périmètre des compteurs et des garde-fous (cibles, cohérence).
+ */
 export function allExercisesFlat() {
-  return SKILLS.flatMap((s) => getExercises(s.id));
+  return ALL_MODULE_SKILLS.flatMap((s) => getExercises(s.id));
 }
 
-/** Toutes les leçons réelles du parcours. */
+/** Toutes les leçons réelles du parcours, tous modules guidés confondus. */
 export function allLessonsFlat() {
-  return SKILLS.flatMap((s) => getLessons(s.id));
+  return ALL_MODULE_SKILLS.flatMap((s) => getLessons(s.id));
 }
 
 /** Réconciliation des formats d'exercice : déclarés (union de types) vs branchés (grader enregistré). */
@@ -61,7 +65,7 @@ export function repoTruth(): RepoTruth {
   const fmt = exerciseFormatReconciliation();
   return {
     concepts: V5_CONCEPTS.length,
-    skills: SKILLS.length,
+    skills: ALL_MODULE_SKILLS.length,
     lessons: allLessonsFlat().length,
     exercises: allExercisesFlat().length,
     glossaryTerms: GLOSSARY_TERMS.length,

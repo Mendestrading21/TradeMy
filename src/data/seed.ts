@@ -12,6 +12,17 @@ import { PROGRESS_SCHEMA_VERSION, emptyLearning, type ProgressState } from './re
 import { rotateExercises, buildCheckpoint } from './exerciseRotation';
 import { objectiveId, type ObjectiveKind } from './learningTarget';
 import { CANDLE_PILOT_EXERCISES } from './pilotScenarios';
+import {
+  CANDLE_SKILLS,
+  CANDLE_MODULE_ID,
+  CANDLE_MODULE_TITLE,
+  CANDLE_MODULE_WORLD_ID,
+  CANDLE_CHECKPOINT_ID,
+  CANDLE_CHECKPOINT_TITLE,
+  CANDLE_MODULE_EXERCISES_BY_SKILL,
+  CANDLE_SKILL_CONCEPT_ID,
+  CANDLE_SKILL_CONCEPT_SLUG,
+} from './candleModuleScenarios';
 
 export interface ContentModule {
   id: string;
@@ -356,6 +367,101 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT 4-M — Module guidé « Lire les chandeliers » (world.candles) ──
+  'skill.candle.pressure': [
+    {
+      id: 'lesson.candle-pressure',
+      slug: 'marubozu-pression',
+      title: 'Marubozu : la pression franche',
+      skillId: 'skill.candle.pressure',
+      objective: 'Lire la conviction d’une séance à sens unique.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une bougie tout en corps, presque sans mèche : le marubozu. La séance n’a pas été contestée.' },
+        { id: 's1', kind: 'observe', body: 'Cherche un corps long, sans mèche haute ni basse, qui clôture près de l’extrême de la séance.' },
+        { id: 's2', kind: 'visual', conceptRef: 'marubozu' },
+        { id: 's3', kind: 'explain', body: 'Le corps long dit la pression ; l’absence de mèche dit qu’elle n’a pas été repoussée.' },
+        { id: 's4', kind: 'falseSignal', body: 'Un marubozu isolé en plein range, ou sur faible participation, ne donne pas de direction fiable.' },
+        { id: 's5', kind: 'summary', body: 'Marubozu = corps plein, pression non contestée ; sa portée dépend toujours du contexte.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Que traduit un marubozu ?', back: 'Une séance à sens unique : corps long, quasi sans mèche, une pression non contestée.' } },
+      ],
+      commonMistake: 'Prendre tout grand corps pour un marubozu sans vérifier l’absence de mèches ni le contexte.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.candle.rejection': [
+    {
+      id: 'lesson.candle-rejection',
+      slug: 'marteau-rejet',
+      title: 'Le marteau : un rejet des bas',
+      skillId: 'skill.candle.rejection',
+      objective: 'Reconnaître un rejet de prix et poser son hypothèse conditionnelle.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une baisse, une bougie plante une longue mèche basse puis referme près du haut : le marteau.' },
+        { id: 's1', kind: 'observe', body: 'Cherche un petit corps en haut et une longue mèche basse, au moins deux fois le corps.' },
+        { id: 's2', kind: 'visual', conceptRef: 'marteau' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'marteau', body: 'Le marteau seul ne suffit pas : il pose une hypothèse à confirmer au-dessus de son plus haut.' },
+        { id: 's4', kind: 'explain', body: 'La longue mèche basse montre que les vendeurs ont poussé le prix bas avant que les acheteurs ne reprennent la main d’ici la clôture.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un marteau en plein range, sans support ni confirmation, n’a pas de valeur : le contexte prime.' },
+        { id: 's6', kind: 'summary', body: 'Marteau = rejet du bas en contexte de baisse ; on attend une confirmation avant d’en tirer une hypothèse.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’invalide un marteau ?', back: 'Une clôture nette sous le plus bas de sa mèche : le rejet ne tient plus.' } },
+      ],
+      commonMistake: 'Prendre tout petit corps avec mèche pour un marteau, hors contexte de baisse.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.candle.indecision': [
+    {
+      id: 'lesson.candle-indecision',
+      slug: 'doji-indecision',
+      title: 'Le doji : l’indécision',
+      skillId: 'skill.candle.indecision',
+      objective: 'Lire un équilibre acheteurs/vendeurs et attendre ce qui le tranche.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Ouverture et clôture presque au même niveau : le doji. Acheteurs et vendeurs se sont neutralisés.' },
+        { id: 's1', kind: 'observe', body: 'Cherche un corps minuscule avec des mèches de chaque côté, après un mouvement marqué.' },
+        { id: 's2', kind: 'visual', conceptRef: 'doji' },
+        { id: 's3', kind: 'explain', body: 'Un doji traduit l’indécision : ni les acheteurs ni les vendeurs n’ont pris le dessus sur la séance.' },
+        { id: 's4', kind: 'falseSignal', body: 'Un doji isolé, sans tendance préalable, porte peu d’information : il ne signale pas à lui seul un retournement.' },
+        { id: 's5', kind: 'summary', body: 'Doji = équilibre ; son sens n’est tranché que par la bougie suivante, au-dessus ou en dessous.' },
+        { id: 's6', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui tranche un doji ?', back: 'La bougie qui suit : elle clôture au-dessus ou en dessous du doji et lève l’indécision.' } },
+      ],
+      commonMistake: 'Lire un retournement dans un doji isolé, sans mouvement préalable ni confirmation.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.candle.reversal': [
+    {
+      id: 'lesson.candle-reversal',
+      slug: 'avalement-haussier-reprise',
+      title: 'L’avalement haussier : une reprise à confirmer',
+      skillId: 'skill.candle.reversal',
+      objective: 'Repérer une reprise en deux bougies et situer confirmation et invalidation.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Après une baisse, une grande bougie haussière englobe entièrement le corps de la bougie baissière précédente : l’avalement haussier.' },
+        { id: 's1', kind: 'observe', body: 'Cherche une bougie baissière suivie d’une bougie haussière dont le corps recouvre le corps précédent.' },
+        { id: 's2', kind: 'visual', conceptRef: 'avalement-haussier' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'avalement-haussier', body: 'La figure pose une hypothèse de reprise : elle se joue au-dessus du plus haut de l’avalement, pas avant.' },
+        { id: 's4', kind: 'explain', body: 'L’englobement montre que les acheteurs ont repris la main sur la séance ; la confirmation vient au-dessus du plus haut de la figure.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un avalement sans participation, aussitôt annulé par un retour sous la figure, n’est pas une reprise.' },
+        { id: 's6', kind: 'summary', body: 'Avalement haussier = englobement + confirmation au-dessus du plus haut ; invalidé sous le plus bas des deux bougies.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’invalide un avalement haussier ?', back: 'Une clôture sous le plus bas des deux bougies : la reprise ne tient plus.' } },
+      ],
+      commonMistake: 'Anticiper la reprise avant la confirmation au-dessus du plus haut de l’avalement.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
 };
 
 // ─── Exercices par compétence (formats variés) ───────────────────────
@@ -435,6 +541,12 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
     { id: 'ex.patterns.scenario', type: 'scenario', skillId: 'skill.patterns', prompt: 'Que peux-tu en conclure ?', context: 'Un double creux s’est formé et le prix casse la ligne de cou avec du volume.', options: ['La figure est confirmée : hypothèse haussière.', 'La figure est invalidée.', 'Il ne se passe rien de notable.'], validation: { correctIndex: 0 }, difficulty: 'medium', feedback: fb('Oui : cassure de la ligne de cou + volume = confirmation.', 'La cassure de la ligne de cou avec volume confirme la figure.', 'Confirmation = cassure de la ligne de cou, idéalement avec volume.', 'Une confirmation n’est jamais une certitude : le prix peut refranchir le niveau (faux signal).') },
     { id: 'ex.patterns.identify-figure', type: 'identify_figure', skillId: 'skill.patterns', prompt: 'Quelle figure chartiste reconnais-tu ?', datasetKey: 'pattern.head-shoulders.v1', variant: 'head-shoulders', visualType: 'chart-pattern', options: ['Triangle ascendant', 'Épaule-tête-épaule', 'Double creux', 'Drapeau haussier'], validation: { correctIndex: 1 }, difficulty: 'medium', feedback: fb('Bien vu : trois sommets, la tête au centre.', 'C’est une épaule-tête-épaule : la tête (sommet central) domine deux épaules.', 'ÉTÉ = tête centrale plus haute + ligne de cou ; la cassure confirme.', 'Sans cassure de la ligne de cou, la figure n’est pas confirmée.') },
   ],
+  // ─── LOT 4-M — Module « Lire les chandeliers » : exercices DÉRIVÉS des scénarios canoniques ──
+  // (une seule vérité par item → visuel = réponse = feedback = a11y). Voir `candleModuleScenarios.ts`.
+  'skill.candle.pressure': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.pressure'],
+  'skill.candle.rejection': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.rejection'],
+  'skill.candle.indecision': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.indecision'],
+  'skill.candle.reversal': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.reversal'],
 };
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
@@ -444,6 +556,8 @@ const SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.trend': 'concept.uptrend',
   'skill.candles': 'concept.candle-anatomy',
   'skill.patterns': 'concept.double-bottom',
+  // LOT 4-M — compétences du module « Lire les chandeliers » (concepts réels de world.candles).
+  ...CANDLE_SKILL_CONCEPT_ID,
 };
 
 // Objectif adressé par chaque exercice (les exercices directionnels portent déjà leur cible).
@@ -520,13 +634,64 @@ export function pickVariant(objectiveId: string, round: number): Exercise | unde
   return vs[((Math.trunc(round) % vs.length) + vs.length) % vs.length];
 }
 
-// ─── Checkpoint (revue mixte du module) ──────────────────────────────
-// Nœud de fin de module : réunit quelques exercices de chaque compétence.
-// Les exercices gardent leur skillId réel → répondre met à jour la maîtrise réelle.
+// ─── Modules guidés (registre canonique) ─────────────────────────────
+// LOT 4-M — source UNIQUE décrivant chaque module guidé : ses compétences ordonnées et son
+// checkpoint PROPRE (jamais partagé). `GUIDED_MODULES` (learningMap) en dérive. Ajouter un module =
+// ajouter une entrée ici (+ ses LESSONS/EXERCISES) ; le moteur (checkpoint, résolution des
+// compétences, carte) est piloté par ce registre, sans dépendance au checkpoint Fondations global.
+// Le checkpoint réunit quelques exercices de chaque compétence de SON module ; les exercices gardent
+// leur skillId réel → répondre met à jour la maîtrise réelle.
 export const CHECKPOINT_ID = 'checkpoint.read-chart';
 export const CHECKPOINT_TITLE = 'Revue — Lire un graphique';
+
+export interface ModuleContent {
+  id: string;
+  title: string;
+  worldId: string;
+  /** Compétences ordonnées du module. */
+  skills: Skill[];
+  /** Checkpoint PROPRE au module (jamais partagé entre modules). */
+  checkpointId: string;
+  checkpointTitle: string;
+}
+
+/** Registre canonique des modules guidés (source unique ; `GUIDED_MODULES` en dérive). */
+export const CONTENT_MODULES: ModuleContent[] = [
+  {
+    id: 'module.foundations.read-chart',
+    title: 'Lire un graphique',
+    worldId: 'world.foundations',
+    skills: SKILLS,
+    checkpointId: CHECKPOINT_ID,
+    checkpointTitle: CHECKPOINT_TITLE,
+  },
+  // LOT 4-M — 2e module guidé réel : « Lire les chandeliers » (monde 3, world.candles). Checkpoint
+  // PROPRE (`checkpoint.candles`), jamais partagé avec Fondations. Les 13 autres mondes restent des
+  // collections de notions (aucun module guidé) jusqu'à un lot dédié.
+  {
+    id: CANDLE_MODULE_ID,
+    title: CANDLE_MODULE_TITLE,
+    worldId: CANDLE_MODULE_WORLD_ID,
+    skills: CANDLE_SKILLS,
+    checkpointId: CANDLE_CHECKPOINT_ID,
+    checkpointTitle: CANDLE_CHECKPOINT_TITLE,
+  },
+];
+
+/** Toutes les compétences, tous modules guidés confondus (résolution du moteur, compteurs, persistance). */
+export const ALL_MODULE_SKILLS: Skill[] = CONTENT_MODULES.flatMap((m) => m.skills);
+const CHECKPOINT_IDS = new Set(CONTENT_MODULES.map((m) => m.checkpointId));
+/** Module dont l'id fourni est le checkpoint (sinon undefined). */
+function moduleByCheckpoint(id: string): ModuleContent | undefined {
+  return CONTENT_MODULES.find((m) => m.checkpointId === id);
+}
+/** Compétences d'un module par son id (fiche Monde / carte de parcours). */
+export function skillsForModule(moduleId: string): Skill[] {
+  return CONTENT_MODULES.find((m) => m.id === moduleId)?.skills ?? [];
+}
+/** Un id est-il un checkpoint (de N'IMPORTE quel module) ? */
 export function isCheckpoint(id: string): boolean {
-  return id === CHECKPOINT_ID;
+  return CHECKPOINT_IDS.has(id);
 }
 
 // ─── Helpers de contenu ──────────────────────────────────────────────
@@ -534,21 +699,21 @@ export function getLessons(skillId: string): Lesson[] {
   return LESSONS[skillId] ?? [];
 }
 export function getExercises(skillId: string): Exercise[] {
-  if (skillId === CHECKPOINT_ID) {
-    return SKILLS.flatMap((s) => (EXERCISES[s.id] ?? []).slice(0, 2));
-  }
+  const mod = moduleByCheckpoint(skillId);
+  if (mod) return mod.skills.flatMap((s) => (EXERCISES[s.id] ?? []).slice(0, 2));
   return EXERCISES[skillId] ?? [];
 }
 
 /**
- * Checkpoint tournant : `perSkill` exercices de chaque compétence, la fenêtre
- * tournant avec `round` → les 8 questions ne sont jamais figées d'un passage à
- * l'autre (round 0 = comportement historique). Plusieurs compétences, donc
- * plusieurs objectifs, sont couvertes à chaque passage.
+ * Checkpoint tournant d'UN module : `perSkill` exercices de chaque compétence du module, la fenêtre
+ * tournant avec `round` (round 0 = comportement historique). Chaque module a son propre checkpoint,
+ * donc plusieurs objectifs de CE module sont couverts à chaque passage.
  */
-export function checkpointExercises(round = 0, perSkill = 2): Exercise[] {
+export function checkpointExercises(checkpointId: string, round = 0, perSkill = 2): Exercise[] {
+  const mod = moduleByCheckpoint(checkpointId);
+  if (!mod) return [];
   return buildCheckpoint(
-    SKILLS.map((s) => EXERCISES[s.id] ?? []),
+    mod.skills.map((s) => EXERCISES[s.id] ?? []),
     perSkill,
     round,
   );
@@ -557,17 +722,20 @@ export function checkpointExercises(round = 0, perSkill = 2): Exercise[] {
 /**
  * Sélection tournante d'une session de compétence : au lieu des premiers `count`
  * figés, une page déterministe qui avance avec `round` (round 0 = historique).
+ * Un checkpoint est délégué à `checkpointExercises` du module correspondant.
  */
 export function rotatedExercises(skillId: string, count: number, round = 0): Exercise[] {
-  if (skillId === CHECKPOINT_ID) return checkpointExercises(round, Math.max(1, Math.floor(count / SKILLS.length) || 2));
+  const mod = moduleByCheckpoint(skillId);
+  if (mod) return checkpointExercises(skillId, round, Math.max(1, Math.floor(count / mod.skills.length) || 2));
   return rotateExercises(EXERCISES[skillId] ?? [], count, round);
 }
 export function skillById(id: string): Skill | undefined {
-  if (id === CHECKPOINT_ID) return { id: CHECKPOINT_ID, name: CHECKPOINT_TITLE };
-  return SKILLS.find((s) => s.id === id);
+  const mod = moduleByCheckpoint(id);
+  if (mod) return { id: mod.checkpointId, name: mod.checkpointTitle };
+  return ALL_MODULE_SKILLS.find((s) => s.id === id);
 }
 export function allLessons(): Lesson[] {
-  return SKILLS.flatMap((s) => getLessons(s.id));
+  return ALL_MODULE_SKILLS.flatMap((s) => getLessons(s.id));
 }
 
 // ─── Pont compétence → fiche concept V5 ──────────────────────────────
@@ -578,6 +746,8 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   'skill.trend': 'tendance-haussiere',
   'skill.candles': 'anatomie-bougie',
   'skill.patterns': 'double-creux',
+  // LOT 4-M — lien « Découvrir la notion » des compétences Chandeliers vers leur fiche concept.
+  ...CANDLE_SKILL_CONCEPT_SLUG,
 };
 export function conceptSlugForSkill(id: string): string | undefined {
   return CONCEPT_BY_SKILL[id];
@@ -604,9 +774,9 @@ export const DEMO_SKILL: Skill = SKILLS[0];
 export const DEMO_LESSONS: Lesson[] = getLessons('skill.actions');
 export const DEMO_EXERCISES: Exercise[] = getExercises('skill.actions');
 
-/** Progression par défaut : une entrée par compétence du module. */
+/** Progression par défaut : une entrée par compétence de CHAQUE module guidé. */
 export function defaultProgress(now: number): ProgressState {
-  const skills = Object.fromEntries(SKILLS.map((s) => [s.id, initialProgress(s.id, now)]));
+  const skills = Object.fromEntries(ALL_MODULE_SKILLS.map((s) => [s.id, initialProgress(s.id, now)]));
   return {
     onboarded: false,
     level: 1,

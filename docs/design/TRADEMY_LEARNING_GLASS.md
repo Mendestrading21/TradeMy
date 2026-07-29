@@ -31,7 +31,7 @@ Une académie sombre, premium et vivante : rigueur de TradingView/Bloomberg, sim
 | feedback.correct | #66E3A4 | bonne réponse |
 | feedback.wrong | #FF8798 | erreur pédagogique |
 | feedback.info | #6EA8FE | information |
-| feedback.warning | #F6C453 | vigilance |
+| feedback.warning | #F09A5A | vigilance et révision due, distinctes d’un checkpoint |
 
 Le vert et le rouge ne servent jamais à la navigation générale. Ils décrivent le marché. Une bonne réponse utilise feedback.correct afin d’éviter toute confusion avec une bougie haussière.
 

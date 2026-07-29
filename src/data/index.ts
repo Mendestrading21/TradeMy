@@ -1,5 +1,6 @@
 export * from './repositories';
 export * from './seed';
+export * from './candleModuleScenarios';
 export * from './glossary';
 export * from './glossarySearch';
 export * from './badges';

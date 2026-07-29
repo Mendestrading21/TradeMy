@@ -8,7 +8,7 @@
  * Aucune dépendance runtime : les visuels sont générés en code (datasets déterministes),
  * jamais téléchargés.
  */
-import { SKILLS, allLessons, getExercises } from './seed';
+import { ALL_MODULE_SKILLS, allLessons, getExercises } from './seed';
 import { GLOSSARY_TERMS } from './glossary';
 import { BADGES } from './badges';
 import { V5_CONCEPTS } from './learningContent';
@@ -38,11 +38,11 @@ export interface OfflineCapabilities {
 
 export function offlineCapabilities(): OfflineCapabilities {
   const lessons = allLessons().length;
-  const exercises = SKILLS.reduce((n, s) => n + getExercises(s.id).length, 0);
+  const exercises = ALL_MODULE_SKILLS.reduce((n, s) => n + getExercises(s.id).length, 0);
   const concepts = V5_CONCEPTS.length;
   const visualDatasets = Object.keys(VISUAL_DATASETS).length;
   return {
-    skills: SKILLS.length,
+    skills: ALL_MODULE_SKILLS.length,
     lessons,
     exercises,
     glossaryTerms: GLOSSARY_TERMS.length,
@@ -51,7 +51,7 @@ export function offlineCapabilities(): OfflineCapabilities {
     visualDatasets,
     worlds: WORLDS.length,
     unifiedGlossary: UNIFIED_GLOSSARY.length,
-    contentReady: SKILLS.length > 0 && lessons > 0 && exercises > 0 && concepts > 0 && visualDatasets > 0,
+    contentReady: ALL_MODULE_SKILLS.length > 0 && lessons > 0 && exercises > 0 && concepts > 0 && visualDatasets > 0,
     progressLocal: true,
   };
 }

@@ -61,9 +61,10 @@ export const palette = {
   red: '#FF5D73',
   redBright: '#FF8091',
 
-  // Annotation technique (cyan) + zones importantes (or)
+  // Annotation technique (cyan) + vigilance (orange) + zones/récompenses (or).
+  // `amber` et `gold` restent volontairement distincts : une révision due n'est pas un checkpoint.
   technical: '#22D3EE',
-  amber: '#F6C453',
+  amber: '#F09A5A',
   gold: '#F6C453',
   neutral: '#93A0B4',
   // Concepts avancés (difficulté 4–5) : orchidée distincte de la marque violette.
@@ -132,7 +133,7 @@ export const colors = {
   // Dérivée de la palette AA existante. La COULEUR N'EST JAMAIS le seul signal : `MarketStatePill`
   // porte toujours une icône + une forme + un libellé. Distincte du feedback (correct/incorrect).
   confirmation: palette.technical, // zone de confirmation = annotation technique (cyan)
-  invalidation: palette.amber, // niveau d'invalidation = zone importante (or), jamais « baissier »
+  invalidation: palette.gold, // niveau d'invalidation = zone importante (or), jamais « baissier »
   falseSignal: palette.neutral, // faux signal = neutre + motif barré (leurre, ni haussier ni baissier)
 
   // Pedagogical feedback — intentionally distinct from bullish/bearish

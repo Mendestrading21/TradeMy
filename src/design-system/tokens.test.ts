@@ -26,6 +26,14 @@ describe('Trademy Learning Glass — sémantique des tokens', () => {
     expect(colors.feedbackIncorrect).not.toBe(colors.bearish);
   });
 
+  it('distingue visuellement une révision due du checkpoint/récompense', () => {
+    expect(colors.warning).toBe(palette.amber);
+    expect(colors.reward).toBe(palette.gold);
+    expect(colors.warning).not.toBe(colors.reward);
+    // L'invalidation reste une zone importante dorée, pas une alerte de révision.
+    expect(colors.invalidation).toBe(colors.reward);
+  });
+
   it('le texte du bouton primaire est le « sur-violet » sombre dédié', () => {
     expect(colors.onPrimary).toBe(palette.onViolet);
   });

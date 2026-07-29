@@ -59,7 +59,7 @@ jest.mock('expo-router', () => {
 
 import WorldDetail, { generateStaticParams } from '@/app/monde/[id]';
 import { ProgressProvider } from '@/data';
-import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById } from '@/data';
+import { WORLDS, V5_CONCEPTS, conceptsByWorld, SKILLS, CHECKPOINT_ID, buildLearningPath, worldEntryById, CANDLE_SKILLS, CANDLE_CHECKPOINT_TITLE } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -223,6 +223,33 @@ describe('Fiche Monde de production — canon, vérité pédagogique, a11y (LOT 
   it('guidé : navigation vers la notion liée d’une compétence (/concept/[slug])', async () => {
     await persist(NEW);
     const r = await mount(WORLD1);
+    const discover = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith('Découvrir la notion liée à'));
+    expect(discover).toBeDefined();
+    act(() => (discover!.props.onPress as () => void)());
+    expect(pushes().some((p) => typeof p === 'string' && p.startsWith('/concept/'))).toBe(true);
+    await act(async () => r.unmount());
+  });
+
+  // ─── LOT 4-M — 2e monde GUIDÉ réel (Chandeliers) surfacé sur SA fiche ────────
+  it('guidé Chandeliers (monde 3) : ses 4 compétences + checkpoint PROPRE surfacent, notion liée ouvrable', async () => {
+    // world 1 terminé + world 2 (anatomie) exploré → world 3 (Chandeliers) « en cours ».
+    await persist(W2_EXPLORED);
+    const r = await mount('world.candles');
+    expect(hasText(r.root, 'Chandeliers japonais')).toBe(true);
+    expect(hasText(r.root, 'En cours')).toBe(true);
+    // Les 4 compétences du module Chandeliers surfacent (nœuds de la carte du monde).
+    for (const s of CANDLE_SKILLS) {
+      const node = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith(`${s.name} —`));
+      expect(node).toBeDefined();
+    }
+    // Le checkpoint PROPRE du module surface (jamais celui de Fondations).
+    expect(hasTextIncluding(r.root, CANDLE_CHECKPOINT_TITLE)).toBe(true);
+    // La prochaine étape = 1re compétence Chandeliers → /session/skill.candle.pressure.
+    const cta = ctaWithHint(r.root, 'Commencer la leçon');
+    expect(cta).toBeDefined();
+    act(() => (cta!.props.onPress as () => void)());
+    expect(pushes()).toContain(`/session/${CANDLE_SKILLS[0].id}`);
+    // La notion liée d’une compétence Chandeliers est ouvrable (/concept/<slug candle>).
     const discover = pressables(r.root).find((n) => String(n.props.accessibilityLabel ?? '').startsWith('Découvrir la notion liée à'));
     expect(discover).toBeDefined();
     act(() => (discover!.props.onPress as () => void)());

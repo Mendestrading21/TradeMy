@@ -14,8 +14,8 @@ import {
   rotateExercises,
   checkpointExercises,
   isCheckpoint,
-  SKILLS,
-  CHECKPOINT_ID,
+  ALL_MODULE_SKILLS,
+  CONTENT_MODULES,
   isFalseSignalExercise,
   useProgress,
   buildSessionSummary,
@@ -38,12 +38,16 @@ import { analytics } from '@/analytics';
 import { useNow } from '@/lib/useNow';
 
 /**
- * Pré-génère un fichier HTML CONCRET par session connue (skill.* + checkpoint). GitHub Pages sert
- * alors `session/skill.candles.html` directement au lieu du repli `404.html` (l'accueil), ce qui
- * supprime la divergence d'hydratation React #418 sur les liens directs vers les routes dynamiques.
+ * Pré-génère un fichier HTML CONCRET par session connue : TOUTES les compétences des modules guidés
+ * (Fondations + Chandeliers, LOT 4-M) ET tous les checkpoints. GitHub Pages sert alors
+ * `session/skill.candle.pressure.html` (et `session/checkpoint.candles.html`) directement au lieu du
+ * repli `404.html`, ce qui supprime la divergence d'hydratation React #418 sur les liens directs.
  */
 export async function generateStaticParams(): Promise<{ skillId: string }[]> {
-  return [...SKILLS.map((s) => ({ skillId: s.id })), { skillId: CHECKPOINT_ID }];
+  return [
+    ...ALL_MODULE_SKILLS.map((s) => ({ skillId: s.id })),
+    ...CONTENT_MODULES.map((m) => ({ skillId: m.checkpointId })),
+  ];
 }
 
 /**
@@ -91,7 +95,7 @@ export default function Session() {
   // la MÊME liste) et avançant entre sessions — même après un échec (variantes différentes).
   const round = state?.rotation?.[resolvedId] ?? 0;
   const list = isCheckpoint(resolvedId)
-    ? checkpointExercises(round, 2)
+    ? checkpointExercises(resolvedId, round, 2)
     : rotateExercises(all, limitCount(all.length, target), round);
   const skillName = skillById(resolvedId)?.name ?? 'Session';
   const lessons = known ? getLessons(resolvedId) : [];
@@ -325,6 +329,8 @@ export default function Session() {
           {isLast ? (
             <Button
               label="Commencer les exercices"
+              fullWidth={false}
+              style={styles.stepNavPrimary}
               onPress={() => {
                 analytics.track('lesson_started', { skillId: resolvedId });
                 emit({ type: 'chart_revealed' }); // le graphique/les exercices apparaissent → le guide observe.
@@ -332,7 +338,12 @@ export default function Session() {
               }}
             />
           ) : (
-            <Button label="Suivant ▶" onPress={() => setLearnStep((s) => s + 1)} />
+            <Button
+              label="Suivant ▶"
+              fullWidth={false}
+              style={styles.stepNavPrimary}
+              onPress={() => setLearnStep((s) => s + 1)}
+            />
           )}
         </View>
       </Screen>
@@ -582,7 +593,8 @@ const RESULT_ICON: Record<string, TrademyIconName> = { perfect: 'trophy', pass: 
 const styles = StyleSheet.create({
   header: { gap: theme.spacing.sm },
   headRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.sm },
-  stepNav: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.md, alignItems: 'center' },
+  stepNav: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.md, alignItems: 'center', width: '100%' },
+  stepNavPrimary: { flex: 1, minWidth: 0 },
   results: { alignItems: 'center', gap: theme.spacing.md },
   accuracyWrap: { width: '100%' },
   statTiles: { flexDirection: 'row', gap: theme.spacing.sm, width: '100%' },

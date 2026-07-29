@@ -23,7 +23,7 @@ import {
   worldEntryById,
   guidedModulesForWorld,
   buildWorldMap,
-  SKILLS,
+  skillById,
   conceptSlugForSkill,
   useProgress,
   type World,
@@ -33,6 +33,7 @@ import {
   type NodeStatus,
   type LearningConcept,
 } from '@/data';
+import type { Skill } from '@/engines/learning';
 import { analytics } from '@/analytics';
 import { useNow } from '@/lib/useNow';
 
@@ -110,6 +111,15 @@ function nodeStatusText(node: MapNode): string {
     default: return 'Verrouillé — termine l’étape précédente';
   }
 }
+
+/**
+ * Signature graphique ORIGINALE d'un monde (identité, pas un statut). LOT 4-M : le monde Chandeliers
+ * porte le motif `candles` (quatre bougies). Les autres mondes n'ont pas encore de signature dédiée ;
+ * la carte est prête à en accueillir sans changer le rendu (aucune icône générique imposée ailleurs).
+ */
+const WORLD_SIGNATURE: Record<string, TrademyIconName> = {
+  'world.candles': 'candles',
+};
 
 // ─── Prochaine étape : DÉRIVÉE de l'état réel, jamais codée en dur ───────────────────────────────
 type NextStepKind = 'lesson' | 'continue' | 'review' | 'checkpoint' | 'explore' | 'next-world' | 'parcours' | 'soon';
@@ -302,10 +312,22 @@ export default function WorldDetail() {
   const isGuided = guidedModules.length > 0;
   const concepts = conceptsByWorld(V5_CONCEPTS, worldId);
 
+  const signatureIcon = WORLD_SIGNATURE[worldId];
   const heroLabel = (
-    <Text variant="label" color={theme.colors.textMuted}>
-      MONDE {world.order} / {WORLDS.length}
-    </Text>
+    <View style={styles.heroEyebrow}>
+      {signatureIcon ? (
+        <TrademyIcon
+          name={signatureIcon}
+          size={22}
+          color={theme.colors.primaryBright}
+          strokeWidth={2}
+          title={`Signature du monde ${world.title}`}
+        />
+      ) : null}
+      <Text variant="label" color={theme.colors.textMuted}>
+        MONDE {world.order} / {WORLDS.length}
+      </Text>
+    </View>
   );
 
   // Monde verrouillé : raison réelle + retour, sans dévoiler le contenu ni proposer d'étape ouvrable.
@@ -327,7 +349,20 @@ export default function WorldDetail() {
     );
   }
 
-  const guidedMap = isGuided ? buildWorldMap(state, SKILLS, guidedModules[0].title, now) : null;
+  // LOT 4-M — carte pilotée par le module (registre canonique) : compétences + checkpoint PROPRES au
+  // monde, résolus depuis son descripteur `GUIDED_MODULES` (aucune dépendance au checkpoint Fondations).
+  const guided = guidedModules[0];
+  const moduleSkills: Skill[] = guided
+    ? guided.skillIds.map((sid) => skillById(sid)).filter((s): s is Skill => Boolean(s))
+    : [];
+  const guidedMap =
+    isGuided && guided
+      ? buildWorldMap(state, moduleSkills, guided.title, now, {
+          checkpointId: guided.checkpointId,
+          checkpointTitle: skillById(guided.checkpointId)?.name,
+          worldTitle: `Monde ${world.order} · ${world.title}`,
+        })
+      : null;
   const exploredSet = new Set(state.learning?.conceptsExplored ?? []);
   const statusKey = entry ? heroStatusKey(entry) : 'unlocked';
   const statusMeta = HERO_STATUS[statusKey];
@@ -381,7 +416,7 @@ export default function WorldDetail() {
         <View style={styles.section}>
           <SectionTitle icon="target" label="Ce que tu vas savoir faire" />
           <Card style={styles.objectives}>
-            {SKILLS.map((s) => (
+            {moduleSkills.map((s) => (
               <View key={s.id} style={styles.objectiveRow}>
                 <TrademyIcon name="chevron-right" size={16} color={theme.colors.primaryBright} strokeWidth={2.4} />
                 <Text variant="body" style={styles.flex1}>{s.name}</Text>
@@ -618,6 +653,7 @@ function ConceptList({
 const RAIL_W = 52;
 const styles = StyleSheet.create({
   hero: { gap: theme.spacing.xs },
+  heroEyebrow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   heroStatusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, marginTop: theme.spacing.xs },
   section: { gap: theme.spacing.sm },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },

@@ -7,6 +7,7 @@ import {
   highestThird,
   highestCandleIndex,
   highestHigh,
+  lowestLow,
   SCENARIO_CANDLE_COUNT,
   DIRECTION_INDEX_BY_TREND,
   type LearningScenario,
@@ -121,5 +122,70 @@ describe('scenario — vérité unique dérivée du graphique (cohérence par co
       const text = [ex.prompt, ex.feedback.correct, ex.feedback.incorrect, ex.feedback.rule ?? '', ex.feedback.whenItFails ?? ''].join(' ');
       expect(text).not.toMatch(forbidden);
     }
+  });
+});
+
+// ── LOT 4-M : interactions natives « figure de chandelier » (mappées sur des players EXISTANTS) ──
+const IDENTIFY: LearningScenario = {
+  id: 's.identify', skillId: 'skill.x', target: T, interaction: 'identify-candle',
+  datasetKey: 'candle.hammer.v1', variant: 'hammer', visualType: 'candlestick-pattern',
+  prompt: 'Quelle figure ?', options: ['Un marteau', 'Un doji', 'Un marubozu'], correctIndex: 0,
+  a11y: 'Petit corps en haut, longue mèche basse.',
+};
+const PLACE_INV: LearningScenario = {
+  id: 's.placeinv', skillId: 'skill.x', target: T, interaction: 'place-invalidation', chartSeed: 41,
+  prompt: 'Place l’invalidation sous le plancher.',
+};
+const READ_SCEN: LearningScenario = {
+  id: 's.readscen', skillId: 'skill.x', target: T, interaction: 'read-scenario',
+  context: 'Un avalement haussier se forme, puis le prix clôture au-dessus de son plus haut.',
+  prompt: 'Que conclure ?', options: ['La confirmation est là (à surveiller).', 'La figure est invalidée.', 'Rien de notable.'],
+  correctIndex: 0,
+};
+
+describe('scenario — LOT 4-M : figure de chandelier (une seule vérité, players existants)', () => {
+  it('identify-candle : dérive un identify_figure ; la figure rendue EST la bonne réponse', () => {
+    const ex = buildScenarioExercise(IDENTIFY);
+    if (ex.type !== 'identify_figure') throw new Error('type');
+    expect(ex.datasetKey).toBe('candle.hammer.v1');
+    expect(ex.variant).toBe('hammer');
+    expect(ex.validation.correctIndex).toBe(0);
+    expect(ex.accessibilitySummary).toBe('Petit corps en haut, longue mèche basse.');
+    expect(ex.feedback.correct).toContain('Un marteau');
+  });
+
+  it('place-invalidation : la cible EST le plus BAS réel (distincte de place-extreme = plus haut)', () => {
+    const ex = buildScenarioExercise(PLACE_INV);
+    if (ex.type !== 'place_invalidation') throw new Error('type');
+    const candles = generateCandles(41, SCENARIO_CANDLE_COUNT);
+    expect(ex.validation.targetPrice).toBe(lowestLow(candles));
+    expect(ex.validation.targetPrice).not.toBe(highestHigh(candles));
+    expect(ex.validation.tolerance).toBeGreaterThan(0);
+  });
+
+  it('read-scenario : dérive un scenario conditionnel (contexte + conclusion correcte)', () => {
+    const ex = buildScenarioExercise(READ_SCEN);
+    if (ex.type !== 'scenario') throw new Error('type');
+    expect(ex.context).toContain('avalement haussier');
+    expect(ex.validation.correctIndex).toBe(0);
+    expect(ex.feedback.correct).toContain('La confirmation est là');
+  });
+
+  it('les 3 nouvelles interactions portent la cible et LE résumé accessible canonique', () => {
+    for (const s of [IDENTIFY, PLACE_INV, READ_SCEN]) {
+      const ex = buildScenarioExercise(s);
+      expect(ex.target).toEqual(T);
+      expect(ex.accessibilitySummary).toBe(scenarioA11ySummary(s));
+    }
+  });
+
+  it('déterministe : deux constructions identiques donnent le même exercice', () => {
+    expect(buildScenarioExercise(IDENTIFY)).toEqual(buildScenarioExercise(IDENTIFY));
+    expect(buildScenarioExercise(PLACE_INV)).toEqual(buildScenarioExercise(PLACE_INV));
+  });
+
+  it('scenarioInteractionTypes reconnaît les nouvelles interactions', () => {
+    const kinds = scenarioInteractionTypes([IDENTIFY, PLACE_INV, READ_SCEN]);
+    expect(kinds).toEqual(expect.arrayContaining(['identify-candle', 'place-invalidation', 'read-scenario']));
   });
 });
