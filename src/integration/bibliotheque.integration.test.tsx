@@ -57,6 +57,7 @@ jest.mock('expo-router', () => {
 });
 
 import Bibliotheque from '@/app/(tabs)/apprendre';
+import { MiniVisual } from '@/engines/visual';
 import { ProgressProvider, V5_CONCEPTS, CATEGORIES, conceptFamilies, conceptMasteryStatus, exercisableObjectiveIds, CHECKPOINT_ID } from '@/data';
 import { findEmoji } from './emojiGuard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -296,6 +297,32 @@ describe('Bibliothèque de production — recherche, collections, vérité stric
     setSearch(r.root, 'doji');
     await flush();
     expect(await AsyncStorage.getItem('patternlab.progress.v1')).toBe(after);
+    await act(async () => r.unmount());
+  });
+
+  it('LOT W5 — bibliothèque-galerie : une vignette par carte AVEC visuel, repli texte sinon, a11y inchangée', async () => {
+    await persist(progress({}));
+    const r = await mount();
+    // Exactement une vignette (MiniVisual) par concept AVEC visuel — et le corpus est ENTIÈREMENT
+    // illustré : chaque carte de la bibliothèque porte son signal visuel.
+    const withVisual = V5_CONCEPTS.filter((c) => c.visualSpec).length;
+    expect(withVisual).toBe(V5_CONCEPTS.length);
+    expect(r.root.findAllByType(MiniVisual)).toHaveLength(withVisual);
+    // La vignette est DÉCORATIVE : le nom accessible de la carte est inchangé (titre en tête + niveau),
+    // porté par le Pressable — le bloc visuel vit sous accessibilityElementsHidden.
+    const sample = V5_CONCEPTS.find((c) => c.visualSpec)!;
+    expect(cardFor(r.root, sample.title)!.props.accessibilityLabel).toContain('Niveau :');
+    // Garde d'avenir : une carte SANS visuel resterait complète (textes + niveau), sans vignette.
+    const plain = V5_CONCEPTS.find((c) => !c.visualSpec);
+    if (plain) {
+      const plainCard = cardFor(r.root, plain.title)!;
+      expect(plainCard.findAllByType(MiniVisual)).toHaveLength(0);
+      expect(plainCard.props.accessibilityLabel).toContain('Niveau :');
+    }
+    // La galerie n'introduit ni emoji ni valeur invalide dans le rendu complet.
+    const json = JSON.stringify(r.toJSON());
+    expect(findEmoji(json)).toEqual([]);
+    expect(json).not.toMatch(/NaN|Infinity|Invalid Date/);
     await act(async () => r.unmount());
   });
 
