@@ -20,7 +20,7 @@ export { MiniVisual } from './components/MiniVisual';
 export { VisualCard } from './components/VisualCard';
 export { FIGURE_OVERLAYS, figureOverlay, type FigureOverlay } from './figureOverlays';
 export { RISK_SETUPS, riskSetup, type RiskSetup } from './riskSetups';
-export { COMPARISONS, comparison, type Comparison, type ComparisonSide } from './comparisons';
+export { COMPARISONS, comparison, COMPARISON_BY_CONCEPT, comparisonForConcept, type Comparison, type ComparisonSide } from './comparisons';
 export { CHEAT_SHEETS, cheatSheet, type CheatItem } from './cheatSheets';
 export { MECHANISMS, mechanism, type Mechanism, type MechanismStep } from './mechanisms';
 export { CHART_MODES, chartModeOptions, type ChartMode, type ChartModeOptions } from './chartMode';

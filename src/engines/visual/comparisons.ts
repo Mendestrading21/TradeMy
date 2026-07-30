@@ -33,3 +33,24 @@ export const COMPARISONS: Record<string, Comparison> = {
 export function comparison(variant: string): Comparison | undefined {
   return COMPARISONS[variant];
 }
+
+/**
+ * LOT W2 — comparaison recommandée par fiche concept : quand une notion se comprend le mieux
+ * PAR CONTRASTE (indécision vs conviction, tendance vs range…), sa fiche montre la paire.
+ * Mapping explicite et minimal (jamais dérivé automatiquement) — chaque clé est verrouillée
+ * par test : le concept existe ET la comparaison existe.
+ */
+export const COMPARISON_BY_CONCEPT: Record<string, string> = {
+  'concept.candle-anatomy': 'bull-vs-bear',
+  'concept.doji': 'doji-vs-marubozu',
+  'concept.marubozu': 'doji-vs-marubozu',
+  'concept.uptrend': 'uptrend-vs-downtrend',
+  'concept.downtrend': 'uptrend-vs-downtrend',
+  'concept.range': 'trend-vs-range',
+};
+
+/** Comparaison recommandée d'un concept (id) — undefined si la fiche n'en a pas. */
+export function comparisonForConcept(conceptId: string): Comparison | undefined {
+  const key = COMPARISON_BY_CONCEPT[conceptId];
+  return key ? COMPARISONS[key] : undefined;
+}
