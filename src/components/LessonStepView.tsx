@@ -10,7 +10,7 @@ import {
 } from '@/design-system';
 import { CharacterScene } from '@/characters';
 import { PatternChart, generateCandles } from '@/engines/pattern';
-import { VisualCard } from '@/engines/visual';
+import { VisualCard, MiniVisual } from '@/engines/visual';
 import { conceptBySlug, V5_CONCEPTS } from '@/data';
 import { LessonReplay } from './LessonReplay';
 import { STEP_META, type LessonStepMeta } from './lessonStepMeta';
@@ -127,6 +127,49 @@ export function LessonStepView({ step, conceptSlug }: { step: LessonStep; concep
     );
   }
 
+  // LOT W1 — le contre-exemple se VOIT : l'étape « faux signal » montre le visuel réel du concept
+  // au-dessus du piège décrit (le lecteur regarde la figure en lisant ce qui la déjoue).
+  // Repli texte seul si la fiche n'a pas de visuel — jamais d'étape vide.
+  if (step.kind === 'falseSignal') {
+    const concept = conceptBySlug(V5_CONCEPTS, step.conceptRef ?? conceptSlug ?? '');
+    const trap = concept?.falseSignals?.[0];
+    return (
+      <View style={styles.stepStack}>
+        {concept?.visualSpec ? <VisualCard spec={concept.visualSpec} title={STEP_META.falseSignal.label} /> : null}
+        <Card style={styles.falseSignal}>
+          {concept?.visualSpec ? null : <StepLabel meta={STEP_META.falseSignal} />}
+          {step.body ? <Text variant="body">{step.body}</Text> : null}
+          {trap && trap !== step.body ? (
+            <Text variant="body" color={theme.colors.textSecondary}>
+              Piège type : {trap}
+            </Text>
+          ) : null}
+        </Card>
+      </View>
+    );
+  }
+
+  // LOT W1 — le résumé se REVOIT : vignette compacte du concept (MiniVisual) à côté de la synthèse,
+  // pour ancrer visuellement « à retenir ». Repli texte seul sans visuel.
+  if (step.kind === 'summary') {
+    const concept = conceptBySlug(V5_CONCEPTS, step.conceptRef ?? conceptSlug ?? '');
+    return (
+      <Card elevated style={styles.summary}>
+        <StepLabel meta={STEP_META.summary} />
+        <View style={styles.summaryRow}>
+          {concept?.visualSpec ? (
+            <View style={styles.summaryVisual}>
+              <MiniVisual spec={concept.visualSpec} width={112} />
+            </View>
+          ) : null}
+          <View style={styles.summaryBody}>
+            {step.body ? <Text variant="body">{step.body}</Text> : null}
+          </View>
+        </View>
+      </Card>
+    );
+  }
+
   if (step.kind === 'chart') {
     return (
       <Card>
@@ -175,4 +218,9 @@ const styles = StyleSheet.create({
   hypothesis: { borderColor: theme.colors.advanced },
   debate: { gap: theme.spacing.md, marginTop: theme.spacing.sm },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
+  falseSignal: { borderColor: theme.colors.falseSignal },
+  summary: { borderColor: theme.colors.primary },
+  summaryRow: { flexDirection: 'row', gap: theme.spacing.md, alignItems: 'center', marginTop: theme.spacing.xs },
+  summaryVisual: { flexShrink: 0 },
+  summaryBody: { flex: 1 },
 });
