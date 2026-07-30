@@ -9,6 +9,8 @@ import { describe, it, expect } from '@jest/globals';
 import renderer, { act, type ReactTestRenderer } from 'react-test-renderer';
 import { Image } from 'expo-image';
 import { MascotAvatar, AVATAR_FIGURE } from './MascotAvatar';
+import { MascotDuo } from './MascotDuo';
+import { theme } from '../design-system/theme';
 import { IMAGES } from './assets';
 import { CHARACTER_STATES } from './states';
 import type { CharacterId, CharacterState, Expression } from './types';
@@ -64,6 +66,45 @@ describe('MascotAvatar — avatar 3D (tête des renders réels)', () => {
     const r = render(<MascotAvatar character="toto" state="think" size={64} />);
     const img = r.root.findAllByType(Image)[0];
     expect(img.props.source).toBe(IMAGES['toto-think']);
+    act(() => r.unmount());
+  });
+
+  it('LOT W3 — anneau d’identité : bordure à la couleur du personnage + halo, libellé conservé', () => {
+    for (const [c, color] of [['toto', theme.colors.bullish], ['bobo', theme.colors.bearish]] as const) {
+      const r = render(<MascotAvatar character={c} size={64} ring />);
+      const flat = JSON.stringify(r.toJSON());
+      expect(flat).toContain(`"borderColor":"${color}"`); // anneau = couleur d'identité canon
+      expect(flat).toContain(`"backgroundColor":"${color}24"`); // halo doux dérivé du même token
+      const labeled = r.root.findAll((n) => n.props?.accessibilityRole === 'image', { deep: true });
+      expect(String(labeled[0]?.props.accessibilityLabel)).toContain(c === 'toto' ? 'Toto' : 'Bobo');
+      act(() => r.unmount());
+    }
+  });
+
+  it('LOT W3 — decorative : masqué aux lecteurs d’écran (le parent porte le libellé)', () => {
+    const r = render(<MascotAvatar character="toto" size={64} decorative />);
+    expect(r.root.findAll((n) => n.props?.accessibilityRole === 'image', { deep: true })).toHaveLength(0);
+    expect(r.root.findAll((n) => n.props?.accessibilityElementsHidden === true, { deep: true }).length).toBeGreaterThan(0);
+    act(() => r.unmount());
+  });
+});
+
+describe('MascotDuo — les deux guides en un seul format (LOT W3)', () => {
+  it('rend les DEUX têtes réelles sous UN SEUL libellé accessible « Toto et Bobo »', () => {
+    const r = render(<MascotDuo size={48} />);
+    const labeled = r.root.findAll((n) => n.props?.accessibilityRole === 'image' && n.props?.accessible === true, { deep: true });
+    // UN SEUL libellé exposé (le duo) — les têtes internes sont décoratives, jamais nommées.
+    const labels = new Set(labeled.map((n) => String(n.props.accessibilityLabel)));
+    expect(labels).toEqual(new Set(['Toto et Bobo, vos guides']));
+    expect(r.root.findAllByType(Image)).toHaveLength(2); // les deux renders réels
+    act(() => r.unmount());
+  });
+
+  it('avec anneaux : chaque tête porte l’anneau de SA couleur d’identité', () => {
+    const r = render(<MascotDuo size={48} ring />);
+    const flat = JSON.stringify(r.toJSON());
+    expect(flat).toContain(`"borderColor":"${theme.colors.bullish}"`);
+    expect(flat).toContain(`"borderColor":"${theme.colors.bearish}"`);
     act(() => r.unmount());
   });
 });

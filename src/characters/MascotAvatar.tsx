@@ -9,6 +9,14 @@ export type MascotAvatarProps = {
   character: CharacterId;
   state?: CharacterState;
   size?: number;
+  /**
+   * LOT W3 — anneau d'IDENTITÉ + halo doux : vert Toto (taureau) / rouge Bobo (ours),
+   * les couleurs canon des personnages. Pour les moments où le guide est mis en avant
+   * (choix du guide, en-têtes) — jamais par défaut.
+   */
+  ring?: boolean;
+  /** Masque l'avatar aux lecteurs d'écran quand un parent porte déjà le libellé (duo, cartes nommées). */
+  decorative?: boolean;
 };
 
 const LABEL: Record<CharacterId, string> = {
@@ -61,18 +69,24 @@ export const AVATAR_FIGURE: Record<CharacterId, Record<Expression, ImageName>> =
  * STATE_TO_EXPRESSION (source unique). Même API : remplacement direct dans
  * CharacterAnimationController — tous les écrans en héritent.
  */
-export function MascotAvatar({ character, state = 'idle', size = 96 }: MascotAvatarProps) {
+export function MascotAvatar({ character, state = 'idle', size = 96, ring = false, decorative = false }: MascotAvatarProps) {
   const expr = STATE_TO_EXPRESSION[state];
   const name = AVATAR_FIGURE[character][expr];
   const crop = HEAD_CROP[name]!;
   const h = size * crop.zoom;
   const w = h * (crop.iw / crop.ih);
-  return (
+  const identity = character === 'toto' ? theme.colors.bullish : theme.colors.bearish;
+  const a11y = decorative
+    ? { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }
+    : { accessible: true, accessibilityRole: 'image' as const, accessibilityLabel: LABEL[character] };
+  const circle = (
     <View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={LABEL[character]}
-      style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}
+      {...(ring ? {} : a11y)}
+      style={[
+        styles.circle,
+        { width: size, height: size, borderRadius: size / 2 },
+        ring ? { borderWidth: 2, borderColor: identity } : null,
+      ]}
     >
       <Image
         source={IMAGES[name]}
@@ -87,6 +101,15 @@ export function MascotAvatar({ character, state = 'idle', size = 96 }: MascotAva
       />
     </View>
   );
+  if (!ring) return circle;
+  // Halo doux à la couleur d'identité derrière l'anneau (mise en avant du guide).
+  const haloPad = Math.max(4, Math.round(size * 0.08));
+  const haloSize = size + haloPad * 2;
+  return (
+    <View {...a11y} style={[styles.haloWrap, { width: haloSize, height: haloSize, borderRadius: haloSize / 2, backgroundColor: `${identity}24` }]}>
+      {circle}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -96,4 +119,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
+  haloWrap: { alignItems: 'center', justifyContent: 'center' },
 });
