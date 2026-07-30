@@ -27,7 +27,7 @@ import {
   useProgress,
   type ConceptState,
 } from '@/data';
-import { VisualCard } from '@/engines/visual';
+import { VisualCard, COMPARISON_BY_CONCEPT } from '@/engines/visual';
 import { CharacterScene } from '@/characters';
 import { Disclaimer } from '@/components/Disclaimer';
 import { analytics } from '@/analytics';
@@ -210,6 +210,41 @@ export default function ConceptFiche() {
 
       {concept.visualSpec ? <VisualCard spec={concept.visualSpec} title="Visuel" /> : null}
 
+      {/* LOT W2 — lecture guidée : la légende de l'exemple annoté de la fiche, sous le visuel,
+          avec la direction du scénario ÉDUCATIF (couleurs sémantiques marché). */}
+      {concept.visualSpec && concept.chartExamples[0] ? (
+        <Card style={styles.readingCard}>
+          <View style={styles.readingRow}>
+            <TrademyIcon
+              name={concept.chartExamples[0].direction === 'bearish' ? 'market-down' : 'market-up'}
+              size={16}
+              color={concept.chartExamples[0].direction === 'bearish' ? theme.colors.bearish : theme.colors.bullish}
+            />
+            <Text variant="label" color={theme.colors.textMuted}>
+              {`Lecture guidée${concept.chartExamples[0].direction ? ` · setup ${concept.chartExamples[0].direction === 'bearish' ? 'baissier' : 'haussier'}` : ''}`}
+            </Text>
+          </View>
+          <Text variant="body" color={theme.colors.textSecondary}>
+            {concept.chartExamples[0].caption}
+          </Text>
+        </Card>
+      ) : null}
+
+      {/* LOT W2 — comprendre par contraste : la paire de comparaison recommandée de la fiche
+          (registre explicite COMPARISON_BY_CONCEPT), rendue par le moteur canonique. */}
+      {COMPARISON_BY_CONCEPT[concept.id] ? (
+        <VisualCard
+          spec={{
+            type: 'comparison',
+            variant: COMPARISON_BY_CONCEPT[concept.id],
+            labels: [],
+            annotations: [],
+            accessibilitySummary: `Deux schémas côte à côte pour situer « ${concept.title} » par contraste.`,
+          }}
+          title="Comparer"
+        />
+      ) : null}
+
       <GlassCard>
         <SectionHead iconName="info" title="En bref" color={theme.colors.textSecondary} />
         <Text variant="body">{concept.definitionShort}</Text>
@@ -349,6 +384,8 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
   reviewNotice: { gap: theme.spacing.xs, borderColor: theme.colors.warning },
+  readingCard: { gap: theme.spacing.xs },
+  readingRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 },
   chevronClosed: { transform: [{ rotate: '0deg' }] },

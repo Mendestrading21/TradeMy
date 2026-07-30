@@ -83,7 +83,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       accessibilitySummary:
         'Bougie à petit corps en haut et longue mèche vers le bas, illustrant un rejet des prix bas après une baisse.',
     },
-    chartExamples: [{ datasetKey: 'chart.hammer.support.v1', caption: 'Marteau formé sur un support, avec confirmation le lendemain.', direction: 'bullish' }],
+    chartExamples: [{ datasetKey: 'candle.hammer.v1', caption: 'Marteau formé sur un support, avec confirmation le lendemain.', direction: 'bullish' }],
     interactiveTemplates: ['select_chart_zone', 'identify_false_signal'],
     flashcards: [
       { front: 'Qu’indique un marteau ?', back: 'Un rejet des prix bas ; un possible retournement haussier s’il est confirmé et bien situé.' },
@@ -155,7 +155,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       accessibilitySummary:
         'Deux creux à un niveau proche séparés par un sommet ; le franchissement du sommet confirme la figure.',
     },
-    chartExamples: [{ datasetKey: 'chart.double-bottom.v1', caption: 'Double creux confirmé par une clôture au-dessus de la ligne de cou.', direction: 'bullish' }],
+    chartExamples: [{ datasetKey: 'pattern.double-bottom.v1', caption: 'Double creux confirmé par une clôture au-dessus de la ligne de cou.', direction: 'bullish' }],
     interactiveTemplates: ['draw_level', 'place_invalidation'],
     flashcards: [{ front: 'Qu’est-ce qui confirme un double creux ?', back: 'Une clôture au-dessus de la ligne de cou (le sommet intermédiaire).' }],
     miniQuizzes: [
@@ -219,7 +219,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'structure.support-resistance.v1',
       accessibilitySummary: 'Deux zones horizontales encadrant le prix : un plancher (support) et un plafond (résistance).',
     },
-    chartExamples: [{ datasetKey: 'chart.support-resistance.v1', caption: 'Prix évoluant entre une zone de support et une zone de résistance.' }],
+    chartExamples: [{ datasetKey: 'structure.support-resistance.v1', caption: 'Prix évoluant entre une zone de support et une zone de résistance.' }],
     interactiveTemplates: ['draw_level', 'select_chart_zone'],
     flashcards: [{ front: 'Support ou résistance : ligne ou zone ?', back: 'Une zone : le marché raisonne rarement au pixel près.' }],
     miniQuizzes: [
@@ -285,7 +285,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       accessibilitySummary:
         'Une bougie avec un corps rectangulaire entre l’ouverture et la clôture, prolongé d’une mèche haute et d’une mèche basse.',
     },
-    chartExamples: [{ datasetKey: 'chart.anatomy.v1', caption: 'Une bougie décomposée : corps au centre, mèches aux extrêmes.' }],
+    chartExamples: [{ datasetKey: 'candle.anatomy.v1', caption: 'Une bougie décomposée : corps au centre, mèches aux extrêmes.' }],
     interactiveTemplates: ['label_chart'],
     flashcards: [
       { front: 'Que montre le corps d’une bougie ?', back: 'La distance ouverture ↔ clôture — donc le sens dominant de la période.' },
@@ -354,7 +354,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'candle.doji.v1',
       accessibilitySummary: 'Une bougie au corps quasi inexistant, encadré de mèches de part et d’autre, traduisant une indécision.',
     },
-    chartExamples: [{ datasetKey: 'chart.doji.v1', caption: 'Doji après une hausse, suivi d’une bougie qui tranche l’indécision.' }],
+    chartExamples: [{ datasetKey: 'candle.doji.v1', caption: 'Doji après une hausse, suivi d’une bougie qui tranche l’indécision.' }],
     interactiveTemplates: ['identify_pattern'],
     flashcards: [{ front: 'Que traduit un doji ?', back: 'Une indécision : ouverture et clôture quasi égales, un équilibre entre acheteurs et vendeurs.' }],
     miniQuizzes: [
@@ -425,7 +425,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'candle.shooting-star.v1',
       accessibilitySummary: 'Une bougie à petit corps en bas et longue mèche vers le haut, illustrant un rejet des prix hauts après une hausse.',
     },
-    chartExamples: [{ datasetKey: 'chart.shooting-star.v1', caption: 'Étoile filante sous une résistance, avec confirmation le lendemain.', direction: 'bearish' }],
+    chartExamples: [{ datasetKey: 'candle.shooting-star.v1', caption: 'Étoile filante sous une résistance, avec confirmation le lendemain.', direction: 'bearish' }],
     interactiveTemplates: ['identify_false_signal', 'select_chart_zone'],
     flashcards: [{ front: 'Qu’indique une étoile filante ?', back: 'Un rejet des prix hauts ; un possible retournement baissier si elle est confirmée et bien située.' }],
     miniQuizzes: [
@@ -492,7 +492,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'candle.bullish-engulfing.v1',
       accessibilitySummary: 'Deux bougies : une petite baissière puis une grande haussière dont le corps recouvre le précédent.',
     },
-    chartExamples: [{ datasetKey: 'chart.bullish-engulfing.v1', caption: 'Avalement haussier formé sur un support.', direction: 'bullish' }],
+    chartExamples: [{ datasetKey: 'candle.bullish-engulfing.v1', caption: 'Avalement haussier formé sur un support.', direction: 'bullish' }],
     interactiveTemplates: ['identify_pattern'],
     flashcards: [{ front: 'Qu’est-ce qu’un avalement haussier ?', back: 'Une bougie haussière dont le corps englobe celui de la bougie baissière précédente : reprise des acheteurs.' }],
     miniQuizzes: [
@@ -560,7 +560,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'pattern.double-top.v1',
       accessibilitySummary: 'Deux sommets à un niveau proche séparés par un creux ; la cassure du creux confirme la figure.',
     },
-    chartExamples: [{ datasetKey: 'chart.double-top.v1', caption: 'Double sommet confirmé par une clôture sous la ligne de cou.', direction: 'bearish' }],
+    chartExamples: [{ datasetKey: 'pattern.double-top.v1', caption: 'Double sommet confirmé par une clôture sous la ligne de cou.', direction: 'bearish' }],
     interactiveTemplates: ['draw_level', 'place_invalidation'],
     flashcards: [{ front: 'Qu’est-ce qui confirme un double sommet ?', back: 'Une clôture sous la ligne de cou (le creux intermédiaire).' }],
     miniQuizzes: [
@@ -627,7 +627,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'structure.uptrend.v1',
       accessibilitySummary: 'Une série de prix progressant vers le haut : chaque sommet et chaque creux dépasse le précédent.',
     },
-    chartExamples: [{ datasetKey: 'chart.uptrend.v1', caption: 'Structure haussière : sommets et creux successivement plus hauts.', direction: 'bullish' }],
+    chartExamples: [{ datasetKey: 'structure.uptrend.v1', caption: 'Structure haussière : sommets et creux successivement plus hauts.', direction: 'bullish' }],
     interactiveTemplates: ['sequence_market_structure'],
     flashcards: [{ front: 'Qu’est-ce qui définit une tendance haussière ?', back: 'Une structure de sommets et de creux de plus en plus hauts (HH/HL).' }],
     miniQuizzes: [
@@ -694,7 +694,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'structure.bos.v1',
       accessibilitySummary: 'Une progression haussière qui se rompt : le prix casse sous le dernier creux protégé.',
     },
-    chartExamples: [{ datasetKey: 'chart.bos.v1', caption: 'Cassure de structure : le dernier higher low cède.', direction: 'bearish' }],
+    chartExamples: [{ datasetKey: 'structure.bos.v1', caption: 'Cassure de structure : le dernier higher low cède.', direction: 'bearish' }],
     interactiveTemplates: ['place_invalidation', 'sequence_market_structure'],
     flashcards: [{ front: 'Qu’est-ce qu’une cassure de structure (BOS) ?', back: 'La rupture de la séquence de creux/sommets qui remet en cause la tendance en cours.' }],
     miniQuizzes: [
@@ -761,7 +761,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'structure.support-resistance.v1',
       accessibilitySummary: 'Un prix qui oscille entre une zone basse (support) et une zone haute (résistance) sans direction nette.',
     },
-    chartExamples: [{ datasetKey: 'chart.range.v1', caption: 'Prix oscillant dans un range entre support et résistance.' }],
+    chartExamples: [{ datasetKey: 'structure.support-resistance.v1', caption: 'Prix oscillant dans un range entre support et résistance.' }],
     interactiveTemplates: ['select_chart_zone', 'draw_level'],
     flashcards: [{ front: 'Qu’est-ce qu’un range ?', back: 'Une phase d’équilibre où le prix oscille entre support et résistance, sans direction nette.' }],
     miniQuizzes: [
@@ -828,7 +828,7 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       datasetKey: 'structure.support-resistance.v1',
       accessibilitySummary: 'Un niveau franchi puis retesté, changeant de rôle : l’ancien plancher agit comme un nouveau plafond.',
     },
-    chartExamples: [{ datasetKey: 'chart.flip.v1', caption: 'Ancien support retesté en résistance après cassure.' }],
+    chartExamples: [{ datasetKey: 'structure.support-resistance.v1', caption: 'Ancien support retesté en résistance après cassure.' }],
     interactiveTemplates: ['draw_level', 'place_invalidation'],
     flashcards: [{ front: 'Qu’est-ce qu’un flip de polarité ?', back: 'Un niveau cassé qui change de rôle : un support devient résistance (ou l’inverse), confirmé au retest.' }],
     miniQuizzes: [

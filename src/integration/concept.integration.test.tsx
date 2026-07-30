@@ -67,7 +67,7 @@ jest.mock('@/data', () => {
 
 import ConceptFiche from '@/app/concept/[slug]';
 import { TrademyIcon, Chip, theme } from '@/design-system';
-import { VisualCard } from '@/engines/visual';
+import { VisualCard, COMPARISON_BY_CONCEPT } from '@/engines/visual';
 import { V5_CONCEPTS, relatedConcepts, needsEditorialReview, conceptMasteryStatus, EDITORIAL_REVIEW_NOTICE } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
@@ -133,8 +133,9 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     expect(hasText(r.root, RICH.title)).toBe(true);
     expect(hasText(r.root, 'En bref')).toBe(true);
     expect(hasText(r.root, 'Définition')).toBe(true);
-    // VisualCard conservée (graphique pédagogique prioritaire).
-    expect(r.root.findAllByType(VisualCard)).toHaveLength(1);
+    // VisualCard conservée (graphique pédagogique prioritaire) — LOT W2 : une fiche mappée
+    // « Comparer » peut légitimement en rendre une seconde.
+    expect(r.root.findAllByType(VisualCard).length).toBeGreaterThanOrEqual(1);
     // Iconographie exclusivement TrademyIcon, en quantité.
     expect(iconNames(r.root).length).toBeGreaterThan(3);
     // Aucun emoji nulle part dans l'arbre rendu.
@@ -242,6 +243,31 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     expect(hasText(r.root, back)).toBe(true); // révélée
     expect(pressables(r.root).some((n) => textNodes(n, 'Révéler la réponse').length > 0)).toBe(false);
     act(() => r.unmount());
+  });
+
+  it('LOT W2 — « Lecture guidée » : la légende de l’exemple annoté s’affiche sous le visuel, direction sémantique', async () => {
+    // Fiche réelle AVEC exemple annoté (36 fiches du corpus en ont un).
+    const withExample = V5_CONCEPTS.find((c) => c.visualSpec && c.chartExamples.length)!;
+    const r = await mount(withExample.slug);
+    expect(hasTextIncluding(r.root, 'Lecture guidée')).toBe(true);
+    expect(hasText(r.root, withExample.chartExamples[0].caption)).toBe(true);
+    // L'icône de direction est sémantique (market-up/market-down), jamais un emoji.
+    expect(iconNames(r.root).some((n) => n === 'market-up' || n === 'market-down')).toBe(true);
+    act(() => r.unmount());
+  });
+
+  it('LOT W2 — « Comparer » : la fiche doji rend la paire recommandée (2 VisualCard), une fiche non mappée non', async () => {
+    const doji = V5_CONCEPTS.find((c) => c.id === 'concept.doji')!;
+    const r = await mount(doji.slug);
+    expect(r.root.findAllByType(VisualCard)).toHaveLength(2); // Visuel + Comparer
+    expect(hasText(r.root, 'Comparer')).toBe(true);
+    act(() => r.unmount());
+    // Une fiche riche NON mappée ne rend ni « Comparer » ni seconde carte (aucun bruit).
+    const unmapped = V5_CONCEPTS.find((c) => c.visualSpec && !COMPARISON_BY_CONCEPT[c.id])!;
+    const r2 = await mount(unmapped.slug);
+    expect(r2.root.findAllByType(VisualCard)).toHaveLength(1);
+    expect(hasText(r2.root, 'Comparer')).toBe(false);
+    act(() => r2.unmount());
   });
 
   it('concepts liés : chips actionnables nommées + navigation /concept/[slug]', async () => {
