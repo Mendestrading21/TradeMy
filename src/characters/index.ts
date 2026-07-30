@@ -1,6 +1,7 @@
 export { MascotAvatar, AVATAR_FIGURE, type MascotAvatarProps } from './MascotAvatar';
 export { MascotFigure, type MascotFigureProps, type MascotGesture } from './MascotFigure';
 export { MascotDuo, type MascotDuoProps } from './MascotDuo';
+export { FIGURE_REGISTRY, figureMeta, FIGURE_NAMES, type MascotFigureMeta } from './figureRegistry';
 export { FIGURES, IMAGES, type FigureName, type ImageName } from './assets';
 export {
   CharacterAnimationController,
