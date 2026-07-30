@@ -2,6 +2,7 @@ import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { theme } from '../design-system/theme';
 import { IMAGES, type ImageName } from './assets';
+import { figureMeta } from './figureRegistry';
 import { STATE_TO_EXPRESSION } from './states';
 import type { CharacterId, CharacterState, Expression } from './types';
 
@@ -27,16 +28,17 @@ const LABEL: Record<CharacterId, string> = {
 /**
  * Cadrage TÊTE d'un render 3D réel dans un cercle : centre du visage (cx, cy) en coordonnées
  * relatives de l'image source, et zoom = hauteur affichée de l'image / diamètre du cercle.
- * `iw`/`ih` = dimensions natives du PNG (vérifiées) pour préserver le ratio exact.
+ * Les dimensions natives du PNG viennent du REGISTRE canonique (`figureRegistry`, LOT W4) —
+ * une seule vérité, verrouillée sur l'en-tête réel des fichiers.
  */
-type HeadCrop = { cx: number; cy: number; zoom: number; iw: number; ih: number };
+type HeadCrop = { cx: number; cy: number; zoom: number };
 
 const HEAD_CROP: Partial<Record<ImageName, HeadCrop>> = {
-  'toto-wave': { cx: 0.56, cy: 0.27, zoom: 2.2, iw: 541, ih: 760 },
-  'toto-present': { cx: 0.38, cy: 0.29, zoom: 2.2, iw: 649, ih: 760 },
-  'toto-think': { cx: 0.54, cy: 0.36, zoom: 1.7, iw: 589, ih: 760 },
-  'bobo-wave': { cx: 0.59, cy: 0.26, zoom: 2.2, iw: 570, ih: 760 },
-  'bobo-warning': { cx: 0.52, cy: 0.28, zoom: 2.1, iw: 545, ih: 760 },
+  'toto-wave': { cx: 0.56, cy: 0.27, zoom: 2.2 },
+  'toto-present': { cx: 0.38, cy: 0.29, zoom: 2.2 },
+  'toto-think': { cx: 0.54, cy: 0.36, zoom: 1.7 },
+  'bobo-wave': { cx: 0.59, cy: 0.26, zoom: 2.2 },
+  'bobo-warning': { cx: 0.52, cy: 0.28, zoom: 2.1 },
 };
 
 /**
@@ -73,8 +75,9 @@ export function MascotAvatar({ character, state = 'idle', size = 96, ring = fals
   const expr = STATE_TO_EXPRESSION[state];
   const name = AVATAR_FIGURE[character][expr];
   const crop = HEAD_CROP[name]!;
+  const meta = figureMeta(name);
   const h = size * crop.zoom;
-  const w = h * (crop.iw / crop.ih);
+  const w = h * (meta.width / meta.height);
   const identity = character === 'toto' ? theme.colors.bullish : theme.colors.bearish;
   const a11y = decorative
     ? { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }
