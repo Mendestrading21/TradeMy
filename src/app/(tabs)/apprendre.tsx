@@ -26,6 +26,7 @@ import {
   type ConceptState,
 } from '@/data';
 import { Disclaimer } from '@/components/Disclaimer';
+import { MiniVisual } from '@/engines/visual';
 import { analytics } from '@/analytics';
 
 /**
@@ -158,19 +159,31 @@ export default function Bibliotheque() {
             onPress={() => router.push(`/concept/${c.slug}`)}
           >
             <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-              <Text variant="title">{c.title}</Text>
-              <Text variant="caption" color={theme.colors.textMuted}>
-                {cat?.label} · {difficultyLabel(c.difficulty)}
-                {c.estimatedMinutes ? ` · ${c.estimatedMinutes} min` : ''}
-              </Text>
-              <Text variant="body" color={theme.colors.textSecondary} numberOfLines={2} style={styles.summary}>
-                {c.definitionShort}
-              </Text>
-              <View style={styles.statusRow}>
-                <TrademyIcon name={meta.icon} size={14} color={meta.color} />
-                <Text variant="caption" color={meta.color}>
-                  {meta.label}
-                </Text>
+              {/* LOT W5 — bibliothèque-galerie : la vignette du concept (MiniVisual) à côté des
+                  textes quand la fiche a un visuel ; repli texte seul sinon. Décorative ici : le
+                  nom accessible de la carte porte déjà tout (bloc masqué aux lecteurs d'écran). */}
+              <View style={styles.thumbRow}>
+                {c.visualSpec ? (
+                  <View style={styles.thumb}>
+                    <MiniVisual spec={c.visualSpec} width={96} />
+                  </View>
+                ) : null}
+                <View style={styles.cardTexts}>
+                  <Text variant="title">{c.title}</Text>
+                  <Text variant="caption" color={theme.colors.textMuted}>
+                    {cat?.label} · {difficultyLabel(c.difficulty)}
+                    {c.estimatedMinutes ? ` · ${c.estimatedMinutes} min` : ''}
+                  </Text>
+                  <Text variant="body" color={theme.colors.textSecondary} numberOfLines={2} style={styles.summary}>
+                    {c.definitionShort}
+                  </Text>
+                  <View style={styles.statusRow}>
+                    <TrademyIcon name={meta.icon} size={14} color={meta.color} />
+                    <Text variant="caption" color={meta.color}>
+                      {meta.label}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
           </Pressable>
@@ -388,6 +401,9 @@ const styles = StyleSheet.create({
   card: {},
   cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: theme.spacing.sm },
   flex1: { flex: 1, gap: 2, minHeight: 44 },
+  thumbRow: { flexDirection: 'row', gap: theme.spacing.md, alignItems: 'center' },
+  thumb: { flexShrink: 0 },
+  cardTexts: { flex: 1, gap: 2 },
   summary: { marginTop: 2 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: theme.spacing.xs },
   footer: { gap: theme.spacing.sm, marginTop: theme.spacing.md },
