@@ -210,25 +210,26 @@ export default function ConceptFiche() {
 
       {concept.visualSpec ? <VisualCard spec={concept.visualSpec} title="Visuel" /> : null}
 
-      {/* LOT W2 — lecture guidée : la légende de l'exemple annoté de la fiche, sous le visuel,
-          avec la direction du scénario ÉDUCATIF (couleurs sémantiques marché). */}
-      {concept.visualSpec && concept.chartExamples[0] ? (
-        <Card style={styles.readingCard}>
-          <View style={styles.readingRow}>
-            <TrademyIcon
-              name={concept.chartExamples[0].direction === 'bearish' ? 'market-down' : 'market-up'}
-              size={16}
-              color={concept.chartExamples[0].direction === 'bearish' ? theme.colors.bearish : theme.colors.bullish}
-            />
-            <Text variant="label" color={theme.colors.textMuted}>
-              {`Lecture guidée${concept.chartExamples[0].direction ? ` · setup ${concept.chartExamples[0].direction === 'bearish' ? 'baissier' : 'haussier'}` : ''}`}
+      {/* LOT W2 — lecture guidée : la légende de l'exemple annoté de la fiche, sous le visuel.
+          La direction réutilise SCENARIO_META (source UNIQUE du sens marché : icône + couleur —
+          bullish/bearish restent réservés à ce bloc, verrou conceptSemanticColors). */}
+      {concept.visualSpec && concept.chartExamples[0] ? (() => {
+        const example = concept.chartExamples[0];
+        const dir = SCENARIO_META.find((s) => s.key === (example.direction ?? 'neutral'))!;
+        return (
+          <Card style={styles.readingCard}>
+            <View style={styles.readingRow}>
+              <TrademyIcon name={dir.icon} size={16} color={dir.color} />
+              <Text variant="label" color={theme.colors.textMuted}>
+                {`Lecture guidée · ${dir.label.toLowerCase()}`}
+              </Text>
+            </View>
+            <Text variant="body" color={theme.colors.textSecondary}>
+              {example.caption}
             </Text>
-          </View>
-          <Text variant="body" color={theme.colors.textSecondary}>
-            {concept.chartExamples[0].caption}
-          </Text>
-        </Card>
-      ) : null}
+          </Card>
+        );
+      })() : null}
 
       {/* LOT W2 — comprendre par contraste : la paire de comparaison recommandée de la fiche
           (registre explicite COMPARISON_BY_CONCEPT), rendue par le moteur canonique. */}
