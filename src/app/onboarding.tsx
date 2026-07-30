@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { Screen, Text, Button, Card, Chip, ProgressBar, TrademyIcon, theme, type TrademyIconName } from '@/design-system';
-import { CharacterScene, MascotFigure, GuideSelectionCard, type CharacterId } from '@/characters';
+import { CharacterScene, MascotFigure, MascotDuo, GuideSelectionCard, type CharacterId } from '@/characters';
 import { MiniVisual } from '@/engines/visual';
 import {
   useProgress,
@@ -168,7 +168,11 @@ export default function Onboarding() {
             Apprends à lire un graphique en cinq minutes par jour. On personnalise ton
             parcours en quelques questions — aucun compte requis.
           </Text>
-          <MascotFigure name="toto-read" height={170} />
+          <MascotFigure name="toto-read" height={150} />
+          {/* LOT W3 — les DEUX guides se présentent ensemble avant le choix (duo annelé). */}
+          <View style={styles.duoRow}>
+            <MascotDuo size={64} ring />
+          </View>
           <Text variant="label" color={theme.colors.textMuted}>
             Ton guide préféré (tu peux changer plus tard)
           </Text>
@@ -375,6 +379,7 @@ function OptionCard({
 const styles = StyleSheet.create({
   progress: { gap: theme.spacing.xs },
   stepGap: { gap: theme.spacing.md },
+  duoRow: { alignItems: 'center' },
   selected: { borderColor: theme.colors.primary, borderWidth: 1.5 },
   optionRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, minHeight: 44 },
   flex1: { flex: 1 },

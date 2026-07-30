@@ -39,7 +39,8 @@ export function GuideSelectionCard({ selected, onSelect }: GuideSelectionCardPro
             style={[styles.card, { borderColor: active ? accent : theme.colors.border }]}
           >
             <View style={styles.head}>
-              <CharacterAnimationController character={id} state={GUIDE_PRESENT_STATE[id]} size={52} />
+              {/* LOT W3 — mise en avant du guide : avatar annelé à sa couleur d'identité + halo. */}
+              <CharacterAnimationController character={id} state={GUIDE_PRESENT_STATE[id]} size={56} ring />
               <View style={styles.flex1}>
                 <View style={styles.nameRow}>
                   <Text variant="title" color={accent}>

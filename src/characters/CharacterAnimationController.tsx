@@ -20,6 +20,8 @@ export type CharacterAnimationControllerProps = {
   character: CharacterId;
   state?: CharacterState;
   size?: number;
+  /** LOT W3 — anneau d'identité + halo (transmis à l'avatar) : mise en avant du guide. */
+  ring?: boolean;
 };
 
 /**
@@ -37,6 +39,7 @@ export function CharacterAnimationController({
   character,
   state = 'idle',
   size = 96,
+  ring = false,
 }: CharacterAnimationControllerProps) {
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
@@ -83,14 +86,14 @@ export function CharacterAnimationController({
     // Alternative STATIQUE : même avatar, aucune animation, même information (libellé accessible).
     return (
       <View accessibilityRole="image" accessibilityLabel={accessibleText}>
-        <MascotAvatar character={character} state={state} size={size} />
+        <MascotAvatar character={character} state={state} size={size} ring={ring} />
       </View>
     );
   }
 
   return (
     <Animated.View style={animatedStyle} accessibilityRole="image" accessibilityLabel={accessibleText}>
-      <MascotAvatar character={character} state={state} size={size} />
+      <MascotAvatar character={character} state={state} size={size} ring={ring} />
     </Animated.View>
   );
 }
