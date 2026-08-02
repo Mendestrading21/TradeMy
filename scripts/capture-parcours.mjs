@@ -29,20 +29,20 @@ const TIMEZONE = 'Europe/Zurich';
 
 const SKILLS = ['skill.actions', 'skill.trend', 'skill.candles', 'skill.patterns'];
 const CHECKPOINT = 'checkpoint.read-chart';
-// Ensembles COMPLETS de fiches par monde (source de vérité `conceptsByWorld`) — un monde de contenu
-// n'est « exploré » que si TOUTES ses fiches sont consultées.
-const ANATOMY = ['anatomie-bougie', 'unite-de-temps', 'echelle-des-prix']; // monde 2 (3 fiches)
-const CANDLES = ['marteau', 'doji', 'etoile-filante', 'avalement-haussier', 'marubozu', 'pendu', 'marteau-inverse', 'avalement-baissier', 'harami', 'etoile-du-matin', 'etoile-du-soir', 'trois-soldats', 'trois-corbeaux', 'pincettes']; // monde 3 (14 fiches)
-const learn = (slugs) => ({ conceptsExplored: slugs, worldsExplored: [], falseSignalsSpotted: 0, figuresRecognized: 0, bestRecognitionStreak: 0 });
+// Modèle GUIDÉ (15/15 mondes, LOT 4-Z) : un monde se TERMINE par ses compétences + son checkpoint
+// propre — plus aucun monde « de contenu » avancé par simple consultation de fiches.
+const ANATOMY_DONE = ['skill.anatomy.candle', 'skill.anatomy.timeframe', 'skill.anatomy.scale', 'checkpoint.anatomy']; // monde 2
+const CANDLES_DONE = ['skill.candle.pressure', 'skill.candle.rejection', 'skill.candle.indecision', 'skill.candle.reversal', 'checkpoint.candles']; // monde 3
 const progress = (o) => JSON.stringify({ onboarded: true, schemaVersion: 8, completedSkills: [], totalXp: 0, streakDays: 0, coins: 0, ...o });
 
 // Scénarios : progression réelle → état de roadmap distinct → CTA principal attendu (signature).
+// Les mondes suivants s'ouvrent avec « Commencer … » (module guidé), jamais « Explorer … ».
 const SEEDS = {
   new: { progress: progress({}), cta: 'Commencer le parcours' },
   progressPartial: { progress: progress({ completedSkills: ['skill.actions'], totalXp: 40, coins: 10 }), cta: 'Continuer Fondations des marchés' },
-  checkpoint: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT], totalXp: 120, streakDays: 3, coins: 30 }), cta: 'Explorer Anatomie d’un graphique' },
-  explored: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT], totalXp: 160, streakDays: 4, coins: 40, learning: learn(ANATOMY) }), cta: 'Explorer Chandeliers japonais' },
-  advanced: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT], totalXp: 260, streakDays: 8, coins: 80, learning: learn([...ANATOMY, ...CANDLES]) }), cta: 'Explorer Tendances et structure' },
+  checkpoint: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT], totalXp: 120, streakDays: 3, coins: 30 }), cta: 'Commencer Anatomie d’un graphique' },
+  explored: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT, ...ANATOMY_DONE], totalXp: 160, streakDays: 4, coins: 40 }), cta: 'Commencer Chandeliers japonais' },
+  advanced: { progress: progress({ completedSkills: [...SKILLS, CHECKPOINT, ...ANATOMY_DONE, ...CANDLES_DONE], totalXp: 260, streakDays: 8, coins: 80 }), cta: 'Commencer Tendances et structure' },
 };
 
 const MANIFEST = ['parcours-new-320', 'parcours-progress-390', 'parcours-checkpoint-390', 'parcours-explored-390', 'parcours-advanced-web', 'parcours-large-text', 'parcours-reduced-motion'];

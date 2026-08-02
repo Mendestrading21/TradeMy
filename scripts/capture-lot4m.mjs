@@ -177,6 +177,10 @@ async function geometryReport(p) {
     const overflowing = [...document.querySelectorAll('*')]
       .filter((el) => el instanceof HTMLElement && visible(el))
       .filter((el) => el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1)
+      // Un conteneur `overflow-x: hidden` COUPE son contenu par design (ex. avatar 3D : cadrage
+      // tête = image surdimensionnée dans un cercle masqué, LOT V1) — il ne peut pas créer de
+      // défilement horizontal de page ; seuls les débordements réellement visibles comptent.
+      .filter((el) => !['hidden', 'clip'].includes(getComputedStyle(el).overflowX))
       .slice(0, 12)
       .map((el) => ({
         ...describe(el),

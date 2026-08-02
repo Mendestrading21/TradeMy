@@ -88,10 +88,10 @@ async function shot(name, worldId, w, h, opts = {}) {
 // États réels distincts + largeurs (390 par défaut, 320 petit écran, 1280 web large).
 await shot('monde-guide-390', 'world.foundations', 390, 844, { seed: NEW, marker: 'Commencer la leçon' });
 await shot('monde-verrouille-390', 'world.anatomy', 390, 844, { seed: NEW, marker: 'Verrouillé' });
-await shot('monde-contenu-390', 'world.anatomy', 390, 844, { seed: W1_DONE, marker: 'Notions à explorer' });
+await shot('monde-contenu-390', 'world.anatomy', 390, 844, { seed: W1_DONE, marker: 'Notions de ce monde' });
 await shot('monde-termine-390', 'world.foundations', 390, 844, { seed: W1_DONE, marker: 'Module validé' });
 await shot('monde-guide-320', 'world.foundations', 320, 568, { seed: NEW, marker: 'Commencer la leçon' });
-await shot('monde-contenu-web', 'world.anatomy', 1280, 900, { seed: W1_DONE, marker: 'Notions à explorer' });
+await shot('monde-contenu-web', 'world.anatomy', 1280, 900, { seed: W1_DONE, marker: 'Notions de ce monde' });
 await shot('monde-guide-web', 'world.foundations', 1280, 900, { seed: NEW, marker: 'Commencer la leçon' });
 
 await browser.close();

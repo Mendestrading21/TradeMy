@@ -118,7 +118,9 @@ async function shot(p, name) {
 async function ctx(w, h, opts = {}) {
   const c = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, ...opts });
   const p = await c.newPage();
-  p.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(`${w}px ${m.text().slice(0, 140)}`); });
+  // Le scénario hors-ligne COUPE le réseau volontairement (`setOffline`) : les échecs de chargement
+  // de ressources qui en découlent sont le comportement attendu, pas un défaut de l'app.
+  p.on('console', (m) => { if (m.type() === 'error' && !m.text().includes('net::ERR_INTERNET_DISCONNECTED')) consoleErrors.push(`${w}px ${m.text().slice(0, 140)}`); });
   p.on('pageerror', (e) => consoleErrors.push(`${w}px PAGEERROR ${String(e).slice(0, 140)}`));
   return { c, p };
 }
