@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Screen, Text, Card, Button, theme } from '@/design-system';
+import { Screen, Text, Card, Button, TrademyIcon, theme } from '@/design-system';
 import { CharacterScene, characterLine } from '@/characters';
 import { VisualCard } from '@/engines/visual';
 import {
@@ -142,7 +142,10 @@ export default function Reconnaissance() {
     const ratio = Math.round((score / session.length) * 100);
     return (
       <Screen>
-        <Text variant="h1">Résultat 🔍</Text>
+        <View style={styles.titleRow}>
+          <TrademyIcon name="search" size={22} color={theme.colors.primaryBright} />
+          <Text variant="h1">Résultat</Text>
+        </View>
         {difficultyPicker}
         {groupPicker}
         <Card elevated style={styles.result}>
@@ -166,7 +169,10 @@ export default function Reconnaissance() {
 
   return (
     <Screen>
-      <Text variant="h1">Quiz visuel 🔍</Text>
+      <View style={styles.titleRow}>
+        <TrademyIcon name="search" size={22} color={theme.colors.primaryBright} />
+        <Text variant="h1">Quiz visuel</Text>
+      </View>
       {difficultyPicker}
       {groupPicker}
       <View style={styles.meta}>
@@ -234,6 +240,7 @@ export default function Reconnaissance() {
 }
 
 const styles = StyleSheet.create({
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   groups: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.xs, marginBottom: theme.spacing.xs },
   pill: {
     borderWidth: 1,

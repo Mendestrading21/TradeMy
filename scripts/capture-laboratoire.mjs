@@ -136,13 +136,13 @@ async function reachLabAndShot(p, name, sc, opts = {}) {
   if ((await pathnameOf(p)) !== BASE_PATH) throw new Error(`Route racine inattendue [${name}]`);
   await p.getByRole('button', { name: 'Reprendre', exact: true }).click({ timeout: 4000 });
   await p.getByText('MISSION DU JOUR', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
-  await p.getByRole('tab', { name: 'Laboratoire' }).click({ timeout: 4000 });
+  await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Laboratoire' }).click({ timeout: 4000 });
   await p.getByRole('heading', { name: 'Laboratoire' }).waitFor({ state: 'visible', timeout: 9000 });
   const resolved = await pathnameOf(p);
   if (resolved !== `${BASE_PATH}/laboratoire`) throw new Error(`Route Laboratoire inattendue: ${resolved} [${name}]`);
-  const sel = await p.getByRole('tab', { name: 'Laboratoire', selected: true }).count();
+  const sel = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Laboratoire, espace actif' }).count();
   if (sel !== 1) throw new Error(`Onglet « Laboratoire » non sélectionné [${name}]`);
-  const tabs = await p.getByRole('tab').count();
+  const tabs = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link').count();
   if (tabs !== 5) throw new Error(`Navigateur d'onglets incohérent (${tabs}) [${name}]`);
 
   // Action de scénario (changement d'activité / interaction) AVANT les vérifications d'état.

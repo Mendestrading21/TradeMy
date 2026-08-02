@@ -11,30 +11,29 @@ export type StateViewProps = {
   variant?: StateVariant;
   title?: string;
   message?: string;
-  /** Émoji d'illustration (ignoré en `loading`). Sobre par défaut, override possible. */
-  icon?: string;
   /**
-   * Icône de la FAMILLE Trademy (préférée à `icon`). Décorative (masquée aux lecteurs d'écran :
-   * l'état entier est déjà annoncé via `accessibilityLabel`). Ignorée en `loading`.
+   * Icône de la FAMILLE Trademy. Décorative (masquée aux lecteurs d'écran : l'état entier est
+   * déjà annoncé via `accessibilityLabel`). Ignorée en `loading`. Par défaut : icône du variant —
+   * plus AUCUN emoji système ne sort de cette primitive (canon Trademy).
    */
   iconName?: TrademyIconName;
   /** Action principale unique (ex. Réessayer). Un seul CTA par état. */
   action?: { label: string; onPress: () => void };
 };
 
-const DEFAULTS: Record<StateVariant, { icon: string; title: string; tone: string }> = {
-  loading: { icon: '⏳', title: 'Chargement…', tone: theme.colors.textSecondary },
-  empty: { icon: '🧭', title: 'Rien ici pour l’instant', tone: theme.colors.textPrimary },
-  error: { icon: '😵‍💫', title: 'Oups, un pépin est survenu', tone: theme.colors.danger },
-  offline: { icon: '📡', title: 'Tu es hors ligne', tone: theme.colors.textPrimary },
-  locked: { icon: '🔒', title: 'Contenu verrouillé', tone: theme.colors.textMuted },
+const DEFAULTS: Record<StateVariant, { iconName: TrademyIconName; title: string; tone: string }> = {
+  loading: { iconName: 'refresh', title: 'Chargement…', tone: theme.colors.textSecondary },
+  empty: { iconName: 'search', title: 'Rien ici pour l’instant', tone: theme.colors.textPrimary },
+  error: { iconName: 'error', title: 'Oups, un pépin est survenu', tone: theme.colors.danger },
+  offline: { iconName: 'refresh', title: 'Tu es hors ligne', tone: theme.colors.textPrimary },
+  locked: { iconName: 'lock', title: 'Contenu verrouillé', tone: theme.colors.textMuted },
 };
 
 /**
  * État transversal : loading / empty / error / offline / locked.
  * Une seule priorité visuelle par état, un seul CTA. Annoncé aux lecteurs d'écran.
  */
-export function StateView({ variant = 'empty', title, message, icon, iconName, action }: StateViewProps) {
+export function StateView({ variant = 'empty', title, message, iconName, action }: StateViewProps) {
   const d = DEFAULTS[variant];
   const heading = title ?? d.title;
   const label = message ? `${heading}. ${message}` : heading;
@@ -61,13 +60,7 @@ export function StateView({ variant = 'empty', title, message, icon, iconName, a
 
   return (
     <View style={styles.wrap} accessible accessibilityRole="summary" accessibilityLabel={label}>
-      {iconName ? (
-        <TrademyIcon name={iconName} size={40} color={d.tone} strokeWidth={2} />
-      ) : (
-        <Text variant="display" center>
-          {icon ?? d.icon}
-        </Text>
-      )}
+      <TrademyIcon name={iconName ?? d.iconName} size={40} color={d.tone} strokeWidth={2} />
       <Text variant="h2" center color={d.tone}>
         {heading}
       </Text>

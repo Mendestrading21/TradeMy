@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, Chip, EmptyState, StateView, theme } from '@/design-system';
+import { Screen, Text, Card, Button, Chip, EmptyState, StateView, TrademyIcon, theme } from '@/design-system';
 import { CharacterScene } from '@/characters';
 import { allLessons, conceptSlugForSkill } from '@/data';
 import { LessonStepView } from '@/components/LessonStepView';
@@ -51,7 +51,7 @@ export default function LessonScreen() {
     return (
       <Screen>
         <EmptyState
-          icon="🔒"
+          iconName="lock"
           title="Étape à débloquer"
           message="Cette étape arrivera plus tard dans le parcours. Termine d’abord les leçons disponibles."
         />
@@ -78,7 +78,7 @@ export default function LessonScreen() {
       ) : null}
       {lesson.estimatedMinutes ? (
         <View style={styles.metaRow}>
-          <Chip icon="⏱️" label={`${lesson.estimatedMinutes} min`} color={theme.colors.technical} />
+          <Chip iconName="timer" label={`${lesson.estimatedMinutes} min`} color={theme.colors.technical} />
           {lesson.difficulty ? <Chip label={lesson.difficulty} color={theme.colors.neutral} /> : null}
         </View>
       ) : null}
@@ -91,9 +91,12 @@ export default function LessonScreen() {
 
       {lesson.commonMistake ? (
         <Card style={styles.mistake}>
-          <Text variant="label" color={theme.colors.warning}>
-            ⚠️ Erreur fréquente
-          </Text>
+          <View style={styles.mistakeHead}>
+            <TrademyIcon name="warning" size={16} color={theme.colors.warning} />
+            <Text variant="label" color={theme.colors.warning}>
+              Erreur fréquente
+            </Text>
+          </View>
           <Text variant="body">{lesson.commonMistake}</Text>
         </Card>
       ) : null}
@@ -118,5 +121,6 @@ export default function LessonScreen() {
 const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', gap: theme.spacing.sm },
   mistake: { borderColor: theme.colors.warning },
+  mistakeHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
   actions: { gap: theme.spacing.sm, marginBottom: theme.spacing.lg },
 });

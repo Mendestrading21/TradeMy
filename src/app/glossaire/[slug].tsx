@@ -59,7 +59,7 @@ export default function GlossaryDetail() {
   if (!term) {
     return (
       <Screen>
-        <EmptyState icon="🔎" title="Terme introuvable" message="Ce terme n’est pas dans l’aperçu du glossaire." />
+        <EmptyState iconName="search" title="Terme introuvable" message="Ce terme n’est pas dans l’aperçu du glossaire." />
         <Button label="Retour au glossaire" variant="secondary" onPress={() => router.back()} />
       </Screen>
     );

@@ -147,7 +147,7 @@ async function reachRevisionsAndShot(p, name, ctaName, opts = {}) {
   const resolved = await pathnameOf(p);
   if (resolved !== `${BASE_PATH}/revisions`) throw new Error(`Route Révisions inattendue: ${resolved} [${name}]`);
   // Navigateur d'onglets présent (5 onglets) ; Révisions est un écran masqué → aucun onglet sélectionné.
-  const tabs = await p.getByRole('tab').count();
+  const tabs = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link').count();
   if (tabs !== 5) throw new Error(`Navigateur d'onglets absent/incohérent (${tabs} onglets) [${name}]`);
   const selected = await p.locator('[role="tab"][aria-selected="true"]').count();
   if (selected !== 0) throw new Error(`Un onglet primaire est sélectionné à tort sur Révisions [${name}]`);

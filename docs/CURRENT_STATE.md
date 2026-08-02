@@ -1,10 +1,10 @@
 # État courant de TradeMy / PatternLab
 
-**Date de référence :** 22 juillet 2026
+**Date de référence :** 30 juillet 2026
 
 **Dépôt :** `Mendestrading21/TradeMy`
 
-**Base vérifiée :** `main` au commit `5f34d57`
+**Base vérifiée :** `main` après la fusion du LOT W5 (programme Visual Max 2 complet)
 
 **Branche de fondation :** `cleanup/repository-foundation`
 
@@ -219,6 +219,25 @@ de session (asset `celebrate` réparé), fiche concept « détail à la demande 
 visuelle dans toutes les leçons guidées, défrange des 8 renders (fin du liseré blanc).
 **Reste ouvert** : LOT V3 — nouvelles poses 3D, bloqué sur la production design du propriétaire
 (brief transmis : 10 poses, PNG fond transparent ~760 px, même style que les 8 renders).
+
+## Programme « Visual Max 2 » (ADR-125 → ADR-129) — 30/07/2026, livré
+
+Suite de la priorité visuelle (« plus d'images mieux organisées, mascottes plus belles, plus
+d'illustrations dans les explications »). Cinq lots fusionnés (PR #44-#48) : leçons 100 %
+illustrées (étapes faux signal + à retenir), fiches illustrées (Lecture guidée + Comparer +
+réparation des 12 clés d'exemples pendantes), mascottes premium (anneaux d'identité + MascotDuo),
+registre canonique des figures (source unique d'organisation des 8 renders, dimensions verrouillées
+sur l'en-tête PNG réel), bibliothèque-galerie (vignette de figure sur chacune des 67 cartes —
+corpus illustré à 100 %, verrouillé par test).
+
+## Audit total & balayage canon (ADR-130) — 30/07/2026
+
+Audit exhaustif de l'export réel (crawl Chromium des 262 pages, parcours par clics, intégrité
+binaire des 30 images, URL canoniques, repli 404). Corrections : zéro emoji rendu sur les écrans
+secondaires et dans les primitives (`StateView`, `OfflineBanner`), écran `+not-found` canonique
+français servi comme `404.html` (fin de l'« Unmatched Route » anglais et du #418 sur URL inconnue),
+garde-fou global `runtimeNoEmoji` (emoji + ★/☆) sur toutes les sources runtime, scripts de capture
+migrés vers la sémantique d'onglets LOT 4-H (liens + « espace actif »).
 
 ## v1 web gratuite (ADR-110) — 29/07/2026
 

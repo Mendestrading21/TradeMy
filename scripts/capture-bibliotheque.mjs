@@ -121,13 +121,13 @@ async function reachBiblioAndShot(p, name, sc, opts = {}) {
   if ((await pathnameOf(p)) !== BASE_PATH) throw new Error(`Route racine inattendue [${name}]`);
   await p.getByRole('button', { name: 'Reprendre', exact: true }).click({ timeout: 4000 });
   await p.getByText('MISSION DU JOUR', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
-  await p.getByRole('tab', { name: 'Bibliothèque' }).click({ timeout: 4000 });
+  await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Bibliothèque' }).click({ timeout: 4000 });
   await p.getByRole('heading', { name: 'Bibliothèque' }).waitFor({ state: 'visible', timeout: 9000 });
   const resolved = await pathnameOf(p);
   if (resolved !== `${BASE_PATH}/apprendre`) throw new Error(`Route Bibliothèque inattendue: ${resolved} [${name}]`);
-  const sel = await p.getByRole('tab', { name: 'Bibliothèque', selected: true }).count();
+  const sel = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Bibliothèque, espace actif' }).count();
   if (sel !== 1) throw new Error(`Onglet « Bibliothèque » non sélectionné [${name}]`);
-  const tabs = await p.getByRole('tab').count();
+  const tabs = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link').count();
   if (tabs !== 5) throw new Error(`Navigateur d'onglets incohérent (${tabs}) [${name}]`);
   // Anti-build-obsolète : pilule d'état strict « Solide » (introuvable avant LOT 4-F).
   if (!(await p.getByText('Solide', { exact: true }).count())) throw new Error(`Marqueur LOT 4-F « Solide » absent (dist obsolète ?) [${name}]`);

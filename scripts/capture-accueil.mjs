@@ -153,9 +153,9 @@ async function reachAccueilAndShot(p, name) {
   //    par la sémantique accessible, pas par une occurrence textuelle.
   const resolved = await pathnameOf(p);
   if (resolved !== BASE_PATH) throw new Error(`Route résolue inattendue: ${resolved} (attendu ${BASE_PATH}) [${name}]`);
-  const accueilActif = await p.getByRole('tab', { name: 'Accueil', selected: true }).count();
+  const accueilActif = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Accueil, espace actif' }).count();
   if (accueilActif !== 1) throw new Error(`Onglet « Accueil » actif (role=tab, aria-selected) absent [${name}]`);
-  const autreOnglet = await p.getByRole('tab', { name: 'Laboratoire' }).count();
+  const autreOnglet = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Laboratoire' }).count();
   if (autreOnglet < 1) throw new Error(`Onglet « Laboratoire » (role=tab) absent — navigateur (tabs) non résolu [${name}]`);
   // 6) Nom accessible du compteur de jetons (un ancien dist ne peut pas produire de fausse preuve).
   const jeton = p.locator(`[aria-label="${JETON_LABEL}"]`);

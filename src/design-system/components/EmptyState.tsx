@@ -1,12 +1,13 @@
 import { StateView } from './StateView';
+import type { TrademyIconName } from '../icons/TrademyIcon';
 
 export type EmptyStateProps = {
-  icon?: string;
+  iconName?: TrademyIconName;
   title: string;
   message?: string;
 };
 
-/** Compat : état « vide » — délègue à la primitive d'état unifiée (StateView). */
-export function EmptyState({ icon, title, message }: EmptyStateProps) {
-  return <StateView variant="empty" icon={icon} title={title} message={message} />;
+/** Compat : état « vide » — délègue à la primitive d'état unifiée (StateView, icônes Trademy). */
+export function EmptyState({ iconName, title, message }: EmptyStateProps) {
+  return <StateView variant="empty" iconName={iconName} title={title} message={message} />;
 }

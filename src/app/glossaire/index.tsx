@@ -37,7 +37,7 @@ export default function Glossaire() {
 
   const views: SegmentOption<ViewMode>[] = [
     { id: 'all', label: 'Tout' },
-    { id: 'favorites', label: '★ Favoris', badge: favorites.size },
+    { id: 'favorites', label: 'Favoris', badge: favorites.size },
     { id: 'recent', label: 'Récents', badge: recentSlugs.length },
   ];
 
@@ -126,7 +126,7 @@ export default function Glossaire() {
       {list.length === 0 ? (
         <Text variant="body" color={theme.colors.textMuted} center>
           {view === 'favorites'
-            ? 'Aucun favori pour l’instant. Touche ★ sur un terme pour l’enregistrer.'
+            ? 'Aucun favori pour l’instant. Touche l’étoile d’un terme pour l’enregistrer.'
             : view === 'recent'
               ? 'Aucun terme consulté récemment.'
               : `Aucun terme ne correspond à « ${query} ».`}
