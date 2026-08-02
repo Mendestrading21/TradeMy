@@ -13,9 +13,16 @@ if (!existsSync(index)) {
   process.exit(1);
 }
 
-// GitHub Pages renvoie 404.html pour un accès direct à une route client. Copier l’entrée Expo
-// permet au routeur de reprendre l’URL courante, notamment pour les routes dynamiques.
-copyFileSync(index, join(dist, '404.html'));
+// GitHub Pages renvoie 404.html pour toute URL inconnue. Les 262 routes réelles ont leur propre
+// fichier pré-rendu : 404.html ne sert donc QUE les adresses inexistantes. On y place le prérendu
+// de l'écran canonique `+not-found` (français, une action « Retour à l'accueil ») — le rendu client
+// coïncide avec le prérendu, ce qui supprime la divergence d'hydratation React #418 (audit canon).
+const notFound = join(dist, '+not-found.html');
+if (!existsSync(notFound)) {
+  console.error('✗ dist/+not-found.html absent — l’écran canonique `+not-found` doit être exporté.');
+  process.exit(1);
+}
+copyFileSync(notFound, join(dist, '404.html'));
 
 // Garde-fou pour tout mode Pages qui passerait encore par Jekyll : `_expo/` doit être servi.
 writeFileSync(join(dist, '.nojekyll'), '');

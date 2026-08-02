@@ -125,15 +125,15 @@ async function reachProfilAndShot(p, name, ctaName, opts = {}) {
   await p.getByRole('button', { name: 'Reprendre', exact: true }).click({ timeout: 4000 });
   await p.getByText('MISSION DU JOUR', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
   // Onglet PRIMAIRE « Profil » (rôle tab).
-  await p.getByRole('tab', { name: 'Profil' }).click({ timeout: 4000 });
+  await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Profil' }).click({ timeout: 4000 });
   await p.getByText('Apprenti Trademy', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
   // Route réellement résolue = /profil.
   const resolved = await pathnameOf(p);
   if (resolved !== `${BASE_PATH}/profil`) throw new Error(`Route Profil inattendue: ${resolved} [${name}]`);
   // Onglet Profil réellement SÉLECTIONNÉ (role=tab + aria-selected).
-  const sel = await p.getByRole('tab', { name: 'Profil', selected: true }).count();
+  const sel = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Profil, espace actif' }).count();
   if (sel !== 1) throw new Error(`Onglet « Profil » non sélectionné [${name}]`);
-  const tabs = await p.getByRole('tab').count();
+  const tabs = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link').count();
   if (tabs !== 5) throw new Error(`Navigateur d'onglets incohérent (${tabs}) [${name}]`);
   // Anti-build-obsolète : marqueur LOT 4-D.
   if (!(await p.getByText('TA PROGRESSION', { exact: true }).count())) throw new Error(`Marqueur LOT 4-D « TA PROGRESSION » absent (dist obsolète ?) [${name}]`);

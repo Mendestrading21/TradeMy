@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, Chip, ProgressBar, theme } from '@/design-system';
+import { Screen, Text, Card, Button, Chip, ProgressBar, TrademyIcon, theme } from '@/design-system';
 import { useProgress } from '@/data';
 import { recentEvents, clearRecentEvents, computeInsights, type AnalyticsCategory } from '@/analytics';
 
@@ -25,7 +25,10 @@ export default function Journal() {
 
   return (
     <Screen>
-      <Text variant="h1">Journal d’usage 📔</Text>
+      <View style={styles.titleRow}>
+        <TrademyIcon name="chart" size={22} color={theme.colors.primaryBright} />
+        <Text variant="h1">Journal d’usage</Text>
+      </View>
       <Text variant="body" color={theme.colors.textSecondary}>
         Transparence totale : voici les évènements d’usage anonymes enregistrés localement sur cet
         appareil. Aucune donnée personnelle, aucun envoi automatique. Tu peux tout effacer.
@@ -122,6 +125,7 @@ export default function Journal() {
 }
 
 const styles = StyleSheet.create({
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   off: { borderColor: theme.colors.warning },
   row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   flex1: { flex: 1 },

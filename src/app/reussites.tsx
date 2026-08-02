@@ -1,8 +1,42 @@
 import { View, StyleSheet } from 'react-native';
-import { Screen, Text, Card, Button, Chip, ProgressBar, StateView, TrademyIcon, theme } from '@/design-system';
+import { Screen, Text, Card, Button, Chip, ProgressBar, StateView, TrademyIcon, theme, type TrademyIconName } from '@/design-system';
 import { MascotFigure } from '@/characters';
 import { BADGES, earnedBadges, streakInfo, STREAK_MILESTONE_REWARD, buildDailyQuests, useProgress } from '@/data';
 import { useNow } from '@/lib/useNow';
+
+// ── Icônes Trademy des quêtes et badges (canon : aucun emoji rendu ; les champs `icon`/`emoji`
+// des données sont IGNORÉS au rendu — même règle que l'onboarding). Repli par famille. ──
+const QUEST_ICON: Record<string, TrademyIconName> = {
+  'quest.session': 'target',
+  'quest.correct5': 'success',
+  'quest.xp30': 'bolt',
+};
+const BADGE_ICON: Record<string, TrademyIconName> = {
+  'first-step': 'progression',
+  'first-skill': 'learn',
+  'streak-3': 'flame',
+  explorer: 'search',
+  collector: 'coin',
+  studious: 'book',
+  mastery: 'mastery',
+  'module-done': 'checkpoint',
+  'candle-anatomist': 'candles',
+  'trend-cartographer': 'chart',
+  'pattern-reader': 'learn',
+  'false-signal-spotter': 'invalidation',
+  curious: 'hint',
+  'world-cartographer': 'home',
+  'reader-eye': 'search',
+  'streak-7': 'flame',
+  climber: 'progression',
+  devoted: 'book',
+  treasurer: 'coin',
+  'curious-plus': 'hint',
+  'world-tour': 'home',
+  'sharp-eye': 'target',
+  'flawless-reco': 'trophy',
+};
+const FAMILY_FALLBACK: Record<string, TrademyIconName> = { progress: 'progression', understanding: 'mastery' };
 
 export default function Reussites() {
   const { state, ready, claimQuest } = useProgress();
@@ -77,8 +111,9 @@ export default function Reussites() {
             {quests.map((q) => (
               <View key={q.id} style={styles.quest}>
                 <View style={styles.questHead}>
+                  <TrademyIcon name={QUEST_ICON[q.id] ?? 'target'} size={16} color={theme.colors.primaryBright} />
                   <Text variant="body" style={styles.flex1}>
-                    {q.icon} {q.label}
+                    {q.label}
                   </Text>
                   {q.claimable ? (
                     <Button
@@ -128,9 +163,9 @@ export default function Reussites() {
     return (
       <Card key={b.id} style={[styles.badge, !has && styles.locked]}>
         {has ? (
-          <Text variant="display" center>
-            {b.emoji}
-          </Text>
+          <View style={styles.lockWrap}>
+            <TrademyIcon name={BADGE_ICON[b.id] ?? FAMILY_FALLBACK[b.family ?? ''] ?? 'trophy'} size={34} color={theme.colors.primaryBright} title={`Badge : ${b.name}`} />
+          </View>
         ) : (
           <View style={styles.lockWrap}>
             <TrademyIcon name="lock" size={34} color={theme.colors.textMuted} title="Badge verrouillé" />

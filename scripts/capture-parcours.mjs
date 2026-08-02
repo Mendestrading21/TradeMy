@@ -126,15 +126,15 @@ async function reachParcoursAndShot(p, name, ctaName, opts = {}) {
   await p.getByRole('button', { name: 'Reprendre', exact: true }).click({ timeout: 4000 });
   await p.getByText('MISSION DU JOUR', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
   // Onglet PRIMAIRE « Apprendre » (rôle tab).
-  await p.getByRole('tab', { name: 'Apprendre' }).click({ timeout: 4000 });
+  await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Apprendre' }).click({ timeout: 4000 });
   await p.getByText('Ton parcours', { exact: true }).waitFor({ state: 'visible', timeout: 9000 });
   // Route réellement résolue = /parcours.
   const resolved = await pathnameOf(p);
   if (resolved !== `${BASE_PATH}/parcours`) throw new Error(`Route Apprendre inattendue: ${resolved} [${name}]`);
   // Onglet Apprendre réellement SÉLECTIONNÉ (role=tab + aria-selected).
-  const sel = await p.getByRole('tab', { name: 'Apprendre', selected: true }).count();
+  const sel = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Apprendre, espace actif' }).count();
   if (sel !== 1) throw new Error(`Onglet « Apprendre » non sélectionné [${name}]`);
-  const tabs = await p.getByRole('tab').count();
+  const tabs = await p.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link').count();
   if (tabs !== 5) throw new Error(`Navigateur d'onglets incohérent (${tabs}) [${name}]`);
   // Anti-build-obsolète : marqueur LOT 4-E.
   if (!(await p.getByText('TA PROCHAINE ÉTAPE', { exact: true }).count())) throw new Error(`Marqueur LOT 4-E « TA PROCHAINE ÉTAPE » absent (dist obsolète ?) [${name}]`);
