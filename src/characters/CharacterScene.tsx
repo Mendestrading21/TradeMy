@@ -26,7 +26,14 @@ export function CharacterScene({
   return (
     <View style={[styles.row, reversed && styles.reversed]}>
       <View style={styles.avatar}>
-        <CharacterAnimationController character={character} state={state} size={size} />
+        {/* LOT M2 — le guide se tourne vers sa bulle : à droite en lecture normale, à gauche quand
+            la scène est en miroir. Sans cela, un pointage désignerait le bord de l'écran. */}
+        <CharacterAnimationController
+          character={character}
+          state={state}
+          size={size}
+          facing={reversed ? -1 : 1}
+        />
         {showName ? (
           <Text variant="caption" color={accent} center>
             {CHARACTER_NAME[character]}
