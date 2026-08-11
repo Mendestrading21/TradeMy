@@ -34,6 +34,7 @@ export * from './sessionSummary';
 export * from './favorites';
 export * from './glossaryUnified';
 export * from './learningStats';
+export * from './guidedReading';
 export * from './derivedRevision';
 export * from './revisionDeck';
 export * from './dailyMission';
