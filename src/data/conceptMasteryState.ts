@@ -11,14 +11,18 @@
  * La maîtrise s'appuie sur la COUVERTURE des objectifs réellement entraînés
  * (`targets` persistés, schéma v8), pas sur une note agrégée au niveau compétence.
  * Deux garde-fous P0 :
- *   1. Un concept qui n'est pas le concept entraîné de sa compétence (partage de
- *      skillId) est plafonné à « exploré » — fin de la maîtrise partagée.
+ *   1. Un concept qui n'est entraîné par AUCUN exercice est plafonné à « exploré »
+ *      — fin de la maîtrise partagée entre fiches d'une même famille.
  *   2. La maîtrise exige la couverture complète des objectifs exerçables du concept.
+ *
+ * LOT C1 : le garde-fou n° 1 posait la mauvaise question (le champ `skillId` de la fiche, hérité
+ * des leçons libres) et plafonnait 42 concepts pourtant activement entraînés. Voir
+ * `isRepresentativeConcept` ci-dessous ; l'intention P0 est conservée, sa mise en œuvre corrigée.
  */
 import type { LearningConcept } from './learningConcept';
 import type { SkillProgress } from '../engines/learning';
 import { objectiveCoverage, type TargetProgress } from './targetProgress';
-import { conceptSlugForSkill, CHECKPOINT_ID, exercisableObjectiveIds } from './seed';
+import { CHECKPOINT_ID, exercisableObjectiveIds } from './seed';
 
 export type ConceptState = 'new' | 'explored' | 'completed' | 'strong' | 'mastered';
 
@@ -47,12 +51,24 @@ export interface MasteryGate {
 }
 
 /**
- * Un concept est « représentatif » de sa compétence s'il en est le concept
- * canonique entraîné (`CONCEPT_BY_SKILL`). Les autres concepts qui partagent le
- * même skillId ne sont pas entraînés individuellement : pas d'héritage de maîtrise.
+ * Un concept est « entraîné » s'il porte au moins un objectif RÉELLEMENT exercé quelque part dans
+ * le parcours. Les fiches de bibliothèque, qui n'ont aucun exercice à elles, n'héritent donc
+ * d'aucune maîtrise : l'intention P0 (fin de la maîtrise partagée) est intacte.
+ *
+ * LOT C1 — CORRECTION. La règle interrogeait auparavant le champ `skillId` de la FICHE, comparé au
+ * concept représentatif de cette compétence. Or ce champ pointe vers les leçons libres historiques
+ * (`skill.candles`, `skill.patterns`, `skill.trend`, `skill.actions`) — ou n'existe pas du tout sur
+ * la moitié du corpus. Il n'a jamais désigné la compétence guidée qui entraîne vraiment la notion.
+ * Résultat mesuré avant ce lot : **3 concepts sur 67** étaient jugés représentatifs, et **42
+ * concepts activement entraînés, exercices ciblés à l'appui, restaient plafonnés à « Découvert »
+ * pour toujours** — quoi que fasse l'apprenant.
+ *
+ * La question posée ici est désormais celle qui compte, et elle se lit dans le même registre que la
+ * couverture : ce concept a-t-il des objectifs exerçables ? Aucun garde-fou n'est perdu —
+ * `objectiveCoverage` exige déjà `total > 0` pour déclarer une couverture complète.
  */
-export function isRepresentativeConcept(concept: Pick<LearningConcept, 'skillId' | 'slug'>): boolean {
-  return Boolean(concept.skillId) && conceptSlugForSkill(concept.skillId as string) === concept.slug;
+export function isRepresentativeConcept(concept: Pick<LearningConcept, 'id'>): boolean {
+  return exercisableObjectiveIds(concept.id).length > 0;
 }
 
 export function masteryGate(concept: LearningConcept, input: ConceptStateInput): MasteryGate {

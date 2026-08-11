@@ -5,7 +5,10 @@ import { CHECKPOINT_ID, exercisableObjectiveIds } from './seed';
 import type { TargetProgress } from './targetProgress';
 
 const anatomy = V5_CONCEPTS.find((c) => c.slug === 'anatomie-bougie')!; // représentatif de skill.candles
-const marteau = V5_CONCEPTS.find((c) => c.slug === 'marteau')!; // partage skill.candles, non représentatif
+const marteau = V5_CONCEPTS.find((c) => c.slug === 'marteau')!; // entraîné par skill.candle.rejection
+// Fiche de BIBLIOTHÈQUE : elle partage le `skillId` historique `skill.candles` et n'a aucun exercice
+// à elle. C'est le vrai cas que le garde-fou P0 doit couvrir.
+const pendu = V5_CONCEPTS.find((c) => c.slug === 'pendu')!;
 
 /** Cible prouvée (entraînée + retenue) pour un objectif donné. */
 const proven = (objectiveId: string, conceptId: string): TargetProgress => ({
@@ -29,11 +32,25 @@ describe('isRepresentativeConcept', () => {
   it('vrai pour le concept entraîné de la compétence', () => {
     expect(isRepresentativeConcept(anatomy)).toBe(true);
   });
-  it('faux pour un concept qui partage seulement le skillId', () => {
-    expect(isRepresentativeConcept(marteau)).toBe(false);
+
+  it('LOT C1 — vrai aussi pour un concept entraîné par une compétence GUIDÉE', () => {
+    // Ce test disait l'inverse avant le LOT C1, et il figeait un bug : le marteau est la cible de
+    // cinq exercices réels (`skill.candle.rejection`), mais la règle interrogeait le `skillId` de la
+    // fiche — hérité de la leçon libre `skill.candles`. Il restait donc plafonné à « Découvert »
+    // pour toujours, comme 41 autres concepts pourtant activement entraînés.
+    expect(exercisableObjectiveIds(marteau.id).length).toBeGreaterThan(0);
+    expect(isRepresentativeConcept(marteau)).toBe(true);
   });
-  it('faux sans skillId', () => {
-    expect(isRepresentativeConcept({ skillId: undefined, slug: 'x' })).toBe(false);
+
+  it('faux pour une fiche de bibliothèque : aucun exercice, donc aucune maîtrise héritée', () => {
+    // L'intention P0 est intacte : le pendu partage le `skillId` du marteau et lui ressemble, mais
+    // il n'est entraîné nulle part — il ne peut donc pas hériter de la maîtrise de la famille.
+    expect(exercisableObjectiveIds(pendu.id)).toEqual([]);
+    expect(isRepresentativeConcept(pendu)).toBe(false);
+  });
+
+  it('faux pour un concept inconnu du parcours', () => {
+    expect(isRepresentativeConcept({ id: 'concept.inexistant' })).toBe(false);
   });
 });
 

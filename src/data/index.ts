@@ -57,3 +57,4 @@ export * from './mascotMoment';
 export * from './lessonContent';
 export * from './mastery';
 export { ProgressProvider, useProgress } from './progressContext';
+export * from './conceptNextStep';
