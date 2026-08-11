@@ -1471,6 +1471,16 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     falseSignals: ['Longue mèche sans zone : bruit plutôt que rejet.'],
     commonMistakes: ['Prendre toute mèche pour un signal fort.'],
     checklist: ['La mèche est-elle à une zone ?', 'Domine-t-elle le corps ?', 'La suite confirme-t-elle ?'],
+    confirmationZone: 'Sur la ou les bougies suivantes, une clôture qui reste du côté de la zone rejetée, sans revenir dans la mèche.',
+    invalidation: 'Une clôture au-delà de l’extrémité de la mèche : la zone n’a pas tenu et le rejet est démenti.',
+    bullishScenario: {
+      conditions: [
+        'Longue mèche basse formée SUR un support déjà testé.',
+        'Clôture ramenée dans la partie haute de la bougie.',
+        'La bougie suivante ne referme pas sous la mèche.',
+      ],
+      invalidation: 'Clôture sous le plus bas de la mèche : le support cède, le scénario haussier tombe.',
+    },
     visualSpec: {
       type: 'candlestick-pattern',
       variant: 'rejection',
@@ -1520,6 +1530,16 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     falseSignals: ['Confondre une correction profonde avec une simple respiration.'],
     commonMistakes: ['Réagir à chaque correction comme à un retournement.'],
     checklist: ['Suis-je en impulsion ou en correction ?', 'La structure tient-elle ?', 'Qu’est-ce qui invaliderait la tendance ?'],
+    confirmationZone: 'La reprise de l’impulsion : un nouveau sommet (ou un nouveau creux) dans le sens dominant, après la respiration.',
+    invalidation: 'Une correction qui efface toute l’impulsion et clôture au-delà de son point de départ : ce n’était pas une respiration, mais un retournement de structure.',
+    bullishScenario: {
+      conditions: [
+        'Impulsion franche qui pose un nouveau sommet.',
+        'Correction plus molle, qui ne casse pas le creux précédent.',
+        'Reprise dans le sens de l’impulsion.',
+      ],
+      invalidation: 'Clôture sous le creux qui précédait l’impulsion : la structure haussière est cassée.',
+    },
     visualSpec: {
       type: 'market-structure',
       variant: 'impulse-correction',
@@ -1569,6 +1589,16 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     falseSignals: ['Prendre un simple contact pour une cassure suivie de retest.'],
     commonMistakes: ['Oublier que le retest peut invalider, pas seulement confirmer.'],
     checklist: ['Le niveau a-t-il vraiment cassé ?', 'Le prix revient-il le tester ?', 'La réaction confirme-t-elle ou invalide-t-elle ?'],
+    confirmationZone: 'Le retest tient : au contact du niveau franchi, le prix clôture du côté de la cassure sans le retraverser.',
+    invalidation: 'Une clôture qui repasse franchement de l’autre côté du niveau : la cassure est démentie, le retest a échoué.',
+    bullishScenario: {
+      conditions: [
+        'Cassure nette d’une résistance, confirmée en clôture.',
+        'Retour du prix sur ce même niveau, devenu support.',
+        'Réaction au contact : le niveau tient à la clôture.',
+      ],
+      invalidation: 'Clôture sous le niveau retesté : la polarité ne s’est pas inversée.',
+    },
     visualSpec: {
       type: 'market-structure',
       variant: 'retest',
@@ -1618,6 +1648,16 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     falseSignals: ['Voir de la distribution dans tout range, sans contexte.'],
     commonMistakes: ['Confondre une simple consolidation avec une distribution.'],
     checklist: ['Y a-t-il eu une hausse préalable ?', 'Le range plafonne-t-il ?', 'Qu’est-ce qui invaliderait la lecture ?'],
+    confirmationZone: 'La sortie par le bas : une clôture sous le plancher du range, souvent après un balayage du haut resté sans suite.',
+    invalidation: 'Une clôture franche au-dessus du sommet du range, tenue ensuite : la lecture de distribution est démentie.',
+    bearishScenario: {
+      conditions: [
+        'Hausse marquée AVANT le range (sans quoi il n’y a rien à distribuer).',
+        'Sommets qui ne progressent plus à l’intérieur du range.',
+        'Clôture sous le plancher du range.',
+      ],
+      invalidation: 'Reprise en clôture au-dessus du sommet du range : la zone n’était pas une distribution.',
+    },
     visualSpec: {
       type: 'market-structure',
       variant: 'distribution',
@@ -1667,6 +1707,16 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     falseSignals: ['Toute mèche au-delà d’un niveau n’est pas un fakeout.'],
     commonMistakes: ['Entrer sur la cassure sans attendre la clôture ni le retest.'],
     checklist: ['La cassure a-t-elle clôturé au-delà ?', 'Le prix est-il revenu ?', 'Ai-je attendu une confirmation ?'],
+    confirmationZone: 'Le retour à l’intérieur : après le dépassement, une clôture de nouveau dans la zone d’origine signe le faux signal.',
+    invalidation: 'Le prix reste au-delà du niveau et y enchaîne les clôtures : la cassure était réelle, ce n’était pas un faux breakout.',
+    neutralScenario: {
+      conditions: [
+        'Dépassement bref d’un niveau surveillé, souvent en mèche.',
+        'Aucune tenue au-delà : pas d’enchaînement de clôtures du bon côté.',
+        'Retour du prix dans la zone d’origine.',
+      ],
+      invalidation: 'Des clôtures successives au-delà du niveau : la sortie est valide, la lecture « faux breakout » tombe.',
+    },
     visualSpec: {
       type: 'market-structure',
       variant: 'fakeout',
