@@ -11,10 +11,16 @@
  *   2. La mèche de rejet      → `concept.meche-de-rejet`
  *   3. Impulsion et correction → `concept.impulsion-et-correction`
  *
- * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : AUCUN des trois
- * concepts ne documente d'invalidation → aucun objectif `invalidate` inventé, AUCUN placement
- * (4 mécaniques distinctes) ; la mèche de rejet et l'impulsion/correction ne documentent pas de
- * zone de confirmation → 3 exercices chacune. Statuts éditoriaux inchangés (`needsReview`).
+ * Objectifs ciblés = objectifs RÉELS (learningTarget). `price-action-intro` ne documente ni zone de
+ * confirmation ni invalidation → 3 exercices, aucun objectif inventé.
+ *
+ * LOT D1 — la mèche de rejet et l'impulsion/correction, elles, documentent DÉSORMAIS une zone de
+ * confirmation ET une invalidation (enrichies par le LOT E3, ADR-133) : leurs compétences les
+ * exercent donc, alors qu'elles s'arrêtaient à 3 exercices quand ces champs étaient vides. Chaque
+ * ajout est DÉRIVÉ du champ réel de la fiche (`confirmationZone`, `bullishScenario.conditions`,
+ * `bullishScenario.invalidation`) — rien n'est inventé. L'invalidation de ces deux concepts est
+ * littéralement « sous le plus bas atteint » : elle se PLACE sur le graphique (mécanique de
+ * manipulation continue) plutôt que de se cocher. Statuts éditoriaux inchangés (`needsReview`).
  * Aucun vocabulaire BUY/SELL.
  */
 import { buildScenarioExercises, type LearningScenario, type Exercise } from '../engines/exercise';
@@ -124,7 +130,9 @@ const READING_SCENARIOS: LearningScenario[] = [
 ];
 
 // ── Compétence 2 — La mèche de rejet ─────────────────────────────────
-// recognize · interpret · avoid-false-signal UNIQUEMENT (ni confirmation ni invalidation documentées).
+// recognize · interpret · confirm · invalidate (PLACEMENT) · avoid-false-signal.
+// LOT D1 : `confirm` et `invalidate` dérivent des champs réels de `concept.meche-de-rejet`
+// (`confirmationZone`, `bullishScenario.conditions`, `bullishScenario.invalidation`).
 const WICK_SCENARIOS: LearningScenario[] = [
   {
     id: 'ex.priceaction.wick.recognize',
@@ -158,6 +166,41 @@ const WICK_SCENARIOS: LearningScenario[] = [
     rule: 'Une mèche se lit mèche d’abord, ZONE ensuite — sans zone, ce n’est que du bruit.',
   },
   {
+    // Dérivé de `confirmationZone` : « une clôture qui reste du côté de la zone rejetée, sans
+    // revenir dans la mèche » + les conditions de `bullishScenario`.
+    id: 'ex.priceaction.wick.confirm',
+    skillId: 'skill.priceaction.wick',
+    target: target(WICK, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce rejet ?',
+    context:
+      'Une longue mèche basse s’est formée SUR un support déjà testé, et la clôture est revenue dans la partie haute de la bougie.',
+    options: [
+      'Les bougies suivantes clôturent du côté de la zone tenue, sans redescendre dans la mèche.',
+      'La mèche est plus longue que le corps : cela suffit, la zone est acquise.',
+      'Le volume de la bougie de rejet est supérieur à la moyenne : le rejet est validé.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La confirmation d’un rejet, c’est la clôture suivante qui RESTE du côté de la zone rejetée, sans revenir dans la mèche.',
+    whenItFails: 'Une clôture qui replonge dans la mèche annule la lecture : le rejet n’a pas tenu.',
+    a11y:
+      'Contexte : une longue mèche basse sur un support déjà testé, clôture ramenée vers le haut. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `bullishScenario.invalidation` : « clôture sous le plus bas de la mèche ». Cette
+    // invalidation est LITTÉRALEMENT le plus bas atteint → elle se place sur le graphique.
+    id: 'ex.priceaction.wick.invalidate',
+    skillId: 'skill.priceaction.wick',
+    target: target(WICK, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 1207,
+    prompt: 'Place le niveau qui démentirait ce rejet haussier : sous le plus bas atteint par la mèche.',
+    difficulty: 'medium',
+    rule: 'Le rejet tombe si le prix clôture sous le plus bas de la mèche : le support n’a pas tenu.',
+    whenItFails: 'Placée trop haut, la ligne saute au moindre bruit ; trop bas, elle ne dit plus rien du support.',
+  },
+  {
     id: 'ex.priceaction.wick.avoid',
     skillId: 'skill.priceaction.wick',
     target: target(WICK, 'avoid-false-signal'),
@@ -174,7 +217,8 @@ const WICK_SCENARIOS: LearningScenario[] = [
 ];
 
 // ── Compétence 3 — Impulsion et correction ───────────────────────────
-// recognize · interpret · avoid-false-signal UNIQUEMENT (ni confirmation ni invalidation documentées).
+// recognize · interpret · confirm · invalidate (PLACEMENT) · avoid-false-signal.
+// LOT D1 : `confirm` et `invalidate` dérivent des champs réels de `concept.impulsion-et-correction`.
 const IMPULSE_SCENARIOS: LearningScenario[] = [
   {
     id: 'ex.priceaction.impulse.recognize',
@@ -206,6 +250,40 @@ const IMPULSE_SCENARIOS: LearningScenario[] = [
     correctOrder: [0, 1, 2, 3],
     difficulty: 'medium',
     rule: 'Impulsion d’abord, correction ensuite — et l’ampleur relative de la correction se surveille toujours.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « la reprise de l’impulsion : un nouveau sommet dans le sens
+    // dominant, après la respiration » + les conditions de `bullishScenario`.
+    id: 'ex.priceaction.impulse.confirm',
+    skillId: 'skill.priceaction.impulse',
+    target: target(IMPULSE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme que c’était bien une respiration ?',
+    context:
+      'Une impulsion franche a posé un nouveau sommet, puis le prix a corrigé plus mollement sans casser le creux précédent.',
+    options: [
+      'Le prix repart dans le sens dominant et pose un NOUVEAU sommet après la respiration.',
+      'La correction dure moins de trois bougies : c’est forcément une respiration.',
+      'La correction revient exactement à la moitié de l’impulsion : le seuil est atteint.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Ce qui confirme une respiration, c’est la REPRISE : un nouveau sommet (ou creux) dans le sens dominant.',
+    whenItFails: 'Tant que le nouveau sommet n’est pas posé, la respiration peut encore devenir un retournement.',
+    a11y:
+      'Contexte : impulsion posant un nouveau sommet, puis correction plus molle qui ne casse pas le creux précédent. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `bullishScenario.invalidation` : « clôture sous le creux qui précédait l’impulsion ».
+    id: 'ex.priceaction.impulse.invalidate',
+    skillId: 'skill.priceaction.impulse',
+    target: target(IMPULSE, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 1308,
+    prompt: 'Place le niveau qui casserait la structure haussière : sous le plus bas atteint avant la reprise.',
+    difficulty: 'medium',
+    rule: 'La structure haussière tombe si le prix clôture sous le creux qui précédait l’impulsion.',
+    whenItFails: 'Une correction profonde n’est pas encore une cassure : c’est la clôture sous le creux qui tranche.',
   },
   {
     id: 'ex.priceaction.impulse.avoid',

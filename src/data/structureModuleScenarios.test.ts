@@ -16,7 +16,7 @@ import {
   STRUCTURE_MODULE_EXERCISES_BY_SKILL,
 } from './structureModuleScenarios';
 import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoint } from './seed';
-import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } from './learningTarget';
+import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
 import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
@@ -24,16 +24,22 @@ import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
 /**
- * Objectifs RÉELS ciblés par compétence (dérivés des champs du concept — voir learningTarget).
- * NB : `concept.uptrend` est aussi la notion liée de `skill.trend` (Fondations), qui cible déjà
- * `recognize` — l'union reste identique à l'ensemble attendu ci-dessous.
+ * Objectifs RÉELS de chaque concept du module. LOT D1 : cette attente est DÉRIVÉE de la fiche
+ * elle-même (`objectivesForConcept`) au lieu d'être écrite en dur — une liste figée avait laissé
+ * passer l'enrichissement du LOT E3 sans que les exercices suivent.
  */
-const EXPECTED: Record<string, ObjectiveKind[]> = {
-  'concept.uptrend': ['recognize', 'interpret', 'invalidate', 'avoid-false-signal'],
-  'concept.downtrend': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-  'concept.range': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-  'concept.break-of-structure': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-};
+const MODULE_CONCEPT_IDS = [
+  'concept.uptrend',
+  'concept.downtrend',
+  'concept.range',
+  'concept.break-of-structure',
+];
+const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
+  MODULE_CONCEPT_IDS.map((id) => [
+    id,
+    objectivesForConcept(V5_CONCEPTS.find((c) => c.id === id)!).map((o) => o.kind),
+  ]),
+);
 
 const ALL_EXERCISES = Object.values(STRUCTURE_MODULE_EXERCISES_BY_SKILL).flat();
 
@@ -45,7 +51,7 @@ describe('Module guidé « Lire la structure » — modèle officiel (world.stru
     }
     expect(ALL_EXERCISES.length).toBe(STRUCTURE_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(16);
+    expect(ALL_EXERCISES.length).toBe(20); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
   });
 
   it('chaque compétence cible un concept RÉEL de world.structure', () => {
@@ -63,11 +69,16 @@ describe('Module guidé « Lire la structure » — modèle officiel (world.stru
       // Aucun objectif ciblé n'est orphelin : il se résout dans le modèle canonique.
       for (const oid of covered) expect(objectiveByIdIn(V5_CONCEPTS, oid)).toBeDefined();
     }
-    // Honnêteté du modèle : l'invalidation documentée du BOS est une reprise AU-DESSUS du niveau
-    // cassé — pas un plancher → aucun exercice de placement d'invalidation ne lui est attaché.
-    expect(exercisableObjectiveIds('concept.break-of-structure')).not.toContain(
+    // LOT D1 — l'invalidation documentée du BOS est désormais exercée. Elle reste une reprise
+    // AU-DESSUS du niveau cassé — pas un plancher → aucun exercice de PLACEMENT ne lui est attaché.
+    expect(exercisableObjectiveIds('concept.break-of-structure')).toContain(
       objectiveId('concept.break-of-structure', 'invalidate'),
     );
+    expect(
+      (STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.break'] ?? []).filter(
+        (e) => e.type === 'place_invalidation',
+      ),
+    ).toEqual([]);
   });
 
   it('le module couvre les 5 natures d’objectif (recognize → interpret → confirm → invalidate → avoid-false-signal)', () => {

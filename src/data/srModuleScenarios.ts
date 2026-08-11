@@ -12,11 +12,16 @@
  *   2. La polarité (flip)    → `concept.polarity-flip`
  *   3. Le retest             → `concept.retest-de-niveau`
  *
- * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget). Honnêteté du
- * modèle : `retest-de-niveau` ne documente ni zone de confirmation ni invalidation → 3 exercices
- * seulement (recognize, interpret, avoid-false-signal). Le seul placement de plancher est attaché
- * au support (invalidation documentée = clôture nette SOUS la zone) ; le flip s'invalide par un
- * retour de l'autre côté (pas un plancher) → aucun placement. Statuts éditoriaux inchangés.
+ * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget). Le seul
+ * placement de plancher est attaché au support (invalidation documentée = clôture nette SOUS la
+ * zone) ; le flip s'invalide par un retour de l'autre côté (pas un plancher) → aucun placement.
+ *
+ * LOT D1 — `retest-de-niveau` documente DÉSORMAIS une zone de confirmation ET une invalidation
+ * (enrichies par le LOT E3, ADR-133) : la compétence les exerce, alors qu'elle s'arrêtait à
+ * 3 exercices quand ces champs étaient vides. Les deux ajouts sont DÉRIVÉS des champs réels
+ * (`confirmationZone`, `bullishScenario.conditions`, `invalidation`) — rien n'est inventé. Son
+ * invalidation est « repasser de l'autre côté du niveau », pas un plancher : elle se raisonne
+ * (scénario) plutôt qu'elle ne se place. Statuts éditoriaux inchangés (`needsReview`).
  */
 import { buildScenarioExercises, type LearningScenario, type Exercise } from '../engines/exercise';
 import type { Skill } from '../engines/learning';
@@ -91,6 +96,28 @@ const ZONES_SCENARIOS: LearningScenario[] = [
     correctOrder: [0, 1, 2, 3],
     difficulty: 'medium',
     rule: 'Un niveau se lit touches d’abord, puis zone, puis réaction — sans jamais le tenir pour acquis.',
+  },
+  {
+    // LOT D1 — dérivé de `confirmationZone` : « réaction du prix à l’approche de la zone (rejet ou
+    // franchissement confirmé) ».
+    id: 'ex.sr.zones.confirm',
+    skillId: 'skill.sr.zones',
+    target: target(SR, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme que cette zone compte vraiment ?',
+    context:
+      'Un niveau a déjà été touché plusieurs fois. Le prix revient à son contact.',
+    options: [
+      'La RÉACTION du prix au contact : un rejet net, ou au contraire un franchissement confirmé en clôture.',
+      'Le nombre de touches : au-delà de trois, la zone est acquise quoi qu’il arrive.',
+      'La rondeur du niveau : un chiffre rond compte toujours plus.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une zone se confirme par la réaction observée au contact — rejet ou franchissement confirmé —, pas par un décompte.',
+    whenItFails: 'Une zone qui ne provoque plus aucune réaction a cessé d’être un niveau : elle est devenue du décor.',
+    a11y:
+      'Contexte : un niveau déjà touché plusieurs fois, que le prix revient toucher. Trois conclusions possibles à départager.',
   },
   {
     id: 'ex.sr.zones.invalidate',
@@ -170,6 +197,28 @@ const FLIP_SCENARIOS: LearningScenario[] = [
     rule: 'Le flip se confirme par la réaction du prix au retest, dans le nouveau rôle du niveau.',
   },
   {
+    // LOT D1 — dérivé de `invalidation` : « retour franc de l’autre côté, annulant le changement
+    // de rôle ». Ce n'est pas un plancher : la lecture se raisonne.
+    id: 'ex.sr.flip.invalidate',
+    skillId: 'skill.sr.flip',
+    target: target(FLIP, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui annulerait ce changement de rôle ?',
+    context:
+      'Une résistance a été franchie et confirmée, puis retestée : elle joue désormais le rôle de support.',
+    options: [
+      'Le prix repasse franchement de l’autre côté du niveau : l’ancien rôle reprend, le flip est annulé.',
+      'Le prix s’éloigne du niveau sans jamais le retoucher.',
+      'Le prix vient toucher le niveau une deuxième fois.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Un flip s’annule par un RETOUR FRANC de l’autre côté du niveau : le rôle initial reprend la main.',
+    whenItFails: 'Un simple contact ne défait rien : c’est le franchissement dans l’autre sens qui annule le changement de rôle.',
+    a11y:
+      'Contexte : une résistance franchie, confirmée puis retestée, devenue support ; il s’agit d’identifier ce qui annulerait ce changement de rôle. Trois propositions à départager.',
+  },
+  {
     id: 'ex.sr.flip.avoid',
     skillId: 'skill.sr.flip',
     target: target(FLIP, 'avoid-false-signal'),
@@ -219,6 +268,50 @@ const RETEST_SCENARIOS: LearningScenario[] = [
     correctOrder: [0, 1, 2, 3],
     difficulty: 'medium',
     rule: 'Un retest se lit cassure vérifiée d’abord, puis retour, puis réaction — il peut confirmer comme invalider.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « le retest tient : au contact du niveau franchi, le prix
+    // clôture du côté de la cassure sans le retraverser » + les conditions de `bullishScenario`.
+    id: 'ex.sr.retest.confirm',
+    skillId: 'skill.sr.retest',
+    target: target(RETEST, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce retest ?',
+    context:
+      'Une résistance a cassé en clôture, puis le prix est revenu la toucher — devenue support, elle est en train d’être testée.',
+    options: [
+      'Le prix clôture du côté de la cassure, au contact, sans retraverser le niveau.',
+      'Le prix touche le niveau : le contact suffit, la polarité est acquise.',
+      'Le prix s’éloigne très vite du niveau sans jamais le retoucher.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Un retest se confirme par la CLÔTURE au contact, du côté de la cassure — pas par le simple contact.',
+    whenItFails: 'Une clôture qui repasse de l’autre côté dément la cassure : le retest a échoué.',
+    a11y:
+      'Contexte : une résistance cassée en clôture puis retestée par le prix. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `invalidation` : « une clôture qui repasse franchement de l’autre côté du niveau ».
+    // Ce n'est PAS un plancher : l'invalidation se raisonne, elle ne se place pas.
+    id: 'ex.sr.retest.invalidate',
+    skillId: 'skill.sr.retest',
+    target: target(RETEST, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait cette lecture ?',
+    context:
+      'La résistance a cassé et le prix est revenu la tester. Tu cherches ce qui invaliderait la polarité.',
+    options: [
+      'Une clôture qui repasse franchement de l’autre côté du niveau : la cassure est démentie.',
+      'Une mèche qui dépasse brièvement le niveau avant de refermer du bon côté.',
+      'Un ralentissement du volume pendant le retest.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'L’invalidation d’un retest, c’est la CLÔTURE de l’autre côté du niveau — pas une mèche.',
+    whenItFails: 'Confondre une mèche de dépassement avec une invalidation fait sortir d’une lecture encore valable.',
+    a11y:
+      'Contexte : une résistance cassée puis retestée ; il s’agit d’identifier ce qui invaliderait la polarité. Trois propositions à départager.',
   },
   {
     id: 'ex.sr.retest.avoid',
