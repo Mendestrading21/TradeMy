@@ -50,8 +50,7 @@ describe('Module guidé « Lire la structure » — modèle officiel (world.stru
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(STRUCTURE_MODULE_SCENARIOS.length);
-    // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(20); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
+    expect(ALL_EXERCISES.length).toBe(23); // LOT D2 : 3 lectures de vrai graphique s'ajoutent aux 20 du LOT D1
   });
 
   it('chaque compétence cible un concept RÉEL de world.structure', () => {
@@ -90,9 +89,13 @@ describe('Module guidé « Lire la structure » — modèle officiel (world.stru
     expect(kinds).toEqual(new Set(['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal']));
   });
 
-  it('mécaniques réellement distinctes : 5 types d’exercice, dont placement et réorganisation (pas que des QCM)', () => {
+  it('mécaniques réellement distinctes : 6 types d’exercice, dont la lecture d’un VRAI graphique', () => {
     const types = new Set(ALL_EXERCISES.map((e) => e.type));
-    expect(types).toEqual(new Set(['identify_figure', 'order', 'scenario', 'place_invalidation', 'find_error']));
+    // LOT D2 — `identify_pattern` s'ajoute : reconnaître une structure sur une figure de catalogue
+    // et lire le sens d'une série quelconque sont deux compétences distinctes.
+    expect(types).toEqual(
+      new Set(['identify_figure', 'order', 'scenario', 'place_invalidation', 'find_error', 'identify_pattern']),
+    );
     // Chaque compétence propose au moins 3 interactions réellement différentes.
     for (const s of STRUCTURE_SKILLS) {
       const kinds = scenarioInteractionTypes(STRUCTURE_MODULE_SCENARIOS_BY_SKILL[s.id]);
@@ -108,6 +111,9 @@ describe('Module guidé « Lire la structure » — modèle officiel (world.stru
         case 'scenario': answer = ex.validation.correctIndex; break;
         case 'find_error': answer = ex.validation.errorIndex; break;
         case 'order': answer = ex.validation.correctOrder; break;
+        case 'identify_pattern': answer = ex.validation.correctIndex; break;
+        case 'label_chart': answer = ex.validation.correctIndex; break;
+        case 'select_chart_zone': answer = ex.validation.correctZone; break;
         case 'place_invalidation': answer = ex.validation.targetPrice; break;
         default: throw new Error(`type inattendu: ${ex.type}`);
       }

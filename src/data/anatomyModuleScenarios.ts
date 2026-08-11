@@ -78,6 +78,25 @@ const CANDLE_ANATOMY_SCENARIOS: LearningScenario[] = [
     rule: 'Le corps relie l’ouverture et la clôture (le sens) ; les mèches marquent les extrêmes de la période.',
   },
   {
+    // LOT D2 — VARIANTE de `recognize` : au lieu de choisir dans un catalogue, on identifie
+    // l'élément qu'un repère désigne sur un vrai graphique. La bougie marquée est celle qui atteint
+    // le plus haut RÉEL de la série rendue (graine 143) → cohérent par construction.
+    id: 'ex.anatomy.candle.label-high',
+    skillId: 'skill.anatomy.candle',
+    target: target(ANATOMY, 'recognize'),
+    interaction: 'label-extreme',
+    chartSeed: 143,
+    prompt: 'Le repère pointe un élément de cette bougie. Que marque-t-il ?',
+    options: [
+      'Le plus haut atteint sur la période (la mèche haute)',
+      'L’ouverture de la bougie',
+      'Le plus bas atteint sur la période (la mèche basse)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La mèche haute marque le plus haut atteint pendant la période ; le corps, lui, donne le sens.',
+  },
+  {
     id: 'ex.anatomy.candle.interpret',
     skillId: 'skill.anatomy.candle',
     target: target(ANATOMY, 'interpret'),
@@ -192,6 +211,21 @@ const SCALE_SCENARIOS: LearningScenario[] = [
     a11y: 'Une série haussière lue sur son axe des prix, avec des repères de niveau.',
     difficulty: 'easy',
     rule: 'L’axe des prix situe chaque bougie à son niveau et permet de mesurer l’amplitude réelle entre deux points.',
+  },
+  {
+    // LOT D2 — VARIANTE de `recognize`, au DOIGT : lire l'axe des prix pour situer le plus haut.
+    // C'est l'exercice qui fait vraiment travailler l'échelle — un QCM sur « à quoi sert l'axe »
+    // n'oblige pas à le lire. La bonne zone est le tiers qui contient le plus haut RÉEL de la série
+    // rendue (graine 126 : tiers du MILIEU, donc ni le premier ni le dernier par réflexe).
+    id: 'ex.anatomy.scale.touch-high',
+    skillId: 'skill.anatomy.scale',
+    target: target(SCALE, 'recognize'),
+    interaction: 'touch-extreme-zone',
+    chartSeed: 126,
+    prompt: 'En lisant l’axe des prix, touche le tiers où le prix a atteint son plus haut.',
+    difficulty: 'medium',
+    rule: 'On situe un extrême en comparant les niveaux sur l’axe, pas en se fiant à l’impression visuelle.',
+    whenItFails: 'Un axe étiré fait paraître un mouvement spectaculaire : seuls les niveaux lus comptent.',
   },
   {
     id: 'ex.anatomy.scale.interpret',

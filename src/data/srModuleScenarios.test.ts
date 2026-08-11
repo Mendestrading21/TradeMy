@@ -20,7 +20,7 @@ import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoin
 import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
-import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
+import { scenarioInteractionTypes, gradeExercise, lowestLow, highestHigh } from '../engines/exercise';
 import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
@@ -50,8 +50,7 @@ describe('Module guidé « Lire les niveaux » — modèle officiel (world.suppo
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(SR_MODULE_SCENARIOS.length);
-    // 4 + 4 + 3 = 11 exercices dérivés (le retest ne documente que 3 objectifs — honnêteté).
-    expect(ALL_EXERCISES.length).toBe(15); // LOT D1 : 5 + 5 + 5 (retest rattrapé, zones + flip complétés)
+    expect(ALL_EXERCISES.length).toBe(16); // LOT D2 : 6 (zones, + placement de résistance) + 5 + 5
   });
 
   it('chaque compétence cible un concept RÉEL de world.support-resistance', () => {
@@ -128,16 +127,28 @@ describe('Module guidé « Lire les niveaux » — modèle officiel (world.suppo
     }
   });
 
-  it('cohérence invalidation : la cible placée EST le plus bas réel de la série rendue', () => {
+  it('cohérence des niveaux placés : chaque cible EST l’extrême réel que son énoncé désigne', () => {
+    // Le module compte DEUX placements, rendus par le même player mais visant des extrêmes
+    // OPPOSÉS — c'est justement ce que le verrou doit distinguer :
+    //  · l'invalidation du support se pose sous le plus BAS atteint (plancher documenté) ;
+    //  · LOT D2 — la résistance se pose sur le plus HAUT atteint (repère d'un niveau).
+    // L'indice de l'exercice dit lequel : la cible est vérifiée contre l'extrême correspondant.
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // Un seul plancher documenté dans ce module : l'invalidation du support (clôture nette dessous).
-    expect(places.length).toBe(1);
+    expect(places.length).toBe(2);
+    const vises = new Set<string>();
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
       const candles = generateCandles(ex.chartSeed, 30);
-      expect(ex.validation.targetPrice).toBe(lowestLow(candles));
+      // L'indice n'est pas décoratif : c'est lui qui dit à l'apprenant QUEL niveau viser. Un
+      // placement sans indice laisserait la cible indevinable — on le vérifie avant de s'en servir.
+      expect(ex.hint).toBeTruthy();
+      const versLeBas = (ex.hint ?? '').includes('plus bas');
+      expect(ex.validation.targetPrice).toBe(versLeBas ? lowestLow(candles) : highestHigh(candles));
       expect(ex.validation.tolerance).toBeGreaterThan(0);
+      vises.add(versLeBas ? 'bas' : 'haut');
     }
+    // Les deux extrêmes sont réellement représentés : aucun des deux placements n'est un doublon.
+    expect(vises).toEqual(new Set(['bas', 'haut']));
   });
 
   it('checkpoint PROPRE au module : reconnu, non vide, et composé des compétences Niveaux', () => {

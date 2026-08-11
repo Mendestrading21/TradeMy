@@ -81,6 +81,22 @@ const UPTREND_SCENARIOS: LearningScenario[] = [
     rule: 'La tendance haussière se lit dans la structure : des sommets (HH) et des creux (HL) de plus en plus hauts.',
   },
   {
+    // LOT D2 — VARIANTE de `recognize` sur un VRAI graphique, pas une figure de catalogue : la
+    // réponse est calculée depuis la série réellement rendue (graine 102, hausse franche de +77 %).
+    // Reconnaître une tendance haussière sur une figure d'illustration et la lire sur un graphique
+    // quelconque sont deux compétences différentes ; la rotation des sessions alterne les deux.
+    id: 'ex.structure.uptrend.read-chart',
+    skillId: 'skill.structure.uptrend',
+    target: target(UPTREND, 'recognize'),
+    interaction: 'read-direction',
+    chartSeed: 102,
+    prompt: 'Voici une période en bougies. Quel est le sens dominant ?',
+    options: ['Plutôt à la hausse', 'Plutôt à la baisse', 'Sans direction nette'],
+    difficulty: 'medium',
+    rule: 'Le sens se lit sur la structure d’ensemble — l’enchaînement des sommets et des creux —, jamais sur une bougie isolée.',
+    whenItFails: 'Une seule grande bougie ne fait pas la tendance : c’est la séquence qui décide.',
+  },
+  {
     id: 'ex.structure.uptrend.interpret',
     skillId: 'skill.structure.uptrend',
     target: target(UPTREND, 'interpret'),
@@ -161,6 +177,19 @@ const DOWNTREND_SCENARIOS: LearningScenario[] = [
     a11y: 'Une structure de prix descendante : les sommets et les creux s’enchaînent de plus en plus bas.',
     difficulty: 'easy',
     rule: 'La tendance baissière se lit dans la structure : des sommets (LH) et des creux (LL) décroissants.',
+  },
+  {
+    // LOT D2 — VARIANTE de `recognize` sur un vrai graphique (graine 135, baisse franche de −36 %).
+    id: 'ex.structure.downtrend.read-chart',
+    skillId: 'skill.structure.downtrend',
+    target: target(DOWNTREND, 'recognize'),
+    interaction: 'read-direction',
+    chartSeed: 135,
+    prompt: 'Voici une période en bougies. Quel est le sens dominant ?',
+    options: ['Plutôt à la hausse', 'Plutôt à la baisse', 'Sans direction nette'],
+    difficulty: 'medium',
+    rule: 'Une baisse se lit à la séquence : des sommets et des creux qui descendent, pas à une bougie rouge.',
+    whenItFails: 'Un rebond au milieu d’une baisse ne renverse rien tant qu’aucun sommet n’est dépassé.',
   },
   {
     id: 'ex.structure.downtrend.interpret',
@@ -249,6 +278,21 @@ const RANGE_SCENARIOS: LearningScenario[] = [
     a11y: 'Un prix qui oscille entre une zone basse (support) et une zone haute (résistance), sans direction nette.',
     difficulty: 'easy',
     rule: 'Le range se reconnaît à ses rebonds répétés sur un support et ses rejets répétés sous une résistance.',
+  },
+  {
+    // LOT D2 — VARIANTE de `recognize` sur un vrai graphique (graine 153 : dérive de −0,7 % sur la
+    // période, aucune direction nette). C'est l'exercice le plus honnête du range : constater
+    // l'absence de sens sur une série quelconque, pas sur une illustration déjà étiquetée.
+    id: 'ex.structure.range.read-chart',
+    skillId: 'skill.structure.range',
+    target: target(RANGE, 'recognize'),
+    interaction: 'read-direction',
+    chartSeed: 153,
+    prompt: 'Voici une période en bougies. Quel est le sens dominant ?',
+    options: ['Plutôt à la hausse', 'Plutôt à la baisse', 'Sans direction nette'],
+    difficulty: 'medium',
+    rule: 'Quand ni les sommets ni les creux ne progressent, il n’y a pas de sens : c’est un range.',
+    whenItFails: 'Chercher une tendance à tout prix dans un range est la façon la plus courante de se tromper.',
   },
   {
     id: 'ex.structure.range.interpret',
