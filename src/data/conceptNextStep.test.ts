@@ -70,7 +70,8 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // LOT C2 : 22 → 20 (avalement baissier, double sommet). LOT C3 : 20 → 17 (triangle descendant,
     // drapeau baissier, ÉTÉ inversée). Chaque baisse correspond à un lot qui a donné à ces fiches
     // leur propre compétence guidée — jamais à un relâchement de la règle.
-    expect(LIBRARY_ONLY.length).toBe(17);
+    // LOT C4 : 17 → 14 (pendu, étoile filante, marteau inversé).
+    expect(LIBRARY_ONLY.length).toBe(14);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 

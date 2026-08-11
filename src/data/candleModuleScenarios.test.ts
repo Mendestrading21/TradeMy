@@ -35,6 +35,10 @@ const MODULE_CONCEPT_IDS = [
   'concept.bullish-engulfing',
   // LOT C2 — la figure miroir : cette fiche de bibliothèque devient une compétence entraînable.
   'concept.bearish-engulfing',
+  // LOT C4 — la même FORME, l'autre histoire (contexte, pas direction).
+  'concept.hanging-man',
+  'concept.shooting-star',
+  'concept.inverted-hammer',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -52,9 +56,8 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(CANDLE_MODULE_SCENARIOS.length);
-    // LOT C2 : 19 → 24. La 5e compétence (« La figure miroir ») exerce les CINQ objectifs réels de
-    // `concept.bearish-engulfing` — reconnaître, interpréter, confirmer, invalider, déjouer.
-    expect(ALL_EXERCISES.length).toBe(24);
+    // LOT C2 : 19 → 24. LOT C4 : 24 → 39 (trois compétences de plus, cinq objectifs réels chacune).
+    expect(ALL_EXERCISES.length).toBe(39);
   });
 
   it('chaque compétence cible un concept RÉEL de world.candles', () => {
@@ -112,7 +115,7 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(5); // LOT C2 : la figure miroir ajoute sa propre reconnaissance.
+    expect(figures.length).toBe(8); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -125,12 +128,13 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // LOT C2 : quatre placements. Trois setups haussiers s'invalident vers le BAS ; la figure
-    // miroir, baissière, s'invalide vers le HAUT — c'est tout l'objet de la compétence, et le test
-    // vérifie que la cible suit vraiment le côté annoncé par l'énoncé.
-    expect(places.length).toBe(4);
+    // LOT C4 — même verrou que le monde des figures, et même leçon : l'invalidation se place du
+    // côté OPPOSÉ au sens du setup. Sept placements : quatre setups haussiers invalidés vers le BAS
+    // (marubozu, marteau, avalement haussier, marteau inversé) et trois baissiers vers le HAUT
+    // (avalement baissier, pendu, étoile filante).
+    expect(places.length).toBe(7);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
-    expect(versLeHaut).toHaveLength(1);
+    expect(versLeHaut).toHaveLength(3);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
       expect(ex.hint).toBeTruthy();
