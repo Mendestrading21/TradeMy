@@ -20,6 +20,7 @@ export * from './badges';
 export * from './gamification';
 export * from './stats';
 export * from './premium';
+export * from './subscription';
 export * from './offline';
 export * from './learningConcept';
 export * from './learningContent';
