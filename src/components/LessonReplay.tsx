@@ -10,6 +10,7 @@ import {
   resetReplay,
   replayAtEnd,
   replayAtStart,
+  type Candle,
 } from '@/engines/pattern';
 
 /**
@@ -17,9 +18,26 @@ import {
  * au rythme de l'utilisateur. Statique (aucune animation automatique → compatible réduction
  * d'animation) ; déterministe par graine. La logique de replay est pure (chartEngine), ici on ne
  * gère que l'état d'affichage. Aucun jugement de marché : on observe la construction du prix.
+ *
+ * LOT E1 — `series` permet de rejouer la FIGURE RÉELLE du concept (dataset canonique du moteur
+ * visuel) au lieu d'une série synthétique : on voit la figure enseignée SE FORMER, ce qui apprend
+ * qu'elle ne se lit qu'une fois complète. Repli sur la série déterministe quand le concept n'a pas
+ * de dataset assez long (figures d'une seule bougie).
  */
-export function LessonReplay({ seed = 2024, count = 26 }: { seed?: number; count?: number }) {
-  const candles = useMemo(() => generateCandles(seed, count), [seed, count]);
+export function LessonReplay({
+  seed = 2024,
+  count = 26,
+  series,
+}: {
+  seed?: number;
+  count?: number;
+  /** Bougies réelles à rejouer (prioritaires sur la graine). */
+  series?: readonly Candle[];
+}) {
+  const candles = useMemo(
+    () => (series && series.length ? [...series] : generateCandles(seed, count)),
+    [series, seed, count],
+  );
   const [state, setState] = useState(() => initReplay(candles.length, 6));
   const atEnd = replayAtEnd(state);
   const atStart = replayAtStart(state);

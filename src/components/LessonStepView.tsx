@@ -10,13 +10,25 @@ import {
 } from '@/design-system';
 import { CharacterScene } from '@/characters';
 import { PatternChart, generateCandles } from '@/engines/pattern';
-import { VisualCard, MiniVisual } from '@/engines/visual';
+import { VisualCard, MiniVisual, datasetByKey } from '@/engines/visual';
 import { conceptBySlug, V5_CONCEPTS } from '@/data';
 import { LessonReplay } from './LessonReplay';
 import { STEP_META, type LessonStepMeta } from './lessonStepMeta';
 import type { LessonStep } from '@/engines/learning';
 
 export { STEP_META } from './lessonStepMeta';
+
+/**
+ * LOT E1 — en dessous de ce nombre de bougies, « révéler une à une » n'apprend rien (figures d'une
+ * seule bougie : marteau, doji, marubozu…) : la manipulation retombe alors sur la série
+ * déterministe, qui enseigne la construction de la structure.
+ */
+const REPLAYABLE_MIN = 8;
+
+/** Minuscule initiale — un critère de reconnaissance s'enchâsse dans une phrase (« repère : … »). */
+function lowerFirst(s: string): string {
+  return s.charAt(0).toLocaleLowerCase('fr-FR') + s.slice(1);
+}
 
 function StepLabel({ meta }: { meta: LessonStepMeta }) {
   return (
@@ -187,14 +199,22 @@ export function LessonStepView({ step, conceptSlug }: { step: LessonStep; concep
   }
 
   if (step.kind === 'interaction') {
-    // Manipulation immersive : révélation du graphique bougie par bougie (statique, a11y).
+    // LOT E1 — la MANIPULATION du canon (« observer, formuler, vérifier, MANIPULER… ») : on rejoue
+    // la FIGURE RÉELLE du concept bougie par bougie quand son dataset est assez long pour qu'une
+    // révélation ait du sens ; sinon la série déterministe. La consigne est DÉRIVÉE du premier
+    // critère de reconnaissance du concept (source unique) — aucun texte dupliqué dans les données.
+    const concept = conceptBySlug(V5_CONCEPTS, step.conceptRef ?? conceptSlug ?? '');
+    const figure = datasetByKey(concept?.visualSpec?.datasetKey);
+    const cue = concept?.howToRecognize?.[0];
+    const consigne = step.body ?? (cue ? `Révèle les bougies une à une, puis repère : ${lowerFirst(cue)}` : undefined);
     return (
       <View style={styles.stepStack}>
-        <LessonReplay seed={step.chartSeed ?? 2024} />
-        {step.body ? (
+        <LessonReplay seed={step.chartSeed ?? 2024} series={figure.length >= REPLAYABLE_MIN ? figure : undefined} />
+        {consigne ? (
           <Card>
+            <StepLabel meta={STEP_META.interaction} />
             <Text variant="body" color={theme.colors.textSecondary}>
-              {step.body}
+              {consigne}
             </Text>
           </Card>
         ) : null}
