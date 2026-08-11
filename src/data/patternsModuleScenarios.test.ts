@@ -19,7 +19,7 @@ import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoin
 import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
-import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
+import { scenarioInteractionTypes, gradeExercise, lowestLow, highestHigh } from '../engines/exercise';
 import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
@@ -33,6 +33,8 @@ const MODULE_CONCEPT_IDS = [
   'concept.ascending-triangle',
   'concept.bull-flag',
   'concept.head-shoulders',
+  // LOT C2 — la figure miroir : cette fiche de bibliothèque devient une compétence entraînable.
+  'concept.double-top',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -51,7 +53,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     }
     expect(ALL_EXERCISES.length).toBe(PATTERNS_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(20); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
+    expect(ALL_EXERCISES.length).toBe(25); // LOT C2 : la 5e compétence (« La figure miroir ») exerce les cinq objectifs réels du double sommet.
   });
 
   it('chaque compétence cible un concept RÉEL de world.patterns', () => {
@@ -118,7 +120,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(4);
+    expect(figures.length).toBe(5); // LOT C2 : la figure miroir ajoute sa propre reconnaissance.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -128,14 +130,19 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     }
   });
 
-  it('cohérence invalidation : la cible placée EST le plus bas réel de la série rendue', () => {
+  it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // Deux planchers documentés : le double creux (sous les creux) et le drapeau (sous le canal).
-    expect(places.length).toBe(2);
+    // Deux planchers documentés (double creux, drapeau) + LOT C2 : le double SOMMET, baissier,
+    // s'invalide AU-DESSUS des sommets. Le test vérifie que la cible suit le côté annoncé.
+    expect(places.length).toBe(3);
+    const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
+    expect(versLeHaut).toHaveLength(1);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
+      expect(ex.hint).toBeTruthy();
       const candles = generateCandles(ex.chartSeed, 30);
-      expect(ex.validation.targetPrice).toBe(lowestLow(candles));
+      const haut = (ex.hint ?? '').includes('plus haut');
+      expect(ex.validation.targetPrice).toBe(haut ? highestHigh(candles) : lowestLow(candles));
       expect(ex.validation.tolerance).toBeGreaterThan(0);
     }
   });
