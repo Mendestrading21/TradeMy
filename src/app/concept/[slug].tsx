@@ -22,6 +22,7 @@ import {
   worldById,
   categoryById,
   conceptMasteryStatus,
+  conceptNextStep,
   needsEditorialReview,
   guidedReading,
   EDITORIAL_REVIEW_NOTICE,
@@ -176,6 +177,15 @@ export default function ConceptFiche() {
     targets: state?.targets ?? {},
   });
   const masteryMeta = STATE_META[mastery.state];
+  // LOT C1 — le canon impose d'afficher la raison d'un verrou ET la prochaine action. Le statut
+  // seul laissait l'apprenant sans explication, en particulier sur les fiches de bibliothèque dont
+  // le statut ne peut légitimement pas dépasser « Découvert ».
+  const nextStep = conceptNextStep(concept, {
+    exploredSlugs: state?.learning?.conceptsExplored ?? [],
+    skills: state?.skills ?? {},
+    completedSkills: state?.completedSkills ?? [],
+    targets: state?.targets ?? {},
+  });
   const scenarios = SCENARIO_META.map((s) => ({
     ...s,
     data: s.key === 'bullish' ? concept.bullishScenario : s.key === 'bearish' ? concept.bearishScenario : concept.neutralScenario,
@@ -199,6 +209,27 @@ export default function ConceptFiche() {
         {concept.estimatedMinutes ? <Chip iconName="timer" label={`${concept.estimatedMinutes} min`} color={theme.colors.neutral} /> : null}
         {concept.aliases[0] ? <Chip label={concept.aliases[0]} color={theme.colors.textMuted} /> : null}
       </View>
+
+      {/* LOT C1 — « où j'en suis, et pourquoi ». Une phrase, et quand une suite existe, un bouton
+          qui mène à une compétence RÉELLE (jamais un bouton mort : `action` est nulle si maîtrisé). */}
+      <Card style={styles.nextStepCard} accessibilityRole="summary">
+        <View style={styles.nextStepRow}>
+          <TrademyIcon name={masteryMeta.icon} size={16} color={masteryMeta.color} />
+          <Text variant="label" color={theme.colors.textMuted}>
+            {`Où j’en suis · ${mastery.stateLabel}`}
+          </Text>
+        </View>
+        <Text variant="body" color={theme.colors.textSecondary}>
+          {nextStep.reason}
+        </Text>
+        {nextStep.action ? (
+          <Button
+            label={`S’entraîner · ${nextStep.action.label}`}
+            variant="secondary"
+            onPress={() => router.push(`/session/${nextStep.action!.skillId}` as never)}
+          />
+        ) : null}
+      </Card>
 
       {needsEditorialReview(concept) ? (
         <Card style={styles.reviewNotice} accessibilityRole="summary">
@@ -386,6 +417,9 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
   reviewNotice: { gap: theme.spacing.xs, borderColor: theme.colors.warning },
+  /** LOT C1 — « Où j'en suis » : couleur neutre, la maîtrise ne s'annonce jamais par la couleur seule. */
+  nextStepCard: { gap: theme.spacing.sm },
+  nextStepRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
   readingCard: { gap: theme.spacing.xs },
   readingRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },

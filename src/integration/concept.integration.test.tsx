@@ -66,13 +66,26 @@ jest.mock('@/data', () => {
 });
 
 import ConceptFiche from '@/app/concept/[slug]';
-import { TrademyIcon, Chip, theme } from '@/design-system';
+import { TrademyIcon, Chip, Button, theme } from '@/design-system';
 import { VisualCard, COMPARISON_BY_CONCEPT } from '@/engines/visual';
-import { V5_CONCEPTS, relatedConcepts, needsEditorialReview, conceptMasteryStatus, EDITORIAL_REVIEW_NOTICE } from '@/data';
+import {
+  V5_CONCEPTS,
+  relatedConcepts,
+  needsEditorialReview,
+  conceptMasteryStatus,
+  conceptNextStep,
+  isRepresentativeConcept,
+  EDITORIAL_REVIEW_NOTICE,
+  type ConceptStateInput,
+} from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
 import * as ExpoRouter from 'expo-router';
 import * as Data from '@/data';
+
+// LOT C1 — progression VIERGE : c'est l'état que le `useProgress` mocké expose à l'écran, donc
+// l'attente du test se calcule avec exactement la même entrée que le rendu.
+const VIDE_PROGRESS: ConceptStateInput = { exploredSlugs: [], skills: {}, completedSkills: [], targets: {} };
 
 const routerState = (ExpoRouter as unknown as { __state: { params: Record<string, unknown>; calls: unknown[][] } }).__state;
 const calls = (Data as unknown as { __calls: { recent: string[]; explored: string[][]; favToggles: string[] } }).__calls;
@@ -278,6 +291,41 @@ describe('Fiche concept de production — canon, logique préservée (LOT 4-J)',
     act(() => (chip!.props.onPress as () => void)());
     const pushes = routerState.calls.filter((c) => c[0] === 'push');
     expect(pushes.some((c) => c[1] === `/concept/${FIRST_RELATED.slug}`)).toBe(true);
+    act(() => r.unmount());
+  });
+
+  it('LOT C1 — « Où j’en suis » : la fiche DIT la raison du statut, pas seulement le statut', async () => {
+    const r = await mount(RICH.slug);
+    // Le bloc annonce l'état courant en toutes lettres, à côté de son icône.
+    expect(hasTextIncluding(r.root, 'Où j’en suis · ')).toBe(true);
+    // Et la raison affichée est EXACTEMENT celle du noyau pur : l'écran ne reformule rien.
+    const attendu = conceptNextStep(RICH, VIDE_PROGRESS);
+    expect(hasTextIncluding(r.root, attendu.reason.slice(0, 40))).toBe(true);
+    act(() => r.unmount());
+  });
+
+  it('LOT C1 — le bouton d’entraînement mène à une compétence RÉELLE (aucun bouton mort)', async () => {
+    const attendu = conceptNextStep(RICH, VIDE_PROGRESS);
+    expect(attendu.action).not.toBeNull();
+    const r = await mount(RICH.slug);
+    const bouton = r.root
+      .findAllByType(Button)
+      .find((n) => String(n.props.label ?? '').includes(attendu.action!.label));
+    expect(bouton).toBeDefined();
+    act(() => bouton!.props.onPress());
+    // La route visée est celle d'une VRAIE compétence jouable : le bouton mène quelque part.
+    expect(routerState.calls).toContainEqual(['push', `/session/${attendu.action!.skillId}`]);
+    act(() => r.unmount());
+  });
+
+  it('LOT C1 — une fiche de BIBLIOTHÈQUE explique son plafond et renvoie vers sa famille', async () => {
+    const bibli = V5_CONCEPTS.find((c) => !isRepresentativeConcept(c))!;
+    const attendu = conceptNextStep(bibli, VIDE_PROGRESS);
+    expect(attendu.blocker).toBe('library-only');
+    const r = await mount(bibli.slug);
+    expect(hasTextIncluding(r.root, 'Découvert')).toBe(true);
+    expect(hasTextIncluding(r.root, attendu.reason.slice(0, 40))).toBe(true);
+    expect(attendu.action).not.toBeNull();
     act(() => r.unmount());
   });
 
