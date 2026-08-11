@@ -43,7 +43,9 @@ describe('Module guidé « Gérer le risque » — modèle officiel (world.risk)
     }
     expect(ALL_EXERCISES.length).toBe(RISK_MODULE_SCENARIOS.length);
     // 2 compétences × 5 (cinq natures documentées) + la taille × 4 = 14 exercices.
-    expect(ALL_EXERCISES.length).toBe(14);
+    // LOT D3 — 6 pour risque/rendement et 6 pour la taille de position (chacune gagne un CALCUL),
+    // 4 pour le stop-loss = 16 exercices dérivés.
+    expect(ALL_EXERCISES.length).toBe(16);
   });
 
   it('chaque compétence cible un concept RÉEL de world.risk', () => {
@@ -73,7 +75,11 @@ describe('Module guidé « Gérer le risque » — modèle officiel (world.risk)
 
   it('mécaniques réellement distinctes : 5 types d’exercice, dont le placement (le stop EST un plancher)', () => {
     const types = new Set(ALL_EXERCISES.map((e) => e.type));
-    expect(types).toEqual(new Set(['identify_figure', 'order', 'scenario', 'place_invalidation', 'find_error']));
+    // LOT D3 — `numeric` s'ajoute : un multiple de risque et une taille de position se POSENT.
+    // Un QCM y laisserait deviner ce que la compétence consiste justement à savoir calculer.
+    expect(types).toEqual(
+      new Set(['identify_figure', 'order', 'scenario', 'place_invalidation', 'find_error', 'numeric']),
+    );
     for (const s of RISK_SKILLS) {
       const kinds = scenarioInteractionTypes(RISK_MODULE_SCENARIOS_BY_SKILL[s.id]);
       expect(kinds.length).toBeGreaterThanOrEqual(3);
@@ -88,6 +94,7 @@ describe('Module guidé « Gérer le risque » — modèle officiel (world.risk)
         case 'scenario': answer = ex.validation.correctIndex; break;
         case 'find_error': answer = ex.validation.errorIndex; break;
         case 'order': answer = ex.validation.correctOrder; break;
+        case 'numeric': answer = ex.validation.answer; break;
         case 'place_invalidation': answer = ex.validation.targetPrice; break;
         default: throw new Error(`type inattendu: ${ex.type}`);
       }

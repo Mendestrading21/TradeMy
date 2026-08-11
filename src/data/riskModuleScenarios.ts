@@ -79,6 +79,27 @@ const REWARD_SCENARIOS: LearningScenario[] = [
     rule: 'Le rapport risque/rendement compare la distance entrée→stop à la distance entrée→cible — avant l’entrée.',
   },
   {
+    // LOT D3 — VARIANTE d'`interpret` qui se CALCULE. Dérivée de la définition de la fiche :
+    // « la distance entrée→stop (le risque) comparée à la distance entrée→cible (le rendement) ».
+    // Un QCM sur les ratios laisse deviner ; ici il faut poser l'opération.
+    id: 'ex.risk.reward.compute',
+    skillId: 'skill.risk.reward',
+    target: target(REWARD, 'interpret'),
+    interaction: 'compute',
+    prompt:
+      'Entrée théorique à 100, invalidation à 95, objectif pédagogique à 115. Combien de fois le risque l’objectif représente-t-il ?',
+    unit: '× le risque',
+    answer: 3,
+    tolerance: 0,
+    method: 'Risque = 100 − 95 = 5. Rendement = 115 − 100 = 15. Rapport = 15 ÷ 5 = 3.',
+    difficulty: 'medium',
+    rule: 'Le rapport se lit toujours en multiples du RISQUE : rendement ÷ risque, mesurés depuis la même entrée.',
+    whenItFails:
+      'Un beau rapport ne dit rien de la probabilité : une entrée à 5 fois le risque peut échouer neuf fois sur dix.',
+    a11y:
+      'Calcul : entrée théorique à 100, invalidation à 95, objectif pédagogique à 115. Réponse attendue en multiples du risque.',
+  },
+  {
     id: 'ex.risk.reward.interpret',
     skillId: 'skill.risk.reward',
     target: target(REWARD, 'interpret'),
@@ -237,6 +258,27 @@ const SIZING_SCENARIOS: LearningScenario[] = [
     a11y: 'Un scénario éducatif : la distance entre l’entrée théorique et le stop fixe le risque, donc la taille.',
     difficulty: 'easy',
     rule: 'La taille découle du risque accepté et de la distance au stop — jamais de l’envie.',
+  },
+  {
+    // LOT D3 — VARIANTE d'`interpret` qui se CALCULE. Dérivée de la définition de la fiche :
+    // « choisir la taille pour que la distance au stop représente une petite part du capital ».
+    // C'est LE geste du dimensionnement : sans l'avoir posé une fois, on ne le sait pas.
+    id: 'ex.risk.sizing.compute',
+    skillId: 'skill.risk.sizing',
+    target: target(SIZING, 'interpret'),
+    interaction: 'compute',
+    prompt:
+      'Capital de 10 000 €, risque accepté de 1 % par idée, distance entrée→invalidation de 5 € par unité. Combien d’unités au maximum ?',
+    unit: 'unités',
+    answer: 20,
+    tolerance: 0,
+    method: 'Risque accepté = 1 % × 10 000 = 100 €. Taille = 100 ÷ 5 = 20 unités.',
+    difficulty: 'medium',
+    rule: 'La taille se DÉDUIT : risque accepté ÷ distance à l’invalidation. Jamais l’inverse, jamais l’envie.',
+    whenItFails:
+      'Élargir l’invalidation pour garder la même taille revient à augmenter le risque sans le dire.',
+    a11y:
+      'Calcul : capital de 10 000 euros, risque accepté de 1 pour cent par idée, distance entrée-invalidation de 5 euros par unité. Réponse attendue en unités.',
   },
   {
     id: 'ex.risk.sizing.interpret',
