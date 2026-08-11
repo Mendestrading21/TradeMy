@@ -6,9 +6,14 @@ import type { TargetProgress } from './targetProgress';
 
 const anatomy = V5_CONCEPTS.find((c) => c.slug === 'anatomie-bougie')!; // représentatif de skill.candles
 const marteau = V5_CONCEPTS.find((c) => c.slug === 'marteau')!; // entraîné par skill.candle.rejection
-// Fiche de BIBLIOTHÈQUE : elle partage le `skillId` historique `skill.candles` et n'a aucun exercice
-// à elle. C'est le vrai cas que le garde-fou P0 doit couvrir.
-const pendu = V5_CONCEPTS.find((c) => c.slug === 'pendu')!;
+// Fiche de BIBLIOTHÈQUE : une figure du monde des chandeliers, consultable, mais qu'aucun exercice
+// ne vise. C'est le vrai cas que le garde-fou P0 doit couvrir.
+// (Le LOT C4 a donné au « pendu », qui tenait ce rôle, sa propre compétence : il n'est plus un bon
+// exemple. Le choix se fait donc par PRÉDICAT — la première fiche du monde sans objectif exerçable —
+// pour que ce test reste juste au fil des lots de contenu, au lieu de casser à chaque tranche.)
+const bibliotheque = V5_CONCEPTS.filter(
+  (c) => c.worldId === 'world.candles' && exercisableObjectiveIds(c.id).length === 0,
+);
 
 /** Cible prouvée (entraînée + retenue) pour un objectif donné. */
 const proven = (objectiveId: string, conceptId: string): TargetProgress => ({
@@ -43,10 +48,13 @@ describe('isRepresentativeConcept', () => {
   });
 
   it('faux pour une fiche de bibliothèque : aucun exercice, donc aucune maîtrise héritée', () => {
-    // L'intention P0 est intacte : le pendu partage le `skillId` du marteau et lui ressemble, mais
-    // il n'est entraîné nulle part — il ne peut donc pas hériter de la maîtrise de la famille.
-    expect(exercisableObjectiveIds(pendu.id)).toEqual([]);
-    expect(isRepresentativeConcept(pendu)).toBe(false);
+    // L'intention P0 est intacte : ces fiches appartiennent au même monde que des concepts
+    // entraînés et leur ressemblent, mais elles ne sont exercées nulle part — elles ne peuvent donc
+    // pas hériter de la maîtrise de la famille.
+    expect(bibliotheque.length).toBeGreaterThan(0);
+    for (const c of bibliotheque) {
+      expect(`${c.id}:${isRepresentativeConcept(c)}`).toBe(`${c.id}:false`);
+    }
   });
 
   it('faux pour un concept inconnu du parcours', () => {

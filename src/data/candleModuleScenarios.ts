@@ -14,6 +14,9 @@
  *   3. L'indécision            → `concept.doji`
  *   4. Le retournement 2 bougies → `concept.bullish-engulfing`
  *   5. La figure miroir        → `concept.bearish-engulfing` (LOT C2)
+ *   6. Le contexte décide      → `concept.hanging-man` (LOT C4)
+ *   7. Le rejet par le haut    → `concept.shooting-star` (LOT C4)
+ *   8. Le même rejet, l'autre histoire → `concept.inverted-hammer` (LOT C4, HAUSSIER)
  *
  * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget) — jamais inventés.
  * `concept.doji` ne documente pas d'invalidation : on ne lui attache donc AUCUN exercice d'invalidation
@@ -39,6 +42,11 @@ export const CANDLE_SKILLS: Skill[] = [
   { id: 'skill.candle.reversal', name: 'Le retournement à deux bougies', description: 'Repérer une reprise à confirmer : l’avalement haussier.' },
   // LOT C2 — la figure MIROIR : même géométrie, direction opposée, invalidation opposée.
   { id: 'skill.candle.mirror', name: 'La figure miroir', description: 'Transposer l’avalement à la baisse — et retrouver son invalidation, qui change de côté.' },
+  // LOT C4 — la même FORME, l'autre histoire : ici ce n'est plus la direction qui change, c'est le
+  // CONTEXTE. Trois figures que leurs propres fiches signalent comme confondues entre elles.
+  { id: 'skill.candle.context', name: 'Le contexte décide', description: 'Marteau ou pendu : même forme, sens opposé — c’est ce qui précède qui tranche.' },
+  { id: 'skill.candle.rejection-high', name: 'Le rejet par le haut', description: 'Lire une étoile filante : longue mèche haute après une hausse, près d’une résistance.' },
+  { id: 'skill.candle.rejection-low', name: 'Le même rejet, l’autre histoire', description: 'Le marteau inversé : même forme que l’étoile filante, mais après une baisse — donc haussier.' },
 ];
 
 // Concepts réels du monde `world.candles` reliés à chaque compétence (source : learningContent V5).
@@ -47,6 +55,9 @@ const HAMMER = 'concept.hammer';
 const DOJI = 'concept.doji';
 const ENGULFING = 'concept.bullish-engulfing';
 const BEARISH_ENGULFING = 'concept.bearish-engulfing';
+const HANGING_MAN = 'concept.hanging-man';
+const SHOOTING_STAR = 'concept.shooting-star';
+const INVERTED_HAMMER = 'concept.inverted-hammer';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -55,6 +66,9 @@ export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.candle.indecision': DOJI,
   'skill.candle.reversal': ENGULFING,
   'skill.candle.mirror': BEARISH_ENGULFING,
+  'skill.candle.context': HANGING_MAN,
+  'skill.candle.rejection-high': SHOOTING_STAR,
+  'skill.candle.rejection-low': INVERTED_HAMMER,
 };
 export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.pressure': 'marubozu',
@@ -62,6 +76,9 @@ export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.indecision': 'doji',
   'skill.candle.reversal': 'avalement-haussier',
   'skill.candle.mirror': 'avalement-baissier',
+  'skill.candle.context': 'pendu',
+  'skill.candle.rejection-high': 'etoile-filante',
+  'skill.candle.rejection-low': 'marteau-inverse',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -476,6 +493,263 @@ const MIRROR_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétences 6 à 8 — La même forme, l'autre histoire — LOT C4 ─────
+// Ici la direction ne suffit plus : le PENDU a exactement la forme du marteau, et le MARTEAU INVERSÉ
+// celle de l'étoile filante. Les trois fiches se signalent mutuellement dans `commonMistakes` — la
+// confusion est documentée par le contenu lui-même. Deux figures baissières (invalidation en haut),
+// une haussière (invalidation en bas) : la règle du LOT C3 tient encore, dans un autre monde.
+const CONTEXT_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.context.recognize',
+    skillId: 'skill.candle.context',
+    target: target(HANGING_MAN, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.hanging-man.v1',
+    variant: 'hanging-man',
+    visualType: 'candlestick-pattern',
+    prompt: 'Cette bougie apparaît APRÈS UNE HAUSSE. Quelle figure est-ce ?',
+    options: [
+      'Un pendu (même forme que le marteau, mais après une hausse)',
+      'Un marteau (même forme, mais après une baisse)',
+      'Un marubozu (corps long, quasi sans mèche)',
+    ],
+    correctIndex: 0,
+    a11y: 'Bougie à petit corps en haut et longue mèche basse, apparaissant après une hausse.',
+    difficulty: 'medium',
+    rule: 'Marteau et pendu ont la MÊME forme : c’est le contexte qui les distingue — baisse avant, ou hausse avant.',
+  },
+  {
+    id: 'ex.candle.context.interpret',
+    skillId: 'skill.candle.context',
+    target: target(HANGING_MAN, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un pendu.',
+    steps: [
+      'Regarde ce qui PRÉCÈDE : une hausse',
+      'Repère la forme : petit corps en haut, longue mèche basse',
+      'Vérifie s’il y a une résistance à proximité',
+      'Attends la bougie suivante pour trancher',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Sur cette figure, le contexte se lit AVANT la forme : la même bougie change de sens selon ce qui la précède.',
+  },
+  {
+    id: 'ex.candle.context.confirm',
+    skillId: 'skill.candle.context',
+    target: target(HANGING_MAN, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce pendu ?',
+    context:
+      'Après plusieurs séances de hausse, une bougie à petit corps et longue mèche basse se forme sous une résistance connue.',
+    options: [
+      'La bougie suivante passe sous le corps du pendu et y reste.',
+      'La longueur de la mèche basse suffit : un rejet aussi net se passe de suite.',
+      'La hausse précédente garantit à elle seule le retournement.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le pendu se confirme SOUS son corps, sur la bougie suivante — un avertissement, jamais un verdict.',
+    whenItFails: 'Sans passage sous le corps, l’avertissement reste un avertissement.',
+    a11y:
+      'Contexte : après plusieurs séances de hausse, une bougie à petit corps et longue mèche basse sous une résistance. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.context.invalidate',
+    skillId: 'skill.candle.context',
+    target: target(HANGING_MAN, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 291,
+    prompt: 'Ce setup est baissier : il s’invalide vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule: 'Le pendu est invalidé par la poursuite de la hausse au-dessus de son plus haut : l’invalidation se place en HAUT.',
+    whenItFails: 'Reprendre l’invalidation du marteau — sous la mèche — revient à traiter le pendu comme son contraire.',
+  },
+  {
+    id: 'ex.candle.context.avoid',
+    skillId: 'skill.candle.context',
+    target: target(HANGING_MAN, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le pendu.',
+    statements: [
+      'Marteau et pendu ont la même forme ; seul le contexte les distingue.',
+      'Une longue mèche basse annonce toujours une reprise des acheteurs, quel que soit ce qui précède.',
+      'En pleine impulsion, loin de toute résistance, un pendu a peu de portée.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+const REJECTION_HIGH_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.rejection-high.recognize',
+    skillId: 'skill.candle.rejection-high',
+    target: target(SHOOTING_STAR, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.shooting-star.v1',
+    variant: 'shooting-star',
+    visualType: 'candlestick-pattern',
+    prompt: 'Cette bougie apparaît APRÈS UNE HAUSSE. Quelle figure est-ce ?',
+    options: [
+      'Une étoile filante (petit corps en bas, longue mèche haute, après une hausse)',
+      'Un marteau inversé (même forme, mais après une baisse)',
+      'Un doji (corps minuscule, mèches équilibrées)',
+    ],
+    correctIndex: 0,
+    a11y: 'Une bougie à petit corps en bas et longue mèche vers le haut, illustrant un rejet des prix hauts après une hausse.',
+    difficulty: 'medium',
+    rule: 'L’étoile filante montre un rejet des prix HAUTS : la longue mèche est au-dessus, et elle survient après une hausse.',
+  },
+  {
+    id: 'ex.candle.rejection-high.interpret',
+    skillId: 'skill.candle.rejection-high',
+    target: target(SHOOTING_STAR, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’une étoile filante.',
+    steps: [
+      'Regarde ce qui précède : une hausse',
+      'Repère la longue mèche HAUTE et le petit corps en bas',
+      'Vérifie la présence d’une résistance à proximité',
+      'Regarde si le volume appuie le rejet',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Une mèche haute traduit un rejet des prix hauts ; c’est le contexte et la résistance qui lui donnent du poids.',
+  },
+  {
+    id: 'ex.candle.rejection-high.confirm',
+    skillId: 'skill.candle.rejection-high',
+    target: target(SHOOTING_STAR, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette étoile filante ?',
+    context:
+      'Après une hausse soutenue, une bougie à longue mèche haute bute sur une résistance connue et referme près de son plus bas.',
+    options: [
+      'Le prix passe sous le plus bas de l’étoile filante sur la ou les bougies suivantes.',
+      'La longueur de la mèche haute suffit à valider le retournement.',
+      'La présence d’une résistance confirme à elle seule la figure.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'L’étoile filante se confirme SOUS son plus bas — le rejet doit être suivi d’effet.',
+    whenItFails: 'Un volume trop faible pour appuyer le rejet affaiblit la lecture, même sur une belle mèche.',
+    a11y:
+      'Contexte : après une hausse soutenue, une bougie à longue mèche haute bute sur une résistance et referme près de son plus bas. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.rejection-high.invalidate',
+    skillId: 'skill.candle.rejection-high',
+    target: target(SHOOTING_STAR, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 305,
+    prompt: 'Ce setup est baissier : il s’invalide vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule: 'L’étoile filante est invalidée par une clôture nette au-dessus du plus haut de sa mèche : l’invalidation se place en HAUT.',
+    whenItFails: 'Au-dessus de la mèche, le rejet n’a pas tenu : ce n’était pas un plafond.',
+  },
+  {
+    id: 'ex.candle.rejection-high.avoid',
+    skillId: 'skill.candle.rejection-high',
+    target: target(SHOOTING_STAR, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur l’étoile filante.',
+    statements: [
+      'Sans résistance à proximité, la figure a beaucoup moins de portée.',
+      'Une longue mèche haute est un rejet valable quel que soit le volume qui l’accompagne.',
+      'Étoile filante et marteau inversé ont la même forme ; le contexte les sépare.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+const REJECTION_LOW_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.rejection-low.recognize',
+    skillId: 'skill.candle.rejection-low',
+    target: target(INVERTED_HAMMER, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.inverted-hammer.v1',
+    variant: 'inverted-hammer',
+    visualType: 'candlestick-pattern',
+    prompt: 'Cette bougie apparaît APRÈS UNE BAISSE. Quelle figure est-ce ?',
+    options: [
+      'Un marteau inversé (même forme que l’étoile filante, mais après une baisse)',
+      'Une étoile filante (même forme, mais après une hausse)',
+      'Un pendu (petit corps en haut, longue mèche basse)',
+    ],
+    correctIndex: 0,
+    a11y: 'Bougie à petit corps en bas et longue mèche haute, après une baisse.',
+    difficulty: 'medium',
+    rule: 'Le marteau inversé a la forme exacte de l’étoile filante : seule la baisse qui le précède en fait un test de retournement HAUSSIER.',
+  },
+  {
+    id: 'ex.candle.rejection-low.interpret',
+    skillId: 'skill.candle.rejection-low',
+    target: target(INVERTED_HAMMER, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un marteau inversé.',
+    steps: [
+      'Regarde ce qui précède : une baisse',
+      'Repère la longue mèche haute et le petit corps en bas',
+      'Cherche un support à proximité',
+      'Attends la confirmation au-dessus du plus haut de la bougie',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Même forme que l’étoile filante, lecture inverse : c’est la baisse précédente qui en fait un test de retournement.',
+  },
+  {
+    id: 'ex.candle.rejection-low.confirm',
+    skillId: 'skill.candle.rejection-low',
+    target: target(INVERTED_HAMMER, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce marteau inversé ?',
+    context:
+      'Après une baisse prolongée, une bougie à petit corps bas et longue mèche haute se forme au contact d’un support.',
+    options: [
+      'Le prix repasse au-dessus du plus haut du marteau inversé.',
+      'La longue mèche haute suffit : les acheteurs ont clairement tenté quelque chose.',
+      'Le contact avec le support confirme à lui seul le retournement.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le marteau inversé se confirme AU-DESSUS de son plus haut — l’exact opposé de l’étoile filante, qui se confirme sous son plus bas.',
+    whenItFails: 'Sans support ni confirmation, la mèche haute traduit surtout un rejet — pas une reprise.',
+    a11y:
+      'Contexte : après une baisse prolongée, une bougie à petit corps bas et longue mèche haute au contact d’un support. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.rejection-low.invalidate',
+    skillId: 'skill.candle.rejection-low',
+    target: target(INVERTED_HAMMER, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 318,
+    prompt:
+      'Attention : ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule:
+      'Le marteau inversé est invalidé par un nouveau plus bas sous la bougie : parce que le setup est haussier, l’invalidation se place en BAS.',
+    whenItFails:
+      'Deux bougies de forme identique n’ont pas la même invalidation : c’est le SENS du setup qui décide, jamais la silhouette.',
+  },
+  {
+    id: 'ex.candle.rejection-low.avoid',
+    skillId: 'skill.candle.rejection-low',
+    target: target(INVERTED_HAMMER, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le marteau inversé.',
+    statements: [
+      'Sans support ni confirmation, la mèche haute traduit surtout un rejet des prix hauts.',
+      'Puisqu’il a la même forme que l’étoile filante, il s’invalide comme elle, vers le haut.',
+      'C’est la baisse qui le précède qui en fait un test de retournement.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.candle.pressure': PRESSURE_SCENARIOS,
@@ -483,6 +757,9 @@ export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]
   'skill.candle.indecision': INDECISION_SCENARIOS,
   'skill.candle.reversal': REVERSAL_SCENARIOS,
   'skill.candle.mirror': MIRROR_SCENARIOS,
+  'skill.candle.context': CONTEXT_SCENARIOS,
+  'skill.candle.rejection-high': REJECTION_HIGH_SCENARIOS,
+  'skill.candle.rejection-low': REJECTION_LOW_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

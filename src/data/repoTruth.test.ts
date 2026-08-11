@@ -79,7 +79,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // LOT 4-M : 4 compétences Fondations + 4 compétences Chandeliers = 8 (2e module guidé réel).
     // LOT C2 : 48 → 50 (deux compétences « figure miroir »). LOT C3 : 50 → 53 (les trois miroirs
     // restants du monde des figures — triangle descendant, drapeau baissier, ÉTÉ inversée).
-    expect(REPO_TRUTH.skills).toBe(53);
+    // LOT C4 : 53 → 56 (les trois confusions de contexte des chandeliers).
+    expect(REPO_TRUTH.skills).toBe(56);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);
