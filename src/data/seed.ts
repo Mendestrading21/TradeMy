@@ -11,6 +11,8 @@ import { generateCandles, supportLevel, resistanceLevel } from '../engines/patte
 import { PROGRESS_SCHEMA_VERSION, emptyLearning, type ProgressState } from './repositories';
 import { rotateExercises, buildCheckpoint } from './exerciseRotation';
 import { objectiveId, type ObjectiveKind } from './learningTarget';
+import { V5_CONCEPTS } from './learningContent';
+import type { LearningConcept } from './learningConcept';
 import { CANDLE_PILOT_EXERCISES } from './pilotScenarios';
 import {
   CANDLE_SKILLS,
@@ -1814,9 +1816,93 @@ function withTarget(ex: Exercise): Exercise {
   return { ...ex, target: { conceptId, objectiveId: objectiveId(conceptId, kind) } };
 }
 
+// ─── LOT E5 — « Associe » : distinguer les concepts FRÈRES d'un même monde ──────────────────
+//
+// Constat mesuré : 85 % des exercices tenaient dans 4 formats sur les 13 implémentés. Le format
+// « Associe » (`match`) n'était utilisé qu'une fois, alors qu'il exerce une compétence que rien
+// d'autre ne travaille : ne pas confondre deux figures voisines du MÊME monde.
+//
+// Chaque module guidé reçoit UN exercice d'association, entièrement DÉRIVÉ de ses concepts réels
+// et de leur premier critère de reconnaissance — aucun texte inventé. La colonne de droite est
+// volontairement DÉCALÉE : le lecteur d'exercice affiche les propositions dans l'ordre reçu, donc
+// une correspondance « ligne à ligne » rendrait l'exercice trivial.
+
+/** Cartes compétence → concept de chaque module guidé (source unique de chaque module). */
+const MODULE_SKILL_MAPS: Record<string, Record<string, string>> = {
+  candles: CANDLE_SKILL_CONCEPT_ID,
+  structure: STRUCTURE_SKILL_CONCEPT_ID,
+  levels: SR_SKILL_CONCEPT_ID,
+  anatomy: ANATOMY_SKILL_CONCEPT_ID,
+  patterns: PATTERNS_SKILL_CONCEPT_ID,
+  indicators: INDICATORS_SKILL_CONCEPT_ID,
+  volume: VOLUME_SKILL_CONCEPT_ID,
+  priceaction: PRICEACTION_SKILL_CONCEPT_ID,
+  risk: RISK_SKILL_CONCEPT_ID,
+  psychology: PSYCHOLOGY_SKILL_CONCEPT_ID,
+  smc: SMC_SKILL_CONCEPT_ID,
+  wyckoff: WYCKOFF_SKILL_CONCEPT_ID,
+  options: OPTIONS_SKILL_CONCEPT_ID,
+  falsesignals: FALSESIGNALS_SKILL_CONCEPT_ID,
+};
+
+/** Objectifs DÉJÀ exerçables avant ce lot : on n'en crée aucun (le contrat de maîtrise est figé). */
+const OBJECTIFS_EXISTANTS = new Set(
+  Object.values(RAW_EXERCISES).flatMap((list) =>
+    list.map((ex) => ex.target?.objectiveId ?? (EXERCISE_OBJECTIVE[ex.id] && SKILL_CONCEPT_ID[ex.skillId]
+      ? objectiveId(SKILL_CONCEPT_ID[ex.skillId], EXERCISE_OBJECTIVE[ex.id])
+      : '')),
+  ).filter(Boolean),
+);
+
+/** Un exercice « Associe » par module guidé, dérivé des concepts réels du module. */
+function buildModuleMatchExercises(): Record<string, Exercise[]> {
+  const out: Record<string, Exercise[]> = {};
+  for (const [key, map] of Object.entries(MODULE_SKILL_MAPS)) {
+    const paires = Object.entries(map)
+      .map(([skillId, conceptId]) => ({ skillId, concept: V5_CONCEPTS.find((c) => c.id === conceptId) }))
+      .filter((p): p is { skillId: string; concept: LearningConcept } => !!p.concept?.howToRecognize[0]?.trim())
+      .slice(0, 3);
+    if (paires.length < 3) continue; // moins de 3 paires : l'association n'apprendrait rien
+
+    const n = paires.length;
+    const criteres = paires.map((p) => p.concept.howToRecognize[0].trim());
+    // Décalage d'un cran : right[j] = critère de left[(j + 1) % n].
+    const right = criteres.map((_, j) => criteres[(j + 1) % n]);
+    const matches = criteres.map((_, i) => (i - 1 + n) % n);
+
+    const porteur = paires[0];
+    const cible = objectiveId(porteur.concept.id, 'recognize');
+    out[porteur.skillId] = [
+      {
+        id: `ex.${key}.match-figures`,
+        type: 'match',
+        skillId: porteur.skillId,
+        prompt: 'Associe chaque notion de ce monde à ce qui permet de la reconnaître.',
+        left: paires.map((p) => p.concept.title),
+        right,
+        validation: { matches },
+        difficulty: 'medium',
+        // Variante de rotation d'un objectif DÉJÀ exerçable : aucune nouvelle exigence de maîtrise.
+        ...(OBJECTIFS_EXISTANTS.has(cible) ? { target: { conceptId: porteur.concept.id, objectiveId: cible } } : {}),
+        feedback: fb(
+          'Bien vu : chaque notion a son critère propre — c’est ce qui évite de les confondre.',
+          'Deux notions voisines n’ont pas le même critère : relis ce qui distingue chacune.',
+          'On distingue des notions voisines par leur critère de reconnaissance, pas par leur allure générale.',
+        ),
+      } as Exercise,
+    ];
+  }
+  return out;
+}
+
+const MODULE_MATCH_EXERCISES = buildModuleMatchExercises();
+
 /** Chaque exercice porte une cible pédagogique (conceptId + objectiveId). */
 const EXERCISES: Record<string, Exercise[]> = Object.fromEntries(
-  Object.entries(RAW_EXERCISES).map(([skillId, list]) => [skillId, list.map(withTarget)]),
+  Object.entries(RAW_EXERCISES).map(([skillId, list]) => [
+    skillId,
+    [...list, ...(MODULE_MATCH_EXERCISES[skillId] ?? [])].map(withTarget),
+  ]),
 );
 
 /** Objectifs réellement exerçables d'un concept = ceux ciblés par au moins un exercice. */

@@ -22,7 +22,7 @@ code** (jamais recopiés d'un document). Garantis par **`src/data/repoTruth.test
 | Concepts riches V5 | `V5_CONCEPTS` | 67 |
 | Compétences (modules guidés) | `ALL_MODULE_SKILLS` | 48 |
 | Leçons | `allLessonsFlat()` | 59 |
-| Exercices | `allExercisesFlat()` | 213 |
+| Exercices | `allExercisesFlat()` | 223 |
 | Termes de glossaire (v1) | `GLOSSARY_TERMS` | 24 |
 | Badges | `BADGES` | 23 |
 | Mondes | `WORLDS` | 15 |
