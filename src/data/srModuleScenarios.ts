@@ -82,6 +82,21 @@ const ZONES_SCENARIOS: LearningScenario[] = [
     rule: 'Support et résistance sont des zones de mémoire du marché : plusieurs touches, des réactions visibles — jamais des lignes exactes.',
   },
   {
+    // LOT D2 — VARIANTE de `recognize` en MANIPULATION : une résistance se repère d'abord au plus
+    // haut atteint ; ici on la POSE sur le graphique au lieu de la choisir dans une liste. La cible
+    // est le plus haut RÉEL de la série rendue (graine 116) → cohérente par construction.
+    // Distincte du placement d'invalidation du support, qui vise le plus BAS.
+    id: 'ex.sr.zones.place-high',
+    skillId: 'skill.sr.zones',
+    target: target(SR, 'recognize'),
+    interaction: 'place-extreme',
+    chartSeed: 116,
+    prompt: 'Une résistance se repère d’abord au plus haut atteint : pose la ligne dessus.',
+    difficulty: 'medium',
+    rule: 'Un niveau se pose là où le prix a réellement réagi — le plus haut atteint est le premier repère.',
+    whenItFails: 'Un niveau est une ZONE, jamais une ligne au pixel près : c’est la réaction du prix qui compte.',
+  },
+  {
     id: 'ex.sr.zones.interpret',
     skillId: 'skill.sr.zones',
     target: target(SR, 'interpret'),

@@ -44,8 +44,9 @@ describe('Module guidé « Lire un graphique de près » — modèle officiel (w
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(ANATOMY_MODULE_SCENARIOS.length);
-    // 4 + 3 + 3 = 10 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(10);
+    // LOT D2 — 5 pour « le corps et les mèches » (+ un repère à identifier), 3 pour l'unité de
+    // temps, 4 pour l'échelle des prix (+ une zone à toucher en lisant l'axe) = 12 exercices.
+    expect(ALL_EXERCISES.length).toBe(12);
   });
 
   it('chaque compétence cible un concept RÉEL de world.anatomy', () => {
@@ -77,9 +78,14 @@ describe('Module guidé « Lire un graphique de près » — modèle officiel (w
     expect(kinds).toEqual(new Set(['recognize', 'interpret', 'confirm', 'avoid-false-signal']));
   });
 
-  it('mécaniques réellement distinctes : 4 types d’exercice (pas de placement — aucun plancher documenté)', () => {
+  it('mécaniques réellement distinctes : 6 types d’exercice, dont le repère et la zone au doigt (pas de placement — aucun plancher documenté)', () => {
     const types = new Set(ALL_EXERCISES.map((e) => e.type));
-    expect(types).toEqual(new Set(['identify_figure', 'order', 'scenario', 'find_error']));
+    // LOT D2 — le monde qui apprend à LIRE un graphique le fait désormais manipuler : un repère à
+    // identifier (`label_chart`) et une zone à toucher en lisant l'axe (`select_chart_zone`).
+    expect(types).toEqual(
+      new Set(['identify_figure', 'order', 'scenario', 'find_error', 'label_chart', 'select_chart_zone']),
+    );
+    // Aucun concept du monde ne documente d'invalidation-plancher → toujours aucun placement.
     expect(ALL_EXERCISES.filter((e) => e.type === 'place_invalidation')).toHaveLength(0);
     for (const s of ANATOMY_SKILLS) {
       const kinds = scenarioInteractionTypes(ANATOMY_MODULE_SCENARIOS_BY_SKILL[s.id]);
@@ -95,6 +101,9 @@ describe('Module guidé « Lire un graphique de près » — modèle officiel (w
         case 'scenario': answer = ex.validation.correctIndex; break;
         case 'find_error': answer = ex.validation.errorIndex; break;
         case 'order': answer = ex.validation.correctOrder; break;
+        case 'identify_pattern': answer = ex.validation.correctIndex; break;
+        case 'label_chart': answer = ex.validation.correctIndex; break;
+        case 'select_chart_zone': answer = ex.validation.correctZone; break;
         default: throw new Error(`type inattendu: ${ex.type}`);
       }
       expect(gradeExercise(ex, answer).correct).toBe(true);
