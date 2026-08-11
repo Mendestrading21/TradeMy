@@ -52,11 +52,28 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
     }
   });
 
-  it('le parcours guidé emploie au moins huit façons différentes de demander', () => {
-    // Avant ce lot : cinq (reconnaissance de figure, remise en ordre, scénario, trouve l'erreur,
-    // placement). Le plafond de treize n'est PAS un objectif : quelques formats (réponse numérique,
-    // vrai/faux, association) n'ont pas encore de contenu qui les justifie honnêtement.
-    expect(formatsUtilises().size).toBeGreaterThanOrEqual(8);
+  it('le parcours guidé emploie au moins neuf façons différentes de demander', () => {
+    // Avant le LOT D2 : cinq (reconnaissance de figure, remise en ordre, scénario, trouve l'erreur,
+    // placement). Le LOT D3 y ajoute la réponse NUMÉRIQUE, là où la compétence consiste justement à
+    // poser un calcul. Le plafond de treize n'est PAS un objectif : `true_false` et `match` n'ont
+    // pas encore de contenu qui les justifie honnêtement dans les modules guidés.
+    expect(formatsUtilises().size).toBeGreaterThanOrEqual(9);
+  });
+
+  it('le monde Risque fait CALCULER : un ratio et une taille ne se cochent pas', () => {
+    // LOT D3 — c'est le seul monde dont les notions ont une réponse chiffrée. Avant ce lot, on
+    // pouvait « savoir » gérer son risque sans jamais poser une opération.
+    for (const id of ['skill.risk.reward', 'skill.risk.sizing']) {
+      expect(getExercises(id).map((e) => e.type)).toContain('numeric');
+    }
+    // Et le calcul reste réservé aux compétences dont la réponse EST un nombre. Une seule autre le
+    // porte : la leçon libre « Actions », qui fait calculer une part du capital (« sur 1 000
+    // actions, combien pour 1 % ? ») — elle le faisait avant ce lot, et c'est légitime. Ailleurs,
+    // un champ numérique n'enseignerait rien.
+    const avecCalcul = GUIDED_SKILL_IDS.filter((id) =>
+      getExercises(id).some((e) => e.type === 'numeric'),
+    ).sort();
+    expect(avecCalcul).toEqual(['skill.actions', 'skill.risk.reward', 'skill.risk.sizing']);
   });
 
   it('« reconnaître » n’est plus une seule et même question répétée', () => {

@@ -24,6 +24,7 @@ import type {
   PlaceInvalidationExercise,
   IdentifyFigureExercise,
   ScenarioExercise,
+  NumericExercise,
 } from './types';
 import { buildDirectionExercise } from './semanticExercise';
 
@@ -52,7 +53,10 @@ export type ScenarioInteraction =
   //    aucun nouveau primitif d'interface — une figure prédit rien sans contexte/confirmation/invalidation).
   | 'identify-candle' // identify_figure — reconnaître UNE figure de chandelier rendue (sa forme)
   | 'place-invalidation' // place_invalidation — PLACER le niveau d'invalidation (sous le plus bas atteint)
-  | 'read-scenario'; // scenario — conclure un scénario conditionnel (SI contexte … ALORS …)
+  | 'read-scenario' // scenario — conclure un scénario conditionnel (SI contexte … ALORS …)
+  // ── LOT D3 : CALCULER un nombre (player `numeric` existant). Certaines notions ne se cochent
+  //    pas : un multiple de risque ou une taille de position se posent, sinon on ne les sait pas.
+  | 'compute'; // numeric — répondre par un nombre, avec son unité
 
 interface ScenarioBase {
   id: string;
@@ -142,6 +146,24 @@ export interface ReadScenarioScenario extends ScenarioBase {
   correctIndex: number;
 }
 
+/**
+ * CALCULER un nombre (player de production `numeric`). La vérité est ici arithmétique : elle vient
+ * de l'énoncé, pas d'une série rendue — d'où un `a11y` explicite décrivant les données fournies.
+ * Réservé aux notions où la réponse EST un nombre (multiple de risque, taille de position) : un QCM
+ * y laisserait deviner ce qu'il faut savoir poser.
+ */
+export interface ComputeScenario extends ScenarioBase {
+  interaction: 'compute';
+  /** Unité affichée à côté du champ (« unités », « × le risque »…). */
+  unit: string;
+  /** Réponse attendue. */
+  answer: number;
+  /** Tolérance acceptée (0 = réponse exacte). */
+  tolerance?: number;
+  /** Comment on arrive au résultat — affiché en règle, pour que l'erreur enseigne. */
+  method: string;
+}
+
 export type LearningScenario =
   | DirectionScenario
   | ExtremeZoneScenario
@@ -151,7 +173,8 @@ export type LearningScenario =
   | FalseSignalScenario
   | IdentifyCandleScenario
   | PlaceInvalidationScenario
-  | ReadScenarioScenario;
+  | ReadScenarioScenario
+  | ComputeScenario;
 
 /** Le tiers temporel (0..2) qui contient le plus haut de la série. Vérité unique de la zone. */
 export function highestThird(candles: Candle[], thirds = 3): number {
@@ -206,6 +229,10 @@ export function scenarioA11ySummary(scenario: LearningScenario): string {
       return scenario.a11y ?? `Figure de chandelier à reconnaître parmi : ${scenario.options.join(' ; ')}.`;
     case 'read-scenario':
       return scenario.a11y ?? `Contexte : ${scenario.context} Conclusions possibles : ${scenario.options.join(' ; ')}.`;
+    case 'compute':
+      // Calcul : les DONNÉES sont l'énoncé lui-même — le lecteur d'écran doit les entendre, ainsi
+      // que l'unité attendue, sans quoi la question serait impossible à répondre sans le visuel.
+      return scenario.a11y ?? `${scenario.prompt} Réponse attendue en ${scenario.unit}.`;
   }
 }
 
@@ -431,6 +458,29 @@ export function buildScenarioExercise(scenario: LearningScenario): Exercise {
           incorrect: `Dans ce contexte, la bonne conclusion est : ${answer}`,
           rule: scenario.rule ?? 'Un scénario se conclut sur une CONDITION vérifiée (confirmation), jamais sur une certitude.',
           whenItFails: scenario.whenItFails ?? 'Sans la condition (confirmation ou invalidation), le scénario reste une hypothèse.',
+        },
+      };
+      return ex;
+    }
+
+    case 'compute': {
+      // Le feedback DONNE le résultat et la MÉTHODE : sur un calcul, une erreur n'apprend rien si
+      // l'on ne voit pas où le raisonnement a dérapé.
+      const ex: NumericExercise = {
+        id: scenario.id,
+        type: 'numeric',
+        skillId: scenario.skillId,
+        target: scenario.target,
+        prompt: scenario.prompt,
+        unit: scenario.unit,
+        validation: { answer: scenario.answer, tolerance: scenario.tolerance ?? 0 },
+        difficulty: scenario.difficulty ?? 'medium',
+        accessibilitySummary,
+        feedback: {
+          correct: `Exact : ${scenario.answer} ${scenario.unit}. ${scenario.method}`,
+          incorrect: `La réponse est ${scenario.answer} ${scenario.unit}. ${scenario.method}`,
+          rule: scenario.rule ?? scenario.method,
+          whenItFails: scenario.whenItFails ?? 'Un calcul juste sur des données fausses reste faux : vérifie d’abord les niveaux.',
         },
       };
       return ex;
