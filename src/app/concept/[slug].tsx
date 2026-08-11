@@ -23,6 +23,7 @@ import {
   categoryById,
   conceptMasteryStatus,
   needsEditorialReview,
+  guidedReading,
   EDITORIAL_REVIEW_NOTICE,
   useProgress,
   type ConceptState,
@@ -213,9 +214,9 @@ export default function ConceptFiche() {
       {/* LOT W2 — lecture guidée : la légende de l'exemple annoté de la fiche, sous le visuel.
           La direction réutilise SCENARIO_META (source UNIQUE du sens marché : icône + couleur —
           bullish/bearish restent réservés à ce bloc, verrou conceptSemanticColors). */}
-      {concept.visualSpec && concept.chartExamples[0] ? (() => {
-        const example = concept.chartExamples[0];
-        const dir = SCENARIO_META.find((s) => s.key === (example.direction ?? 'neutral'))!;
+      {concept.visualSpec && guidedReading(concept) ? (() => {
+        const reading = guidedReading(concept)!;
+        const dir = SCENARIO_META.find((s) => s.key === reading.direction)!;
         return (
           <Card style={styles.readingCard}>
             <View style={styles.readingRow}>
@@ -225,7 +226,7 @@ export default function ConceptFiche() {
               </Text>
             </View>
             <Text variant="body" color={theme.colors.textSecondary}>
-              {example.caption}
+              {reading.caption}
             </Text>
           </Card>
         );
