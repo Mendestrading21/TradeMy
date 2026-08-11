@@ -3,7 +3,8 @@
  *
  * Même rigueur que les modules précédents : câblage, couverture d'objectifs RÉELS (jamais
  * inventés), mécaniques distinctes, gradabilité, cohérence structure/dataset, cohérence du
- * placement d'invalidation (seul plancher documenté : le support), checkpoint propre, et absence
+ * placement d'invalidation (seul plancher documenté : le support), couverture COMPLÈTE des natures
+ * documentées par chaque fiche (LOT D1), checkpoint propre, et absence
  * totale de vocabulaire BUY/SELL ou de promesse de gain.
  */
 import { describe, it, expect } from '@jest/globals';
@@ -16,20 +17,29 @@ import {
   SR_MODULE_EXERCISES_BY_SKILL,
 } from './srModuleScenarios';
 import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoint } from './seed';
-import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } from './learningTarget';
+import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
 import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
 import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
-/** Objectifs RÉELS ciblés par compétence (dérivés des champs du concept — voir learningTarget). */
-const EXPECTED: Record<string, ObjectiveKind[]> = {
-  'concept.support-resistance': ['recognize', 'interpret', 'invalidate', 'avoid-false-signal'],
-  'concept.polarity-flip': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-  // `retest-de-niveau` ne documente NI zone de confirmation NI invalidation → 3 objectifs seulement.
-  'concept.retest-de-niveau': ['recognize', 'interpret', 'avoid-false-signal'],
-};
+/**
+ * Objectifs RÉELS de chaque concept du module. LOT D1 : cette attente est DÉRIVÉE de la fiche
+ * elle-même (`objectivesForConcept`) au lieu d'être écrite en dur — une liste figée avait laissé
+ * passer l'enrichissement du LOT E3 sans que les exercices suivent.
+ */
+const MODULE_CONCEPT_IDS = [
+  'concept.support-resistance',
+  'concept.polarity-flip',
+  'concept.retest-de-niveau',
+];
+const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
+  MODULE_CONCEPT_IDS.map((id) => [
+    id,
+    objectivesForConcept(V5_CONCEPTS.find((c) => c.id === id)!).map((o) => o.kind),
+  ]),
+);
 
 const ALL_EXERCISES = Object.values(SR_MODULE_EXERCISES_BY_SKILL).flat();
 
@@ -41,7 +51,7 @@ describe('Module guidé « Lire les niveaux » — modèle officiel (world.suppo
     }
     expect(ALL_EXERCISES.length).toBe(SR_MODULE_SCENARIOS.length);
     // 4 + 4 + 3 = 11 exercices dérivés (le retest ne documente que 3 objectifs — honnêteté).
-    expect(ALL_EXERCISES.length).toBe(11);
+    expect(ALL_EXERCISES.length).toBe(15); // LOT D1 : 5 + 5 + 5 (retest rattrapé, zones + flip complétés)
   });
 
   it('chaque compétence cible un concept RÉEL de world.support-resistance', () => {
@@ -52,18 +62,25 @@ describe('Module guidé « Lire les niveaux » — modèle officiel (world.suppo
     }
   });
 
-  it('couvre uniquement des OBJECTIFS RÉELS ; le retest (sans confirmation/invalidation documentées) reste à 3 exercices', () => {
+  it('couvre uniquement des OBJECTIFS RÉELS ; le retest rattrape sa confirmation et son invalidation, sans placement', () => {
     for (const [cid, kinds] of Object.entries(EXPECTED)) {
       const covered = new Set(exercisableObjectiveIds(cid));
       expect(covered).toEqual(new Set(kinds.map((k) => objectiveId(cid, k))));
       for (const oid of covered) expect(objectiveByIdIn(V5_CONCEPTS, oid)).toBeDefined();
     }
-    expect(exercisableObjectiveIds('concept.retest-de-niveau')).not.toContain(
+    // LOT D1 — le retest documente désormais confirmation ET invalidation (LOT E3, ADR-133) : les
+    // deux natures sont exercées. Son invalidation reste « repasser de l'autre côté du niveau »,
+    // pas un plancher → elle se raisonne, sans exercice de PLACEMENT.
+    expect(exercisableObjectiveIds('concept.retest-de-niveau')).toContain(
       objectiveId('concept.retest-de-niveau', 'confirm'),
     );
-    expect(exercisableObjectiveIds('concept.retest-de-niveau')).not.toContain(
+    expect(exercisableObjectiveIds('concept.retest-de-niveau')).toContain(
       objectiveId('concept.retest-de-niveau', 'invalidate'),
     );
+    const retestPlacements = (SR_MODULE_EXERCISES_BY_SKILL['skill.sr.retest'] ?? []).filter(
+      (e) => e.type === 'place_invalidation',
+    );
+    expect(retestPlacements).toEqual([]);
   });
 
   it('le module couvre les 5 natures d’objectif (recognize → interpret → confirm → invalidate → avoid-false-signal)', () => {

@@ -11,11 +11,16 @@
  *   1. L'accumulation  → `concept.wyckoff-accumulation`
  *   2. La distribution → `concept.distribution-wyckoff`
  *
- * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : l'accumulation
- * documente les 5 natures, et son invalidation est un PLANCHER (« rupture par le bas de la zone
- * d'accumulation ») → seul exercice de placement du module. La distribution ne documente NI zone
- * de confirmation NI invalidation → 3 natures seulement (recognize, interpret, avoid-false-signal),
- * aucun objectif inventé.
+ * Objectifs ciblés = objectifs RÉELS (learningTarget). L'accumulation documente les 5 natures, et
+ * son invalidation est un PLANCHER (« rupture par le bas de la zone d'accumulation ») → seul
+ * exercice de placement du module.
+ *
+ * LOT D1 — la distribution documente DÉSORMAIS une zone de confirmation ET une invalidation
+ * (enrichies par le LOT E3, ADR-133) : la compétence les exerce, alors qu'elle s'arrêtait à
+ * 3 natures quand ces champs étaient vides. Les deux ajouts sont DÉRIVÉS des champs réels
+ * (`confirmationZone`, `bearishScenario.conditions`, `invalidation`) — rien n'est inventé. Son
+ * invalidation est une clôture AU-DESSUS du sommet du range : ce n'est pas un plancher, elle se
+ * raisonne (scénario) plutôt qu'elle ne se place.
  * Statuts éditoriaux inchangés (`needsReview`). Aucun vocabulaire BUY/SELL — uniquement des
  * scénarios ÉDUCATIFS (entrée théorique, invalidation, objectif pédagogique).
  */
@@ -166,6 +171,51 @@ const DISTRIBUTION_SCENARIOS: LearningScenario[] = [
     correctOrder: [0, 1, 2, 3],
     difficulty: 'medium',
     rule: 'Contexte d’abord, plafonnement ensuite, absorption observée, prudence toujours — un range seul ne dit rien.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « la sortie par le bas : une clôture sous le plancher du
+    // range, souvent après un balayage du haut resté sans suite » + les conditions de
+    // `bearishScenario`.
+    id: 'ex.wyckoff.distribution.confirm',
+    skillId: 'skill.wyckoff.distribution',
+    target: target(DISTRIBUTION, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette lecture de distribution ?',
+    context:
+      'Après une hausse marquée, le prix évolue dans un range dont les sommets ne progressent plus ; un balayage du haut vient de rester sans suite.',
+    options: [
+      'Une clôture sous le PLANCHER du range : la sortie se fait par le bas.',
+      'Le balayage du haut suffit : il signe à lui seul la distribution.',
+      'Un range de plus de vingt bougies : la durée qualifie la distribution.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une distribution se confirme par la SORTIE par le bas — une clôture sous le plancher du range.',
+    whenItFails: 'Tant que le plancher tient, le range peut n’être qu’une pause avant continuation.',
+    a11y:
+      'Contexte : après une hausse, un range aux sommets qui ne progressent plus, avec un balayage du haut sans suite. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `invalidation` : « une clôture franche au-dessus du sommet du range, tenue
+    // ensuite ». L'invalidation est un PLAFOND, pas un plancher : elle se raisonne, ne se place pas.
+    id: 'ex.wyckoff.distribution.invalidate',
+    skillId: 'skill.wyckoff.distribution',
+    target: target(DISTRIBUTION, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait cette lecture de distribution ?',
+    context:
+      'Tu lis un range en sommet comme une distribution possible. Tu cherches ce qui invaliderait cette lecture.',
+    options: [
+      'Une clôture franche au-dessus du sommet du range, tenue ensuite : ce n’était pas une distribution.',
+      'Une seule mèche qui dépasse le sommet du range avant de refermer dedans.',
+      'Un range qui dure plus longtemps que prévu.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'La lecture de distribution tombe sur une clôture franche AU-DESSUS du sommet du range, tenue ensuite.',
+    whenItFails: 'Une mèche seule ne dément rien : c’est la clôture tenue qui tranche.',
+    a11y:
+      'Contexte : un range en sommet lu comme une distribution possible ; il s’agit d’identifier ce qui invaliderait cette lecture. Trois propositions à départager.',
   },
   {
     id: 'ex.wyckoff.distribution.avoid',

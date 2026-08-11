@@ -16,7 +16,7 @@ import {
   PATTERNS_MODULE_EXERCISES_BY_SKILL,
 } from './patternsModuleScenarios';
 import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoint } from './seed';
-import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } from './learningTarget';
+import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
 import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
@@ -24,18 +24,22 @@ import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
 /**
- * Objectifs RÉELS ciblés par compétence (dérivés des champs du concept — voir learningTarget).
- * NB : `concept.double-bottom` est aussi ciblé (recognize) par un exercice Fondations
- * (skill.patterns) — l'union reste identique à l'ensemble attendu ci-dessous.
+ * Objectifs RÉELS de chaque concept du module. LOT D1 : cette attente est DÉRIVÉE de la fiche
+ * elle-même (`objectivesForConcept`) au lieu d'être écrite en dur — une liste figée avait laissé
+ * passer l'enrichissement du LOT E3 sans que les exercices suivent.
  */
-const EXPECTED: Record<string, ObjectiveKind[]> = {
-  // Fondations (skill.patterns) cible déjà recognize ET confirm sur le double creux :
-  // l'union avec le module (interpret, invalidate, avoid) couvre les 5 natures.
-  'concept.double-bottom': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
-  'concept.ascending-triangle': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-  'concept.bull-flag': ['recognize', 'confirm', 'invalidate', 'avoid-false-signal'],
-  'concept.head-shoulders': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-};
+const MODULE_CONCEPT_IDS = [
+  'concept.double-bottom',
+  'concept.ascending-triangle',
+  'concept.bull-flag',
+  'concept.head-shoulders',
+];
+const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
+  MODULE_CONCEPT_IDS.map((id) => [
+    id,
+    objectivesForConcept(V5_CONCEPTS.find((c) => c.id === id)!).map((o) => o.kind),
+  ]),
+);
 
 const ALL_EXERCISES = Object.values(PATTERNS_MODULE_EXERCISES_BY_SKILL).flat();
 
@@ -47,7 +51,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     }
     expect(ALL_EXERCISES.length).toBe(PATTERNS_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(16);
+    expect(ALL_EXERCISES.length).toBe(20); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
   });
 
   it('chaque compétence cible un concept RÉEL de world.patterns', () => {
@@ -64,13 +68,19 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
       expect(covered).toEqual(new Set(kinds.map((k) => objectiveId(cid, k))));
       for (const oid of covered) expect(objectiveByIdIn(V5_CONCEPTS, oid)).toBeDefined();
     }
-    // Le placement de plancher n'est PAS attaché aux figures dont l'invalidation n'est pas un plancher.
-    expect(exercisableObjectiveIds('concept.ascending-triangle')).not.toContain(
+    // LOT D1 — l'invalidation documentée du triangle (sous la ligne des creux MONTANTS) et celle
+    // de l'ÉTÉ (reprise AU-DESSUS de la ligne de cou) sont désormais exercées, mais aucune n'est un
+    // plancher : elles se raisonnent (scénario), sans exercice de PLACEMENT.
+    expect(exercisableObjectiveIds('concept.ascending-triangle')).toContain(
       objectiveId('concept.ascending-triangle', 'invalidate'),
     );
-    expect(exercisableObjectiveIds('concept.head-shoulders')).not.toContain(
+    expect(exercisableObjectiveIds('concept.head-shoulders')).toContain(
       objectiveId('concept.head-shoulders', 'invalidate'),
     );
+    const sansPlancher = ['skill.patterns.triangle', 'skill.patterns.reversal'];
+    for (const id of sansPlancher) {
+      expect((PATTERNS_MODULE_EXERCISES_BY_SKILL[id] ?? []).filter((e) => e.type === 'place_invalidation')).toEqual([]);
+    }
   });
 
   it('le module couvre les 5 natures d’objectif (recognize → interpret → confirm → invalidate → avoid-false-signal)', () => {

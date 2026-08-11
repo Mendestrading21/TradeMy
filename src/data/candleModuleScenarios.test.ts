@@ -16,20 +16,30 @@ import {
   CANDLE_MODULE_EXERCISES_BY_SKILL,
 } from './candleModuleScenarios';
 import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoint } from './seed';
-import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } from './learningTarget';
+import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
 import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
 import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
-/** Objectifs RÉELS ciblés par compétence (dérivés des champs du concept — voir learningTarget). */
-const EXPECTED: Record<string, ObjectiveKind[]> = {
-  'concept.marubozu': ['recognize', 'interpret', 'invalidate', 'avoid-false-signal'],
-  'concept.hammer': ['recognize', 'confirm', 'invalidate', 'avoid-false-signal'],
-  'concept.doji': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
-  'concept.bullish-engulfing': ['recognize', 'interpret', 'confirm', 'invalidate'],
-};
+/**
+ * Objectifs RÉELS de chaque concept du module. LOT D1 : cette attente est DÉRIVÉE de la fiche
+ * elle-même (`objectivesForConcept`) au lieu d'être écrite en dur — une liste figée avait laissé
+ * passer l'enrichissement du LOT E3 sans que les exercices suivent.
+ */
+const MODULE_CONCEPT_IDS = [
+  'concept.marubozu',
+  'concept.hammer',
+  'concept.doji',
+  'concept.bullish-engulfing',
+];
+const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
+  MODULE_CONCEPT_IDS.map((id) => [
+    id,
+    objectivesForConcept(V5_CONCEPTS.find((c) => c.id === id)!).map((o) => o.kind),
+  ]),
+);
 
 const ALL_EXERCISES = Object.values(CANDLE_MODULE_EXERCISES_BY_SKILL).flat();
 
@@ -41,7 +51,7 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
     }
     expect(ALL_EXERCISES.length).toBe(CANDLE_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(16);
+    expect(ALL_EXERCISES.length).toBe(19); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
   });
 
   it('chaque compétence cible un concept RÉEL de world.candles', () => {

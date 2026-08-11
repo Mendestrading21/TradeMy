@@ -3,7 +3,7 @@
  *
  * QUINZIÈME et DERNIER module guidé : le parcours entier est guidé. Même rigueur que les modules
  * précédents : câblage, couverture d'objectifs RÉELS (le faux breakout ne documente NI
- * confirmation NI invalidation → 3 natures seulement), mécaniques distinctes (4 — AUCUN
+ * LOT D1 : les deux fiches exercent désormais leurs 5 natures documentées), mécaniques distinctes (AUCUN
  * placement : l'invalidation du fakeout est une clôture AU-DELÀ du niveau, pas un plancher),
  * gradabilité, cohérence visuel/dataset, checkpoint propre, vocabulaire.
  */
@@ -17,7 +17,7 @@ import {
   FALSESIGNALS_MODULE_EXERCISES_BY_SKILL,
 } from './falseSignalsModuleScenarios';
 import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoint } from './seed';
-import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } from './learningTarget';
+import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld, WORLDS } from './learningConcept';
 import { isGuidedWorld } from './learningMap';
@@ -25,14 +25,20 @@ import { scenarioInteractionTypes, gradeExercise } from '../engines/exercise';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
 /**
- * Objectifs RÉELS ciblés par compétence (dérivés des champs du concept — voir learningTarget).
- * Aucun autre module n'exerce ces concepts : l'union observée == l'ensemble ciblé ici.
- * Le faux breakout ne documente NI `confirmationZone` NI `invalidation` → 3 natures seulement.
+ * Objectifs RÉELS de chaque concept du module. LOT D1 : cette attente est DÉRIVÉE de la fiche
+ * elle-même (`objectivesForConcept`) au lieu d'être écrite en dur — une liste figée avait laissé
+ * passer l'enrichissement du LOT E3 sans que les exercices suivent.
  */
-const EXPECTED: Record<string, ObjectiveKind[]> = {
-  'concept.fakeout': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
-  'concept.faux-breakout': ['recognize', 'interpret', 'avoid-false-signal'],
-};
+const MODULE_CONCEPT_IDS = [
+  'concept.fakeout',
+  'concept.faux-breakout',
+];
+const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
+  MODULE_CONCEPT_IDS.map((id) => [
+    id,
+    objectivesForConcept(V5_CONCEPTS.find((c) => c.id === id)!).map((o) => o.kind),
+  ]),
+);
 
 const ALL_EXERCISES = Object.values(FALSESIGNALS_MODULE_EXERCISES_BY_SKILL).flat();
 
@@ -44,7 +50,7 @@ describe('Module guidé « Déjouer les faux signaux » — modèle officiel (wo
     }
     expect(ALL_EXERCISES.length).toBe(FALSESIGNALS_MODULE_SCENARIOS.length);
     // Fakeout × 5 natures + faux breakout × 3 natures = 8 exercices.
-    expect(ALL_EXERCISES.length).toBe(8);
+    expect(ALL_EXERCISES.length).toBe(10); // LOT D1 : 5 + 5 (la 2e fiche rattrape confirmation + invalidation)
   });
 
   it('15/15 : avec ce module, TOUS les mondes du parcours sont guidés (plus aucun monde de contenu)', () => {

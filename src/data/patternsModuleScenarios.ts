@@ -98,6 +98,28 @@ const DOUBLE_SCENARIOS: LearningScenario[] = [
     rule: 'Un double creux se lit creux d’abord, puis ligne de cou, puis confirmation — jamais une promesse.',
   },
   {
+    // LOT D1 — dérivé de `confirmationZone` : « au-dessus de la ligne de cou (sommet
+    // intermédiaire) » + les conditions du scénario de la fiche.
+    id: 'ex.patterns.double.confirm',
+    skillId: 'skill.patterns.double',
+    target: target(DOUBLE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce double creux ?',
+    context:
+      'Deux creux se sont formés à un niveau similaire, séparés par un sommet intermédiaire qui définit la ligne de cou.',
+    options: [
+      'Une clôture AU-DESSUS de la ligne de cou : c’est là que la figure se confirme.',
+      'Le simple fait que les deux creux soient au même niveau.',
+      'Un second creux légèrement plus bas que le premier.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Un double creux ne se confirme qu’au-dessus de la ligne de cou — le sommet intermédiaire est le juge.',
+    whenItFails: 'Tant que la ligne de cou n’est pas franchie en clôture, la figure n’est qu’un dessin.',
+    a11y:
+      'Contexte : deux creux à un niveau similaire séparés par un sommet intermédiaire formant la ligne de cou. Trois conclusions possibles à départager.',
+  },
+  {
     id: 'ex.patterns.double.invalidate',
     skillId: 'skill.patterns.double',
     target: target(DOUBLE, 'invalidate'),
@@ -175,6 +197,27 @@ const TRIANGLE_SCENARIOS: LearningScenario[] = [
     rule: 'La confirmation du triangle ascendant se lit au-dessus de la résistance, sur clôture — idéalement retestée.',
   },
   {
+    // LOT D1 — dérivé de `invalidation` : « sortie par le bas : clôture sous la trendline des creux ».
+    id: 'ex.patterns.triangle.invalidate',
+    skillId: 'skill.patterns.triangle',
+    target: target(TRIANGLE, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait ce triangle ascendant ?',
+    context:
+      'Des creux de plus en plus hauts se resserrent contre une résistance horizontale déjà touchée plusieurs fois.',
+    options: [
+      'Une clôture SOUS la ligne des creux montants : la sortie se fait par le bas, la lecture tombe.',
+      'Une mèche qui perce brièvement la résistance sans clôturer au-dessus.',
+      'Un resserrement plus lent que prévu vers la pointe.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Un triangle ascendant est démenti par une clôture sous la ligne des creux montants : c’est elle qui portait la figure.',
+    whenItFails: 'Un triangle ne « doit » rien : la sortie par le bas est une issue possible, pas un accident.',
+    a11y:
+      'Contexte : des creux montants se resserrant contre une résistance horizontale ; il s’agit d’identifier ce qui démentirait la figure. Trois propositions à départager.',
+  },
+  {
     id: 'ex.patterns.triangle.avoid',
     skillId: 'skill.patterns.triangle',
     target: target(TRIANGLE, 'avoid-false-signal'),
@@ -207,6 +250,25 @@ const FLAG_SCENARIOS: LearningScenario[] = [
     a11y: 'Une forte impulsion (le mât) suivie d’un petit canal de consolidation légèrement incliné : le drapeau.',
     difficulty: 'medium',
     rule: 'Le drapeau haussier se reconnaît à son mât (l’impulsion) suivi d’un canal court de consolidation.',
+  },
+  {
+    // LOT D1 — dérivé de `definitionShort` (« une forte hausse — le mât — suivie d’une
+    // consolidation en petit canal descendant ») et de `howToRecognize`.
+    id: 'ex.patterns.flag.interpret',
+    skillId: 'skill.patterns.flag',
+    target: target(FLAG, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un drapeau haussier.',
+    steps: [
+      'Repère le mât : une impulsion nette et rapide',
+      'Repère le drapeau : une consolidation en canal étroit, souvent contre-tendance',
+      'Observe le volume : il se calme pendant la consolidation',
+      'Attends la sortie : rien n’est joué tant que la borne haute n’est pas franchie en clôture',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Un drapeau se lit mât d’abord, consolidation ensuite — et la sortie se constate, elle ne s’anticipe pas.',
+    whenItFails: 'Une consolidation qui efface une bonne part du mât n’est plus un drapeau.',
   },
   {
     id: 'ex.patterns.flag.confirm',
@@ -300,6 +362,28 @@ const REVERSAL_SCENARIOS: LearningScenario[] = [
     correctIndex: 0,
     difficulty: 'medium',
     rule: 'La confirmation de l’ÉTÉ se lit sous la ligne de cou, idéalement retestée par l’arrière.',
+  },
+  {
+    // LOT D1 — dérivé de `invalidation` : « le prix reprend au-dessus de la ligne de cou et de
+    // l’épaule droite ».
+    id: 'ex.patterns.reversal.invalidate',
+    skillId: 'skill.patterns.reversal',
+    target: target(HNS, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait cette épaule-tête-épaule ?',
+    context:
+      'Trois sommets se sont formés, celui du milieu plus haut ; deux creux dessinent la ligne de cou et l’épaule droite est en place.',
+    options: [
+      'Le prix reprend AU-DESSUS de la ligne de cou ET de l’épaule droite : la figure est démentie.',
+      'La tête est nettement plus haute que les deux épaules.',
+      'Le volume décroît en approchant de la tête.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Une épaule-tête-épaule tombe quand le prix repasse au-dessus de la ligne de cou et de l’épaule droite.',
+    whenItFails: 'Une figure « parfaite » à l’œil n’oblige à rien : c’est la reprise au-dessus qui tranche.',
+    a11y:
+      'Contexte : trois sommets dont celui du milieu est le plus haut, deux creux formant la ligne de cou, épaule droite en place ; il s’agit d’identifier ce qui démentirait la figure. Trois propositions à départager.',
   },
   {
     id: 'ex.patterns.reversal.avoid',

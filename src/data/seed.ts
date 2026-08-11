@@ -1650,6 +1650,10 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
     { id: 'ex.actions.match', type: 'match', skillId: 'skill.actions', prompt: 'Associe chaque terme à sa définition.', left: ['Action', 'Obligation', 'Dividende'], right: ['Part d’entreprise', 'Dette de l’entreprise', 'Part du bénéfice versée'], validation: { matches: [0, 1, 2] }, difficulty: 'medium', feedback: fb('Parfait : action = part, obligation = dette, dividende = bénéfice versé.', 'Une obligation est une dette, pas une part.', 'Action ≠ obligation.') },
     { id: 'ex.actions.find', type: 'find_error', skillId: 'skill.actions', prompt: 'Repère l’affirmation FAUSSE.', statements: ['Une action est une part d’entreprise.', 'Le prix d’une action ne varie jamais.', 'Un actionnaire peut recevoir des dividendes.'], validation: { errorIndex: 1 }, difficulty: 'easy', feedback: fb('Exact : le prix varie en permanence.', 'L’erreur est « le prix ne varie jamais ».', 'Le prix d’une action fluctue toujours.') },
     { id: 'ex.actions.dividende', type: 'mcq', skillId: 'skill.actions', prompt: 'À la date de détachement du dividende, que devient le cours de l’action ?', options: ['Il baisse d’environ le montant du dividende', 'Il monte du montant du dividende', 'Il ne change pas'], validation: { correctIndex: 0 }, difficulty: 'medium', feedback: fb('Exact : la valeur sort de l’entreprise vers l’actionnaire, le cours s’ajuste à la baisse.', 'Toucher un dividende n’ajoute pas de valeur : le cours baisse d’environ le dividende.', 'Détachement = le cours s’ajuste d’environ le dividende.', 'Un dividende n’est jamais garanti d’une année sur l’autre.') },
+    // LOT D1 — objectif `confirm` de `concept.market-basics`, jusqu'ici documenté mais exercé nulle
+    // part. Dérivé de sa `confirmationZone` : « la lecture se fait sur la structure des prix, dans
+    // son unité de temps ».
+    { id: 'ex.actions.confirm', type: 'mcq', skillId: 'skill.actions', prompt: 'Sur quoi se fait la lecture d’un prix ?', options: ['Sur la structure des prix, dans son unité de temps', 'Sur la dernière bougie, isolément', 'Sur la couleur dominante du graphique'], validation: { correctIndex: 0 }, difficulty: 'medium', feedback: fb('Exact : un prix se lit dans sa structure et dans l’unité de temps choisie.', 'Une bougie isolée ne dit rien : c’est la structure, dans son unité de temps, qui porte la lecture.', 'La lecture se fait sur la structure des prix, dans son unité de temps.', 'Changer d’unité de temps change l’impression, pas les prix.') },
     { id: 'ex.actions.per', type: 'mcq', skillId: 'skill.actions', prompt: 'Un PER de 10 signifie approximativement…', options: ['On paie l’action ~10 ans de bénéfices actuels', 'L’action rapporte 10 % par an', 'Le dividende vaut 10 €'], validation: { correctIndex: 0 }, difficulty: 'medium', feedback: fb('Exact : PER = prix ÷ bénéfice par action ; 10 ≈ dix années de bénéfices.', 'Le PER n’est ni un rendement ni un dividende : c’est un multiple prix/bénéfice.', 'PER = prix ÷ bénéfice par action.', 'Un PER se compare à secteur et moment comparables.') },
   ],
   'skill.trend': [
@@ -1752,7 +1756,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
 
 // ─── Cibles pédagogiques des exercices ───────────────────────────────
 // Concept représentatif de chaque compétence (source : CONCEPT_BY_SKILL, mais par id).
-const SKILL_CONCEPT_ID: Record<string, string> = {
+// Exporté (LOT D1) : c'est la source UNIQUE compétence → concept, dont le verrou de couverture
+// `guidedObjectiveCoverage.test.ts` a besoin pour comparer les exercices au contenu réel.
+export const SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.actions': 'concept.market-basics',
   'skill.trend': 'concept.uptrend',
   'skill.candles': 'concept.candle-anatomy',
@@ -1787,6 +1793,7 @@ const EXERCISE_OBJECTIVE: Record<string, ObjectiveKind> = {
   'ex.actions.numeric': 'interpret',
   'ex.actions.match': 'interpret',
   'ex.actions.find': 'avoid-false-signal',
+  'ex.actions.confirm': 'confirm',
   'ex.actions.dividende': 'interpret',
   'ex.actions.per': 'interpret',
   'ex.trend.tf': 'recognize',

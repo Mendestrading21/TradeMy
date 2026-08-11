@@ -98,6 +98,28 @@ const PRESSURE_SCENARIOS: LearningScenario[] = [
     rule: 'Un marubozu se lit corps d’abord (la pression), puis mèches (ici minimes), puis contexte.',
   },
   {
+    // LOT D1 — dérivé de `confirmationZone` : « continuation dans le sens du corps sur la bougie
+    // suivante » + les conditions du scénario de la fiche.
+    id: 'ex.candle.pressure.confirm',
+    skillId: 'skill.candle.pressure',
+    target: target(MARUBOZU, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette pression ?',
+    context:
+      'Un marubozu au corps long, quasiment sans mèche, vient de clôturer à la cassure d’une résistance surveillée.',
+    options: [
+      'La bougie suivante prolonge le mouvement dans le sens du corps et tient au-dessus du niveau franchi.',
+      'La longueur du corps suffit : une pression aussi nette se passe de suite.',
+      'L’absence totale de mèche garantit à elle seule la continuation.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une pression se confirme par la CONTINUATION : la bougie suivante prolonge le sens du corps et tient.',
+    whenItFails: 'Un retour rapide sous le corps du marubozu annule la lecture, aussi net qu’il ait paru.',
+    a11y:
+      'Contexte : un marubozu au corps long sans mèche, clôturant à la cassure d’une résistance. Trois conclusions possibles à départager.',
+  },
+  {
     id: 'ex.candle.pressure.invalidate',
     skillId: 'skill.candle.pressure',
     target: target(MARUBOZU, 'invalidate'),
@@ -140,6 +162,24 @@ const REJECTION_SCENARIOS: LearningScenario[] = [
     a11y: 'Bougie à petit corps en haut et longue mèche vers le bas, illustrant un rejet des prix bas après une baisse.',
     difficulty: 'easy',
     rule: 'Le marteau se reconnaît à sa longue mèche basse (≥ 2× le corps) sous un petit corps en haut.',
+  },
+  {
+    // LOT D1 — dérivé de `definitionShort` et de `howToRecognize` : la lecture ordonnée d'un marteau.
+    id: 'ex.candle.rejection.interpret',
+    skillId: 'skill.candle.rejection',
+    target: target(HAMMER, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un marteau.',
+    steps: [
+      'Repère le petit corps, dans le tiers HAUT de la bougie',
+      'Mesure la mèche basse : au moins deux fois la hauteur du corps',
+      'Vérifie qu’il n’y a quasiment pas de mèche haute',
+      'Replace la bougie dans son contexte : elle n’a de sens qu’après une baisse, sur un support',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Un marteau se lit forme d’abord (petit corps haut, longue mèche basse), CONTEXTE ensuite — jamais l’inverse.',
+    whenItFails: 'La même forme en plein range, loin de tout support, ne raconte pas un rejet.',
   },
   {
     id: 'ex.candle.rejection.confirm',
@@ -309,6 +349,22 @@ const REVERSAL_SCENARIOS: LearningScenario[] = [
     prompt: 'Place le niveau d’invalidation : sous quel plancher l’avalement ne tient plus ?',
     difficulty: 'hard',
     rule: 'L’avalement est invalidé par une clôture sous le plus bas des deux bougies : place l’invalidation sous ce plancher.',
+  },
+  {
+    // LOT D1 — dérivé de `falseSignals` (« avalement sans participation, aussitôt annulé par un
+    // retour sous la figure ») et de `commonMistakes` (« ne regarder que la seconde bougie »).
+    id: 'ex.candle.reversal.avoid',
+    skillId: 'skill.candle.reversal',
+    target: target(ENGULFING, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur l’avalement haussier.',
+    statements: [
+      'Le corps haussier doit englober le corps baissier qui le précède.',
+      'Il suffit de regarder la seconde bougie : si elle est grande et haussière, la figure est là.',
+      'Un avalement aussitôt annulé par un retour sous la figure était un faux signal.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
   },
 ];
 

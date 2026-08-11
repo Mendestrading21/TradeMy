@@ -97,6 +97,28 @@ const UPTREND_SCENARIOS: LearningScenario[] = [
     rule: 'La tendance se lit sommets d’abord, puis creux, puis tenue des retracements — jamais sur une seule bougie.',
   },
   {
+    // LOT D1 — dérivé de `confirmationZone` : « chaque nouveau plus-haut au-dessus du précédent
+    // confirme la structure » + les conditions du scénario de la fiche.
+    id: 'ex.structure.uptrend.confirm',
+    skillId: 'skill.structure.uptrend',
+    target: target(UPTREND, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette tendance haussière ?',
+    context:
+      'Le prix enchaîne des sommets et des creux de plus en plus hauts ; un retracement vient de se terminer au-dessus du creux précédent.',
+    options: [
+      'Un NOUVEAU plus-haut au-dessus du précédent : la séquence se poursuit.',
+      'Une succession de bougies vertes, quel que soit le niveau atteint.',
+      'Un retracement qui revient exactement sur le creux précédent.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une tendance haussière se confirme sommet après sommet : chaque nouveau plus-haut valide la structure.',
+    whenItFails: 'Tant que le nouveau sommet n’est pas dépassé, la hausse peut n’être qu’un rebond dans une structure qui s’essouffle.',
+    a11y:
+      'Contexte : une séquence de sommets et de creux de plus en plus hauts, après un retracement qui a tenu. Trois conclusions possibles à départager.',
+  },
+  {
     id: 'ex.structure.uptrend.invalidate',
     skillId: 'skill.structure.uptrend',
     target: target(UPTREND, 'invalidate'),
@@ -173,6 +195,28 @@ const DOWNTREND_SCENARIOS: LearningScenario[] = [
     rule: 'La poursuite baissière se confirme à la reprise sous le dernier creux, après un rebond en sommet plus bas.',
   },
   {
+    // LOT D1 — dérivé de `invalidation` : « formation d’un plus haut plus haut (changement de
+    // structure) ». C'est un SOMMET dépassé, pas un plancher : la lecture se raisonne.
+    id: 'ex.structure.downtrend.invalidate',
+    skillId: 'skill.structure.downtrend',
+    target: target(DOWNTREND, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait cette tendance baissière ?',
+    context:
+      'Les sommets et les creux baissent régulièrement. Tu cherches ce qui signalerait que la structure a changé.',
+    options: [
+      'Un sommet qui dépasse le sommet précédent : un plus-haut plus-haut casse la séquence baissière.',
+      'Une seule bougie verte au milieu de la baisse.',
+      'Un ralentissement du rythme des baisses, sans nouveau sommet.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Une tendance baissière tombe quand un sommet dépasse le précédent : c’est le changement de structure.',
+    whenItFails: 'Une bougie verte isolée ne change rien : seule la structure des sommets tranche.',
+    a11y:
+      'Contexte : des sommets et des creux qui baissent régulièrement ; il s’agit d’identifier ce qui signalerait un changement de structure. Trois propositions à départager.',
+  },
+  {
     id: 'ex.structure.downtrend.avoid',
     skillId: 'skill.structure.downtrend',
     target: target(DOWNTREND, 'avoid-false-signal'),
@@ -237,6 +281,27 @@ const RANGE_SCENARIOS: LearningScenario[] = [
     correctIndex: 0,
     difficulty: 'medium',
     rule: 'Une sortie de range se confirme par une clôture au-delà de la borne, idéalement retestée.',
+  },
+  {
+    // LOT D1 — dérivé de `invalidation` : « faux départ : le prix repasse aussitôt dans le range ».
+    id: 'ex.structure.range.invalidate',
+    skillId: 'skill.structure.range',
+    target: target(RANGE, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Le prix vient de sortir du range. Qu’est-ce qui démentirait cette sortie ?',
+    context:
+      'Après plusieurs allers-retours entre support et résistance, une bougie franchit la borne haute du range.',
+    options: [
+      'Le prix repasse aussitôt DANS le range : la sortie était un faux départ.',
+      'Le prix s’éloigne de la borne et y enchaîne les clôtures.',
+      'La bougie de sortie est plus grande que les précédentes.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une sortie de range est démentie par le RETOUR : le prix repasse à l’intérieur, c’était un faux départ.',
+    whenItFails: 'Croire chaque franchissement de borne coûte cher : la plupart reviennent dans la zone.',
+    a11y:
+      'Contexte : un range entre support et résistance, franchi par le haut ; il s’agit d’identifier ce qui démentirait la sortie. Trois propositions à départager.',
   },
   {
     id: 'ex.structure.range.avoid',
@@ -305,6 +370,27 @@ const BREAK_SCENARIOS: LearningScenario[] = [
     correctIndex: 0,
     difficulty: 'medium',
     rule: 'La cassure se confirme sous le dernier creux protégé, idéalement avec de la participation — sans jamais garantir la suite.',
+  },
+  {
+    // LOT D1 — dérivé de `invalidation` : « reprise au-dessus du niveau cassé sans suite baissière ».
+    id: 'ex.structure.break.invalidate',
+    skillId: 'skill.structure.break',
+    target: target(BOS, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait cette cassure de structure ?',
+    context:
+      'Le prix vient de clôturer sous le dernier creux protégé d’une séquence haussière : la structure semble cassée.',
+    options: [
+      'Le prix reprend au-dessus du niveau cassé, sans suite baissière : la cassure est démentie.',
+      'Le prix continue de baisser lentement sous le creux franchi.',
+      'La bougie de cassure ferme loin de son plus bas.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Une cassure de structure est démentie par la REPRISE au-dessus du niveau cassé, sans suite dans le sens de la cassure.',
+    whenItFails: 'Une cassure sans suite n’est qu’un débordement passager : la structure d’origine reprend la main.',
+    a11y:
+      'Contexte : une clôture sous le dernier creux protégé d’une séquence haussière ; il s’agit d’identifier ce qui démentirait la cassure. Trois propositions à départager.',
   },
   {
     id: 'ex.structure.break.avoid',

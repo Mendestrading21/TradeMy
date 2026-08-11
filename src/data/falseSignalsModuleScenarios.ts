@@ -14,8 +14,13 @@
  *
  * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : l'« invalidation »
  * du fakeout est une CLÔTURE CONFIRMÉE AU-DELÀ du niveau (la cassure devient valide) — un
- * événement au-dessus, pas un plancher → scénario conditionnel, aucun placement. Le faux
- * breakout ne documente NI zone de confirmation NI invalidation → 3 natures seulement.
+ * événement au-dessus, pas un plancher → scénario conditionnel, aucun placement.
+ *
+ * LOT D1 — le faux breakout documente DÉSORMAIS une zone de confirmation ET une invalidation
+ * (enrichies par le LOT E3, ADR-133) : la compétence les exerce, alors qu'elle s'arrêtait à
+ * 3 natures quand ces champs étaient vides. Les deux ajouts sont DÉRIVÉS des champs réels
+ * (`confirmationZone`, `neutralScenario.conditions`, `invalidation`) — rien n'est inventé. Comme
+ * pour le fakeout, son invalidation est un événement AU-DELÀ du niveau : elle se raisonne.
  * Statuts éditoriaux inchangés (`needsReview`). Aucun vocabulaire BUY/SELL — uniquement des
  * scénarios ÉDUCATIFS (entrée théorique, invalidation, objectif pédagogique).
  */
@@ -173,6 +178,50 @@ const FAUX_BREAKOUT_SCENARIOS: LearningScenario[] = [
     correctOrder: [0, 1, 2, 3],
     difficulty: 'medium',
     rule: 'Franchissement, absence de poursuite, retour dans la zone, conclusion : l’échec d’une cassure se constate, il ne se devine pas.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « le retour à l’intérieur : après le dépassement, une clôture
+    // de nouveau dans la zone d’origine signe le faux signal » + les conditions de `neutralScenario`.
+    id: 'ex.falsesignals.breakout.confirm',
+    skillId: 'skill.falsesignals.breakout',
+    target: target(FAUX_BREAKOUT, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui signe le faux breakout ?',
+    context:
+      'Le prix a brièvement dépassé un niveau surveillé, en mèche, sans enchaîner de clôtures au-delà.',
+    options: [
+      'Une clôture de nouveau DANS la zone d’origine : le retour à l’intérieur signe le faux signal.',
+      'Le simple fait que la mèche ait dépassé le niveau.',
+      'La taille de la mèche : plus elle est longue, plus le faux signal est certain.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Ce qui signe un faux breakout, c’est le RETOUR : une clôture de nouveau dans la zone d’origine.',
+    whenItFails: 'Tant que le prix reste au-delà du niveau, rien n’est signé : la cassure peut être réelle.',
+    a11y:
+      'Contexte : un dépassement bref d’un niveau surveillé, en mèche, sans clôture tenue au-delà. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `invalidation` : « le prix reste au-delà du niveau et y enchaîne les clôtures ».
+    // Événement AU-DELÀ du niveau, pas un plancher → scénario conditionnel, aucun placement.
+    id: 'ex.falsesignals.breakout.invalidate',
+    skillId: 'skill.falsesignals.breakout',
+    target: target(FAUX_BREAKOUT, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui démentirait la lecture « faux breakout » ?',
+    context:
+      'Tu as lu le dépassement comme un faux signal. Tu cherches ce qui prouverait le contraire.',
+    options: [
+      'Le prix RESTE au-delà du niveau et y enchaîne les clôtures : la cassure était réelle.',
+      'Le prix revient toucher le niveau par en dessous une seule fois.',
+      'Le volume baisse après le dépassement.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'La lecture « faux breakout » tombe dès que les clôtures s’enchaînent AU-DELÀ du niveau.',
+    whenItFails: 'S’entêter à voir un piège dans une cassure qui tient, c’est manquer ce que le marché a déjà tranché.',
+    a11y:
+      'Contexte : un dépassement de niveau lu comme un faux signal ; il s’agit d’identifier ce qui prouverait le contraire. Trois propositions à départager.',
   },
   {
     id: 'ex.falsesignals.breakout.avoid',
