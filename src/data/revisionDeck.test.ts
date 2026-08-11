@@ -1,17 +1,29 @@
 import { describe, it, expect } from '@jest/globals';
 import { buildRevisionDeck } from './revisionDeck';
+import { derivedCardsWithoutDuplicates } from './derivedRevision';
 import { V5_CONCEPTS } from './learningContent';
 
 const deck = buildRevisionDeck();
 
 describe('buildRevisionDeck', () => {
-  it('réunit toutes les flashcards et mini-quiz des concepts', () => {
-    const expectedFlash = V5_CONCEPTS.reduce((n, c) => n + c.flashcards.length, 0);
-    const expectedQuiz = V5_CONCEPTS.reduce((n, c) => n + c.miniQuizzes.length, 0);
+  it('réunit toutes les flashcards et mini-quiz des concepts, SANS rien perdre (LOT E2)', () => {
+    const attenduRedige = V5_CONCEPTS.reduce((n, c) => n + c.flashcards.length, 0);
+    const attenduDerive = V5_CONCEPTS.reduce((n, c) => n + derivedCardsWithoutDuplicates(c).length, 0);
+    const attenduQuiz = V5_CONCEPTS.reduce((n, c) => n + c.miniQuizzes.length, 0);
     expect(deck.conceptCount).toBe(V5_CONCEPTS.length);
-    expect(deck.flashcards).toHaveLength(expectedFlash);
-    expect(deck.quizzes).toHaveLength(expectedQuiz);
-    expect(deck.flashcards.length).toBeGreaterThan(0);
+    expect(deck.quizzes).toHaveLength(attenduQuiz);
+    // Le deck = cartes RÉDIGÉES (aucune perdue) + cartes DÉRIVÉES des champs réels (ADR-132).
+    expect(deck.flashcards.filter((f) => f.origin === 'redigee')).toHaveLength(attenduRedige);
+    expect(deck.flashcards.filter((f) => f.origin === 'derivee')).toHaveLength(attenduDerive);
+    expect(deck.flashcards).toHaveLength(attenduRedige + attenduDerive);
+    // Chaque carte rédigée est bien présente, à l'identique.
+    for (const c of V5_CONCEPTS) {
+      for (const f of c.flashcards) {
+        expect(deck.flashcards).toContainEqual(
+          expect.objectContaining({ conceptSlug: c.slug, front: f.front, back: f.back, origin: 'redigee' }),
+        );
+      }
+    }
     expect(deck.quizzes.length).toBeGreaterThan(0);
   });
 
