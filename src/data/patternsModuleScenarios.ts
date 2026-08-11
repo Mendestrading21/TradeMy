@@ -13,6 +13,9 @@
  *   3. Les drapeaux          → `concept.bull-flag` (drapeau haussier, continuation)
  *   4. Le retournement majeur → `concept.head-shoulders` (épaule-tête-épaule)
  *   5. La figure miroir        → `concept.double-top` (double sommet — LOT C2)
+ *   6. Le triangle, retourné   → `concept.descending-triangle` (LOT C3)
+ *   7. Le drapeau, retourné    → `concept.bear-flag` (LOT C3)
+ *   8. Le retournement, retourné → `concept.inverse-head-shoulders` (LOT C3, HAUSSIER)
  *
  * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du placement : seuls le double
  * creux (« sous le second creux ») et le drapeau (« sous le bas du drapeau ») documentent une
@@ -39,6 +42,12 @@ export const PATTERNS_SKILLS: Skill[] = [
   { id: 'skill.patterns.reversal', name: 'Le retournement majeur', description: 'Reconnaître l’épaule-tête-épaule et sa ligne de cou.' },
   // LOT C2 — la figure MIROIR : le double, retourné. Même lecture, invalidation de l'autre côté.
   { id: 'skill.patterns.mirror', name: 'La figure miroir', description: 'Transposer le double à la baisse — et retrouver son invalidation, qui change de côté.' },
+  // LOT C3 — les trois miroirs restants, DANS LES DEUX SENS : deux baissiers (invalidation en haut)
+  // et un haussier (invalidation en bas). La règle n'est pas « baissier = en haut » : l'invalidation
+  // suit la DIRECTION du setup, quelle qu'elle soit.
+  { id: 'skill.patterns.triangle-mirror', name: 'Le triangle, retourné', description: 'Lire un triangle descendant : support plat, sommets qui descendent — et invalidation en haut.' },
+  { id: 'skill.patterns.flag-mirror', name: 'Le drapeau, retourné', description: 'Lire une pause de continuation baissière : mât, canal, reprise — et invalidation en haut.' },
+  { id: 'skill.patterns.reversal-mirror', name: 'Le retournement, retourné', description: 'Lire une épaule-tête-épaule inversée : figure HAUSSIÈRE, donc invalidation en bas.' },
 ];
 
 // Concepts réels du monde `world.patterns` reliés à chaque compétence.
@@ -47,6 +56,9 @@ const TRIANGLE = 'concept.ascending-triangle';
 const FLAG = 'concept.bull-flag';
 const HNS = 'concept.head-shoulders';
 const DOUBLE_TOP = 'concept.double-top';
+const DESC_TRIANGLE = 'concept.descending-triangle';
+const BEAR_FLAG = 'concept.bear-flag';
+const INVERSE_HNS = 'concept.inverse-head-shoulders';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -55,6 +67,9 @@ export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.patterns.flag': FLAG,
   'skill.patterns.reversal': HNS,
   'skill.patterns.mirror': DOUBLE_TOP,
+  'skill.patterns.triangle-mirror': DESC_TRIANGLE,
+  'skill.patterns.flag-mirror': BEAR_FLAG,
+  'skill.patterns.reversal-mirror': INVERSE_HNS,
 };
 export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.double': 'double-creux',
@@ -62,6 +77,9 @@ export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.flag': 'drapeau-haussier',
   'skill.patterns.reversal': 'epaule-tete-epaule',
   'skill.patterns.mirror': 'double-sommet',
+  'skill.patterns.triangle-mirror': 'triangle-descendant',
+  'skill.patterns.flag-mirror': 'drapeau-baissier',
+  'skill.patterns.reversal-mirror': 'etei-inversee',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -508,6 +526,262 @@ const MIRROR_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétences 6 à 8 — Les miroirs restants — LOT C3 ────────────────
+// Deux figures BAISSIÈRES (triangle descendant, drapeau baissier) : invalidation EN HAUT.
+// Une figure HAUSSIÈRE (ÉTÉ inversée) : invalidation EN BAS. La règle enseignée n'est donc pas
+// « baissier = en haut », mais : l'invalidation se place du côté OPPOSÉ au sens du setup.
+const TRIANGLE_MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.triangle-mirror.recognize',
+    skillId: 'skill.patterns.triangle-mirror',
+    target: target(DESC_TRIANGLE, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.descending-triangle.v1',
+    variant: 'descending-triangle',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un triangle descendant (support plat, sommets qui descendent)',
+      'Un triangle ascendant (résistance plate, creux qui montent)',
+      'Un drapeau haussier (canal après un mât)',
+    ],
+    correctIndex: 0,
+    a11y: 'Un support horizontal testé plusieurs fois, surmonté de sommets de plus en plus bas : la compression pousse vers le bas.',
+    difficulty: 'easy',
+    rule: 'Le triangle descendant se reconnaît à son support PLAT et à ses sommets descendants — l’exact opposé de l’ascendant.',
+  },
+  {
+    id: 'ex.patterns.triangle-mirror.interpret',
+    skillId: 'skill.patterns.triangle-mirror',
+    target: target(DESC_TRIANGLE, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un triangle descendant.',
+    steps: [
+      'Repère le support horizontal testé plusieurs fois',
+      'Trace la ligne des sommets, de plus en plus bas',
+      'Constate la compression entre les deux',
+      'Attends la résolution : une clôture sous le support',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Un triangle se lit support d’abord, puis ligne des sommets, puis compression — la résolution vient après, jamais avant.',
+  },
+  {
+    id: 'ex.patterns.triangle-mirror.confirm',
+    skillId: 'skill.patterns.triangle-mirror',
+    target: target(DESC_TRIANGLE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce triangle descendant ?',
+    context:
+      'Le prix a testé quatre fois le même support, tandis que chaque rebond s’arrête plus bas que le précédent. La compression est nette.',
+    options: [
+      'Une clôture sous le support horizontal, idéalement suivie d’un retest par le dessous.',
+      'Le quatrième test du support suffit : à force, il finit toujours par céder.',
+      'La compression seule confirme la figure, sans attendre de cassure.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La zone de confirmation d’un triangle descendant est SOUS le support horizontal, sur clôture — et le retest la renforce.',
+    whenItFails: 'Un support testé souvent n’est pas un support condamné : sans clôture dessous, rien n’est confirmé.',
+    a11y:
+      'Contexte : quatre tests du même support, avec des rebonds de plus en plus bas. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.triangle-mirror.invalidate',
+    skillId: 'skill.patterns.triangle-mirror',
+    target: target(DESC_TRIANGLE, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 248,
+    prompt:
+      'Ce setup est baissier : il s’invalide vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule:
+      'Le triangle descendant est invalidé par une clôture nette au-dessus de la ligne des sommets descendants : l’invalidation se place en HAUT.',
+    whenItFails: 'Placer l’invalidation sous le support revient à confondre la zone de confirmation avec la zone d’invalidation.',
+  },
+  {
+    id: 'ex.patterns.triangle-mirror.avoid',
+    skillId: 'skill.patterns.triangle-mirror',
+    target: target(DESC_TRIANGLE, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le triangle descendant.',
+    statements: [
+      'Une fausse cassure sous le support, sans participation et aussitôt annulée, n’était pas une résolution.',
+      'Plus le support est testé, plus la cassure vers le bas est certaine.',
+      'La figure n’est résolue qu’à la clôture, pas pendant la séance.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+const FLAG_MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.flag-mirror.recognize',
+    skillId: 'skill.patterns.flag-mirror',
+    target: target(BEAR_FLAG, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.bear-flag.v1',
+    variant: 'bear-flag',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un drapeau baissier (un mât vers le bas, puis un canal qui remonte doucement)',
+      'Un drapeau haussier (un mât vers le haut, puis un canal qui redescend doucement)',
+      'Un double sommet (deux plafonds au même niveau)',
+    ],
+    correctIndex: 0,
+    difficulty: 'easy',
+    a11y: 'Une chute rapide, puis une remontée lente et étroite en canal : une pause avant reprise possible.',
+    rule: 'Le drapeau baissier se reconnaît à son mât VERS LE BAS suivi d’un canal qui remonte doucement à contre-sens.',
+  },
+  {
+    id: 'ex.patterns.flag-mirror.interpret',
+    skillId: 'skill.patterns.flag-mirror',
+    target: target(BEAR_FLAG, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un drapeau baissier.',
+    steps: [
+      'Repère le mât : une chute rapide et nette',
+      'Identifie le canal : une remontée lente et étroite',
+      'Vérifie que le canal ne rend pas tout le mât',
+      'Attends la reprise sous le bas du drapeau',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Un drapeau se lit mât d’abord, puis canal — sans mât net, il n’y a pas de drapeau.',
+  },
+  {
+    id: 'ex.patterns.flag-mirror.confirm',
+    skillId: 'skill.patterns.flag-mirror',
+    target: target(BEAR_FLAG, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce drapeau baissier ?',
+    context:
+      'Après une chute rapide, le prix remonte lentement dans un canal étroit, sans effacer la baisse initiale.',
+    options: [
+      'Le prix repasse sous le bas du drapeau et y reste.',
+      'La lenteur de la remontée suffit : un rebond mou annonce toujours la suite.',
+      'La hauteur du mât garantit à elle seule la reprise de la baisse.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Un drapeau baissier se confirme SOUS le bas du drapeau — la pause se termine par une reprise, pas par une promesse.',
+    whenItFails: 'Une cassure sans suivi laisse la figure en suspens : la pause peut aussi se retourner.',
+    a11y: 'Contexte : une chute rapide suivie d’une remontée lente en canal étroit. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.flag-mirror.invalidate',
+    skillId: 'skill.patterns.flag-mirror',
+    target: target(BEAR_FLAG, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 262,
+    prompt: 'Ce setup est baissier : il s’invalide vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule: 'Le drapeau baissier est invalidé par un retour au-dessus du haut du drapeau : l’invalidation se place en HAUT.',
+    whenItFails: 'Un canal qui rend tout le mât n’est plus une pause : c’est un retournement.',
+  },
+  {
+    id: 'ex.patterns.flag-mirror.avoid',
+    skillId: 'skill.patterns.flag-mirror',
+    target: target(BEAR_FLAG, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le drapeau baissier.',
+    statements: [
+      'Sans mât net, il n’y a pas de drapeau : la figure suppose un mouvement initial franc.',
+      'Toute remontée lente après une baisse est un drapeau baissier.',
+      'Une cassure sans suivi laisse la figure en suspens.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+const REVERSAL_MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.reversal-mirror.recognize',
+    skillId: 'skill.patterns.reversal-mirror',
+    target: target(INVERSE_HNS, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.inverse-head-shoulders.v1',
+    variant: 'inverse-head-shoulders',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Une épaule-tête-épaule inversée (trois creux, celui du milieu plus bas)',
+      'Une épaule-tête-épaule classique (trois sommets, celui du milieu plus haut)',
+      'Un triangle symétrique (sommets qui descendent, creux qui montent)',
+    ],
+    correctIndex: 0,
+    difficulty: 'easy',
+    a11y: 'Trois creux successifs, celui du milieu nettement plus bas, reliés par une ligne de cou au-dessus.',
+    rule: 'L’ÉTÉ inversée se reconnaît à ses trois creux dont le central est le plus bas — le retournement d’une baisse.',
+  },
+  {
+    id: 'ex.patterns.reversal-mirror.interpret',
+    skillId: 'skill.patterns.reversal-mirror',
+    target: target(INVERSE_HNS, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’une ÉTÉ inversée.',
+    steps: [
+      'Repère les trois creux successifs',
+      'Vérifie que celui du milieu (la tête) est le plus bas',
+      'Trace la ligne de cou qui relie les sommets intermédiaires',
+      'Attends la clôture AU-DESSUS de la ligne de cou',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'L’ÉTÉ inversée se lit creux d’abord, puis tête, puis ligne de cou — la confirmation vient en dernier.',
+  },
+  {
+    id: 'ex.patterns.reversal-mirror.confirm',
+    skillId: 'skill.patterns.reversal-mirror',
+    target: target(INVERSE_HNS, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette ÉTÉ inversée ?',
+    context:
+      'Après une baisse, trois creux se sont formés : le central est nettement plus bas, et les deux sommets intermédiaires dessinent une ligne de cou.',
+    options: [
+      'Une clôture au-dessus de la ligne de cou.',
+      'La symétrie des deux épaules suffit à valider la figure.',
+      'La profondeur de la tête garantit à elle seule le retournement.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Cette figure est HAUSSIÈRE : elle se confirme AU-DESSUS de la ligne de cou — l’inverse exact de l’ÉTÉ classique.',
+    whenItFails: 'Une cassure sans suivi laisse la figure en suspens ; trois creux ne suffisent pas.',
+    a11y: 'Contexte : trois creux après une baisse, le central plus bas, ligne de cou tracée. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.reversal-mirror.invalidate',
+    skillId: 'skill.patterns.reversal-mirror',
+    target: target(INVERSE_HNS, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 277,
+    prompt:
+      'Attention : ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule:
+      'L’ÉTÉ inversée est invalidée par un nouveau plus bas sous la tête : parce que le setup est haussier, l’invalidation se place en BAS.',
+    whenItFails:
+      'La règle n’est pas « une figure de retournement s’invalide en haut » : l’invalidation se place TOUJOURS du côté opposé au sens du setup.',
+  },
+  {
+    id: 'ex.patterns.reversal-mirror.avoid',
+    skillId: 'skill.patterns.reversal-mirror',
+    target: target(INVERSE_HNS, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur l’ÉTÉ inversée.',
+    statements: [
+      'Des épaules très asymétriques rendent la figure moins lisible.',
+      'Comme toute figure de retournement, elle s’invalide au-dessus de sa tête.',
+      'Une cassure de la ligne de cou sans suivi laisse la figure en suspens.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.patterns.double': DOUBLE_SCENARIOS,
@@ -515,6 +789,9 @@ export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario
   'skill.patterns.flag': FLAG_SCENARIOS,
   'skill.patterns.reversal': REVERSAL_SCENARIOS,
   'skill.patterns.mirror': MIRROR_SCENARIOS,
+  'skill.patterns.triangle-mirror': TRIANGLE_MIRROR_SCENARIOS,
+  'skill.patterns.flag-mirror': FLAG_MIRROR_SCENARIOS,
+  'skill.patterns.reversal-mirror': REVERSAL_MIRROR_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

@@ -67,9 +67,10 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // Ce compte n'est pas décoratif : c'est la mesure du défaut réparé. S'il change, c'est qu'un lot
     // a donné (ou retiré) une compétence propre à des fiches — il faut alors le vouloir.
     expect(REPRESENTATIVE.length + LIBRARY_ONLY.length).toBe(V5_CONCEPTS.length);
-    // LOT C2 : 22 → 20. Deux fiches de bibliothèque (avalement baissier, double sommet) ont reçu
-    // leur propre compétence guidée et sont donc devenues entraînables.
-    expect(LIBRARY_ONLY.length).toBe(20);
+    // LOT C2 : 22 → 20 (avalement baissier, double sommet). LOT C3 : 20 → 17 (triangle descendant,
+    // drapeau baissier, ÉTÉ inversée). Chaque baisse correspond à un lot qui a donné à ces fiches
+    // leur propre compétence guidée — jamais à un relâchement de la règle.
+    expect(LIBRARY_ONLY.length).toBe(17);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 
