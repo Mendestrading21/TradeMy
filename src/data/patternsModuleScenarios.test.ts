@@ -35,6 +35,10 @@ const MODULE_CONCEPT_IDS = [
   'concept.head-shoulders',
   // LOT C2 — la figure miroir : cette fiche de bibliothèque devient une compétence entraînable.
   'concept.double-top',
+  // LOT C3 — les trois miroirs restants, dans les DEUX sens.
+  'concept.descending-triangle',
+  'concept.bear-flag',
+  'concept.inverse-head-shoulders',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -53,7 +57,8 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     }
     expect(ALL_EXERCISES.length).toBe(PATTERNS_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(25); // LOT C2 : la 5e compétence (« La figure miroir ») exerce les cinq objectifs réels du double sommet.
+    // LOT C3 : 25 → 40. Trois compétences miroir de plus, cinq objectifs réels chacune.
+    expect(ALL_EXERCISES.length).toBe(40);
   });
 
   it('chaque compétence cible un concept RÉEL de world.patterns', () => {
@@ -120,7 +125,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(5); // LOT C2 : la figure miroir ajoute sa propre reconnaissance.
+    expect(figures.length).toBe(8); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -132,11 +137,13 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // Deux planchers documentés (double creux, drapeau) + LOT C2 : le double SOMMET, baissier,
-    // s'invalide AU-DESSUS des sommets. Le test vérifie que la cible suit le côté annoncé.
-    expect(places.length).toBe(3);
+    // LOT C3 — le verrou porte maintenant la LEÇON du lot : l'invalidation se place du côté OPPOSÉ
+    // au sens du setup. Six placements : trois setups haussiers (double creux, drapeau haussier,
+    // ÉTÉ inversée) invalidés vers le BAS, trois setups baissiers (double sommet, triangle
+    // descendant, drapeau baissier) invalidés vers le HAUT.
+    expect(places.length).toBe(6);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
-    expect(versLeHaut).toHaveLength(1);
+    expect(versLeHaut).toHaveLength(3);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
       expect(ex.hint).toBeTruthy();
