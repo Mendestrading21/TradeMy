@@ -13,6 +13,7 @@
  *   2. Le rejet des extrêmes   → `concept.hammer`
  *   3. L'indécision            → `concept.doji`
  *   4. Le retournement 2 bougies → `concept.bullish-engulfing`
+ *   5. La figure miroir        → `concept.bearish-engulfing` (LOT C2)
  *
  * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget) — jamais inventés.
  * `concept.doji` ne documente pas d'invalidation : on ne lui attache donc AUCUN exercice d'invalidation
@@ -36,6 +37,8 @@ export const CANDLE_SKILLS: Skill[] = [
   { id: 'skill.candle.rejection', name: 'Le rejet des extrêmes', description: 'Reconnaître un rejet de prix : la longue mèche du marteau.' },
   { id: 'skill.candle.indecision', name: 'L’indécision', description: 'Lire l’équilibre acheteurs/vendeurs : le doji.' },
   { id: 'skill.candle.reversal', name: 'Le retournement à deux bougies', description: 'Repérer une reprise à confirmer : l’avalement haussier.' },
+  // LOT C2 — la figure MIROIR : même géométrie, direction opposée, invalidation opposée.
+  { id: 'skill.candle.mirror', name: 'La figure miroir', description: 'Transposer l’avalement à la baisse — et retrouver son invalidation, qui change de côté.' },
 ];
 
 // Concepts réels du monde `world.candles` reliés à chaque compétence (source : learningContent V5).
@@ -43,6 +46,7 @@ const MARUBOZU = 'concept.marubozu';
 const HAMMER = 'concept.hammer';
 const DOJI = 'concept.doji';
 const ENGULFING = 'concept.bullish-engulfing';
+const BEARISH_ENGULFING = 'concept.bearish-engulfing';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -50,12 +54,14 @@ export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.candle.rejection': HAMMER,
   'skill.candle.indecision': DOJI,
   'skill.candle.reversal': ENGULFING,
+  'skill.candle.mirror': BEARISH_ENGULFING,
 };
 export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.pressure': 'marubozu',
   'skill.candle.rejection': 'marteau',
   'skill.candle.indecision': 'doji',
   'skill.candle.reversal': 'avalement-haussier',
+  'skill.candle.mirror': 'avalement-baissier',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -368,12 +374,115 @@ const REVERSAL_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 5 — La figure miroir (avalement baissier) — LOT C2 ────
+// L'avalement BAISSIER est le miroir exact de l'avalement haussier enseigné juste avant : même
+// géométrie, direction opposée, et surtout invalidation opposée — au-DESSUS du plus haut, alors que
+// la version haussière s'invalide sous le plus bas. C'est précisément là que se trompe l'apprenant.
+// Les cinq objectifs sont ceux de la fiche `concept.bearish-engulfing`, sans exception ni ajout.
+const MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.mirror.recognize',
+    skillId: 'skill.candle.mirror',
+    target: target(BEARISH_ENGULFING, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.bearish-engulfing.v1',
+    variant: 'bearish-engulfing',
+    visualType: 'candlestick-pattern',
+    prompt: 'Quelle figure de chandelier reconnais-tu ?',
+    options: [
+      'Un avalement baissier (grande rouge qui englobe la verte précédente)',
+      'Un avalement haussier (grande verte qui englobe la rouge précédente)',
+      'Un marteau (petit corps, longue mèche basse)',
+    ],
+    correctIndex: 0,
+    a11y:
+      'Une grande bougie rouge qui recouvre le corps de la bougie verte précédente, après une hausse.',
+    difficulty: 'easy',
+    rule:
+      'L’avalement baissier se reconnaît à sa grande bougie rouge dont le corps englobe entièrement le corps vert précédent, après une hausse.',
+  },
+  {
+    // Dérivé mot pour mot de `howToRecognize` et `contextRequired` de la fiche.
+    id: 'ex.candle.mirror.interpret',
+    skillId: 'skill.candle.mirror',
+    target: target(BEARISH_ENGULFING, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un avalement baissier.',
+    steps: [
+      'Vérifie qu’une hausse précède la figure',
+      'Repère la petite bougie haussière',
+      'Contrôle que la grande bougie baissière englobe bien son corps',
+      'Regarde s’il y a une résistance à proximité',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule:
+      'Un avalement baissier se lit contexte d’abord (la hausse), puis englobement, puis résistance — la géométrie seule ne suffit pas.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « Sous le plus bas de la bougie d'englobement ».
+    id: 'ex.candle.mirror.confirm',
+    skillId: 'skill.candle.mirror',
+    target: target(BEARISH_ENGULFING, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cet avalement baissier ?',
+    context:
+      'Une grande bougie rouge vient d’englober la petite verte précédente, sous une résistance surveillée, après plusieurs séances de hausse.',
+    options: [
+      'Le prix passe sous le plus bas de la bougie d’englobement et y reste.',
+      'La taille de la bougie rouge suffit : un englobement aussi net se passe de suite.',
+      'La résistance au-dessus garantit à elle seule la poursuite de la baisse.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule:
+      'La zone de confirmation d’un avalement baissier est SOUS le plus bas de la bougie d’englobement — exactement le miroir du cas haussier.',
+    whenItFails:
+      'Sans passage sous ce plancher, la figure reste une hypothèse : une grande bougie n’est pas une preuve.',
+    a11y:
+      'Contexte : une grande bougie rouge englobe la petite verte précédente, sous une résistance, après une hausse. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `invalidation` : « Clôture au-dessus du plus haut de la figure ». C'est LE point où
+    // le miroir compte : la version haussière s'invalide vers le BAS, celle-ci vers le HAUT.
+    id: 'ex.candle.mirror.invalidate',
+    skillId: 'skill.candle.mirror',
+    target: target(BEARISH_ENGULFING, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 214,
+    prompt:
+      'Un setup baissier s’invalide vers le HAUT. Place la ligne sur le plus haut atteint : au-dessus, la lecture baissière tombe.',
+    difficulty: 'hard',
+    rule:
+      'Un avalement baissier est invalidé par une clôture au-dessus du plus haut de la figure : l’invalidation se place en HAUT, jamais en bas.',
+    whenItFails:
+      'Placer l’invalidation sous la figure, par réflexe haussier, revient à surveiller le mauvais côté du graphique.',
+  },
+  {
+    // Dérivé de `falseSignals` (« englobement partiel », « figure isolée sans résistance proche »)
+    // et de `commonMistakes` (« confondre avalement et simple grande bougie »).
+    id: 'ex.candle.mirror.avoid',
+    skillId: 'skill.candle.mirror',
+    target: target(BEARISH_ENGULFING, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur l’avalement baissier.',
+    statements: [
+      'Un englobement seulement partiel affaiblit la figure : le corps doit être entièrement recouvert.',
+      'Une grande bougie rouge suffit à faire un avalement, même sans petite bougie verte avant elle.',
+      'Isolée, loin de toute résistance, la figure a beaucoup moins de portée.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.candle.pressure': PRESSURE_SCENARIOS,
   'skill.candle.rejection': REJECTION_SCENARIOS,
   'skill.candle.indecision': INDECISION_SCENARIOS,
   'skill.candle.reversal': REVERSAL_SCENARIOS,
+  'skill.candle.mirror': MIRROR_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

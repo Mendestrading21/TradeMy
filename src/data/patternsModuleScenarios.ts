@@ -12,6 +12,7 @@
  *   2. Les triangles         → `concept.ascending-triangle` (triangle ascendant)
  *   3. Les drapeaux          → `concept.bull-flag` (drapeau haussier, continuation)
  *   4. Le retournement majeur → `concept.head-shoulders` (épaule-tête-épaule)
+ *   5. La figure miroir        → `concept.double-top` (double sommet — LOT C2)
  *
  * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du placement : seuls le double
  * creux (« sous le second creux ») et le drapeau (« sous le bas du drapeau ») documentent une
@@ -36,6 +37,8 @@ export const PATTERNS_SKILLS: Skill[] = [
   { id: 'skill.patterns.triangle', name: 'Les triangles', description: 'Lire la compression d’un triangle ascendant et attendre sa résolution.' },
   { id: 'skill.patterns.flag', name: 'Les drapeaux', description: 'Lire une pause de continuation : mât, canal, reprise.' },
   { id: 'skill.patterns.reversal', name: 'Le retournement majeur', description: 'Reconnaître l’épaule-tête-épaule et sa ligne de cou.' },
+  // LOT C2 — la figure MIROIR : le double, retourné. Même lecture, invalidation de l'autre côté.
+  { id: 'skill.patterns.mirror', name: 'La figure miroir', description: 'Transposer le double à la baisse — et retrouver son invalidation, qui change de côté.' },
 ];
 
 // Concepts réels du monde `world.patterns` reliés à chaque compétence.
@@ -43,6 +46,7 @@ const DOUBLE = 'concept.double-bottom';
 const TRIANGLE = 'concept.ascending-triangle';
 const FLAG = 'concept.bull-flag';
 const HNS = 'concept.head-shoulders';
+const DOUBLE_TOP = 'concept.double-top';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -50,12 +54,14 @@ export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.patterns.triangle': TRIANGLE,
   'skill.patterns.flag': FLAG,
   'skill.patterns.reversal': HNS,
+  'skill.patterns.mirror': DOUBLE_TOP,
 };
 export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.double': 'double-creux',
   'skill.patterns.triangle': 'triangle-ascendant',
   'skill.patterns.flag': 'drapeau-haussier',
   'skill.patterns.reversal': 'epaule-tete-epaule',
+  'skill.patterns.mirror': 'double-sommet',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -401,12 +407,114 @@ const REVERSAL_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 5 — La figure miroir (double sommet) — LOT C2 ─────────
+// Le double SOMMET est le miroir exact du double creux enseigné en compétence 1 : même géométrie,
+// même ligne de cou, direction opposée — et invalidation opposée, AU-DESSUS des sommets là où le
+// double creux s'invalide sous ses planchers. La fiche le dit elle-même : « le miroir baissier du
+// double creux ». Les cinq objectifs sont ceux de `concept.double-top`, sans exception ni ajout.
+const MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.mirror.recognize',
+    skillId: 'skill.patterns.mirror',
+    target: target(DOUBLE_TOP, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.double-top.v1',
+    variant: 'double-top',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un double sommet (deux plafonds au même niveau, un « M »)',
+      'Un double creux (deux planchers au même niveau, un « W »)',
+      'Un triangle ascendant (résistance plate, creux montants)',
+    ],
+    correctIndex: 0,
+    a11y: 'Deux sommets à un niveau proche séparés par un creux ; la cassure du creux confirme la figure.',
+    difficulty: 'easy',
+    rule:
+      'Le double sommet se reconnaît à ses deux plafonds au même niveau et à sa ligne de cou (le creux intermédiaire).',
+  },
+  {
+    // Dérivé de `howToRecognize` et `contextRequired` de la fiche.
+    id: 'ex.patterns.mirror.interpret',
+    skillId: 'skill.patterns.mirror',
+    target: target(DOUBLE_TOP, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un double sommet.',
+    steps: [
+      'Vérifie qu’une hausse précède la figure',
+      'Repère deux sommets à un niveau similaire',
+      'Trace la ligne de cou (le creux intermédiaire)',
+      'Attends la clôture SOUS la ligne de cou',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule:
+      'Un double sommet se lit contexte d’abord, puis sommets, puis ligne de cou, puis confirmation — jamais une promesse.',
+  },
+  {
+    // Dérivé de `confirmationZone` : « Sous la ligne de cou (creux intermédiaire) ».
+    id: 'ex.patterns.mirror.confirm',
+    skillId: 'skill.patterns.mirror',
+    target: target(DOUBLE_TOP, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce double sommet ?',
+    context:
+      'Le prix a testé deux fois le même plafond sans le franchir, avec un volume plus faible au second sommet ; le creux intermédiaire est net.',
+    options: [
+      'Une clôture sous la ligne de cou, c’est-à-dire sous le creux intermédiaire.',
+      'Le second échec au plafond suffit : deux refus valent confirmation.',
+      'La baisse du volume au second sommet confirme à elle seule la figure.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule:
+      'Un double sommet se confirme SOUS la ligne de cou — exactement le miroir du double creux, qui se confirme au-dessus.',
+    whenItFails:
+      'Tant que la ligne de cou n’est pas cassée, la figure n’est pas confirmée : anticiper est l’erreur la plus courante.',
+    a11y:
+      'Contexte : deux tests d’un même plafond sans franchissement, volume plus faible au second, creux intermédiaire net. Trois conclusions possibles à départager.',
+  },
+  {
+    // Dérivé de `invalidation` : « Le prix casse nettement au-dessus du second sommet ». C'est là
+    // que le miroir compte : le double creux s'invalide vers le BAS, celui-ci vers le HAUT.
+    id: 'ex.patterns.mirror.invalidate',
+    skillId: 'skill.patterns.mirror',
+    target: target(DOUBLE_TOP, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 231,
+    prompt:
+      'Un double sommet s’invalide vers le HAUT. Place la ligne sur le plus haut atteint : au-dessus, la figure tombe.',
+    difficulty: 'hard',
+    rule:
+      'Le double sommet est invalidé par une cassure nette au-dessus des sommets : l’invalidation se place en HAUT, jamais sous la ligne de cou.',
+    whenItFails:
+      'Placer l’invalidation sous la figure, par réflexe de double creux, revient à surveiller le mauvais côté du graphique.',
+  },
+  {
+    // Dérivé de `falseSignals` (« cassure de la ligne de cou sans participation, suivie d'un retour
+    // au-dessus ») et de `commonMistakes` (« anticiper avant la cassure »).
+    id: 'ex.patterns.mirror.avoid',
+    skillId: 'skill.patterns.mirror',
+    target: target(DOUBLE_TOP, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le double sommet.',
+    statements: [
+      'Une cassure de la ligne de cou sans participation, suivie d’un retour au-dessus, était un faux signal.',
+      'Dès que le second sommet échoue, la figure est confirmée : la ligne de cou n’est qu’un détail.',
+      'Tant que la ligne de cou tient, la figure n’est qu’une hypothèse.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.patterns.double': DOUBLE_SCENARIOS,
   'skill.patterns.triangle': TRIANGLE_SCENARIOS,
   'skill.patterns.flag': FLAG_SCENARIOS,
   'skill.patterns.reversal': REVERSAL_SCENARIOS,
+  'skill.patterns.mirror': MIRROR_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

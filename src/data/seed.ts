@@ -635,6 +635,32 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT C2 — La figure MIROIR (world.candles) ──────────────────────
+  'skill.candle.mirror': [
+    {
+      id: 'lesson.candle-mirror',
+      slug: 'avalement-baissier-miroir',
+      title: 'La figure miroir : le même geste, à l’envers',
+      skillId: 'skill.candle.mirror',
+      objective: 'Transposer l’avalement à la baisse et retrouver son invalidation, qui change de côté.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Tu viens d’apprendre l’avalement haussier. Sa version baissière a exactement la même géométrie — et une invalidation à l’opposé.' },
+        { id: 's1', kind: 'observe', body: 'Cherche une petite bougie haussière suivie d’une grande bougie baissière dont le corps recouvre le précédent, après une hausse.' },
+        { id: 's2', kind: 'visual', conceptRef: 'avalement-baissier' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'avalement-baissier', body: 'La figure pose une hypothèse de bascule vers les vendeurs : elle se joue sous le plus bas de l’englobement, pas avant.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'avalement-baissier' },
+        { id: 's4', kind: 'explain', body: 'L’englobement montre que les vendeurs ont repris la main. Le réflexe à corriger est celui de l’invalidation : sur un setup baissier, elle se place AU-DESSUS du plus haut de la figure.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un englobement seulement partiel, ou une figure isolée loin de toute résistance, n’est pas une bascule.' },
+        { id: 's6', kind: 'summary', body: 'Avalement baissier = englobement après une hausse ; confirmation sous le plus bas de l’englobement ; invalidation au-dessus du plus haut de la figure.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Où se place l’invalidation d’un avalement baissier ?', back: 'Au-dessus du plus haut de la figure — l’inverse du cas haussier.' } },
+      ],
+      commonMistake: 'Placer l’invalidation sous la figure par réflexe haussier, et surveiller le mauvais côté du graphique.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
   // ─── LOT 4-N — Module guidé « Lire la structure » (world.structure) ──
   'skill.structure.uptrend': [
     {
@@ -975,6 +1001,32 @@ const LESSONS: Record<string, Lesson[]> = {
         { id: 's7', kind: 'flashcard', flashcard: { front: 'Où se confirme une épaule-tête-épaule ?', back: 'Sous la ligne de cou, en clôture — idéalement retestée par l’arrière.' } },
       ],
       commonMistake: 'Jouer la figure dès l’épaule droite, avant la cassure de la ligne de cou.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  // ─── LOT C2 — La figure MIROIR (world.patterns) ─────────────────────
+  'skill.patterns.mirror': [
+    {
+      id: 'lesson.patterns-mirror',
+      slug: 'double-sommet-miroir',
+      title: 'La figure miroir : le double, retourné',
+      skillId: 'skill.patterns.mirror',
+      objective: 'Transposer le double creux à la baisse et retrouver son invalidation, qui change de côté.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Le double sommet est le miroir baissier du double creux : deux plafonds au lieu de deux planchers, un « M » au lieu d’un « W ».' },
+        { id: 's1', kind: 'observe', body: 'Cherche deux sommets à un niveau proche, séparés par un creux intermédiaire : c’est lui, la ligne de cou.' },
+        { id: 's2', kind: 'visual', conceptRef: 'double-sommet' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'double-sommet', body: 'Deux échecs au même plafond posent une hypothèse de retournement : elle se joue sous la ligne de cou, pas avant.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'double-sommet' },
+        { id: 's4', kind: 'explain', body: 'La confirmation est une clôture SOUS la ligne de cou. Le réflexe à corriger est l’invalidation : elle se place AU-DESSUS des sommets.' },
+        { id: 's5', kind: 'falseSignal', body: 'Une cassure de la ligne de cou sans participation, suivie d’un retour au-dessus, était un faux signal.' },
+        { id: 's6', kind: 'summary', body: 'Double sommet = deux plafonds + ligne de cou ; confirmation sous la ligne de cou ; invalidation au-dessus des sommets.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Où se place l’invalidation d’un double sommet ?', back: 'Au-dessus des deux sommets — l’inverse du double creux.' } },
+      ],
+      commonMistake: 'Anticiper avant la cassure de la ligne de cou, ou placer l’invalidation sous la figure par réflexe de double creux.',
       sources: ['Voix pédagogique Trademy'],
       status: 'draft',
     },
@@ -1703,6 +1755,7 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.candle.rejection': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.rejection'],
   'skill.candle.indecision': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.indecision'],
   'skill.candle.reversal': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.reversal'],
+  'skill.candle.mirror': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.mirror'],
   // LOT 4-N — module « Lire la structure » : exercices dérivés des scénarios (une vérité par item).
   'skill.structure.uptrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.uptrend'],
   'skill.structure.downtrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.downtrend'],
@@ -1721,6 +1774,7 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.patterns.triangle': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.triangle'],
   'skill.patterns.flag': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.flag'],
   'skill.patterns.reversal': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.reversal'],
+  'skill.patterns.mirror': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.mirror'],
   'skill.indicators.rsi': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.rsi'],
   'skill.indicators.macd': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.macd'],
   'skill.indicators.bollinger': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.bollinger'],

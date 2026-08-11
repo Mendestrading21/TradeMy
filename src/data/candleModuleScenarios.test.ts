@@ -19,7 +19,7 @@ import { getExercises, exercisableObjectiveIds, checkpointExercises, isCheckpoin
 import { objectiveId, parseObjectiveId, objectiveByIdIn, objectivesForConcept, type ObjectiveKind } from './learningTarget';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
-import { scenarioInteractionTypes, gradeExercise, lowestLow } from '../engines/exercise';
+import { scenarioInteractionTypes, gradeExercise, lowestLow, highestHigh } from '../engines/exercise';
 import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
@@ -33,6 +33,8 @@ const MODULE_CONCEPT_IDS = [
   'concept.hammer',
   'concept.doji',
   'concept.bullish-engulfing',
+  // LOT C2 — la figure miroir : cette fiche de bibliothèque devient une compétence entraînable.
+  'concept.bearish-engulfing',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -50,8 +52,9 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(CANDLE_MODULE_SCENARIOS.length);
-    // 4 compétences × 4 items = 16 exercices dérivés.
-    expect(ALL_EXERCISES.length).toBe(19); // LOT D1 : chaque compétence exerce toutes les natures documentées de sa fiche
+    // LOT C2 : 19 → 24. La 5e compétence (« La figure miroir ») exerce les CINQ objectifs réels de
+    // `concept.bearish-engulfing` — reconnaître, interpréter, confirmer, invalider, déjouer.
+    expect(ALL_EXERCISES.length).toBe(24);
   });
 
   it('chaque compétence cible un concept RÉEL de world.candles', () => {
@@ -109,7 +112,7 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(4);
+    expect(figures.length).toBe(5); // LOT C2 : la figure miroir ajoute sa propre reconnaissance.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -120,13 +123,20 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
     }
   });
 
-  it('cohérence invalidation : la cible placée EST le plus bas réel de la série rendue', () => {
+  it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    expect(places.length).toBe(3);
+    // LOT C2 : quatre placements. Trois setups haussiers s'invalident vers le BAS ; la figure
+    // miroir, baissière, s'invalide vers le HAUT — c'est tout l'objet de la compétence, et le test
+    // vérifie que la cible suit vraiment le côté annoncé par l'énoncé.
+    expect(places.length).toBe(4);
+    const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
+    expect(versLeHaut).toHaveLength(1);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
+      expect(ex.hint).toBeTruthy();
       const candles = generateCandles(ex.chartSeed, 30);
-      expect(ex.validation.targetPrice).toBe(lowestLow(candles));
+      const haut = (ex.hint ?? '').includes('plus haut');
+      expect(ex.validation.targetPrice).toBe(haut ? highestHigh(candles) : lowestLow(candles));
       expect(ex.validation.tolerance).toBeGreaterThan(0);
     }
   });

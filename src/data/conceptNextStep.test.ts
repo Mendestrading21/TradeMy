@@ -10,9 +10,10 @@ import { MASTERY_MIN_REPS, type TargetProgress } from './targetProgress';
  * LOT C1 — VERROU de la raison et de la prochaine action.
  *
  * Le défaut réparé : la machine de maîtrise savait pourquoi un concept était bloqué, mais
- * l'apprenant, lui, ne voyait qu'un statut. Et pour **22 fiches sur 67** ce statut ne peut
- * légitimement jamais bouger : ce sont des notions de bibliothèque, sans exercices à elles, que le
- * garde-fou P0 plafonne — à raison — à « Découvert ». Personne ne le disait.
+ * l'apprenant, lui, ne voyait qu'un statut. Et pour les fiches de BIBLIOTHÈQUE — sans exercices à
+ * elles — ce statut ne peut légitimement jamais bouger : le garde-fou P0 les plafonne, à raison, à
+ * « Découvert ». Personne ne le disait. Elles étaient 22 au LOT C1 ; le LOT C2 en a rendu deux
+ * entraînables, il en reste 20.
  *
  * (Le même lot corrige, dans `conceptMasteryState`, un plafonnement qui frappait AUSSI 42 concepts
  * pourtant activement entraînés : c'était un bug, pas une règle. Le compte de 22 vérifié ici est
@@ -66,7 +67,9 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // Ce compte n'est pas décoratif : c'est la mesure du défaut réparé. S'il change, c'est qu'un lot
     // a donné (ou retiré) une compétence propre à des fiches — il faut alors le vouloir.
     expect(REPRESENTATIVE.length + LIBRARY_ONLY.length).toBe(V5_CONCEPTS.length);
-    expect(LIBRARY_ONLY.length).toBe(22);
+    // LOT C2 : 22 → 20. Deux fiches de bibliothèque (avalement baissier, double sommet) ont reçu
+    // leur propre compétence guidée et sont donc devenues entraînables.
+    expect(LIBRARY_ONLY.length).toBe(20);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 
@@ -78,7 +81,7 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     }
   });
 
-  it('et elle propose une compétence guidée RÉELLE : les 22 ont une suite, aucune n’est orpheline', () => {
+  it('et elle propose une compétence guidée RÉELLE : chacune a une suite, aucune n’est orpheline', () => {
     const sansSuite: string[] = [];
     for (const c of LIBRARY_ONLY) {
       const step = conceptNextStep(c, VIDE);
