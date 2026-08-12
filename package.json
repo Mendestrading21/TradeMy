@@ -57,7 +57,7 @@
     "verify:docs": "node ./scripts/verify-doc-links.mjs",
     "verify:web": "node ./scripts/verify-web-build.mjs",
     "release:check": "node ./scripts/release-check.mjs && npm run verify:deployment && npm run verify:brand && npm run verify:docs",
-    "build:web": "npm run prepare:web && expo export --platform web && npm run finalize:web && npm run verify:web",
+    "build:web": "npm run prepare:web && node ./scripts/export-web.mjs && npm run finalize:web && npm run verify:web",
     "check": "npm run lint && npm run typecheck && npm test -- --runInBand && npm run validate:content && npm run release:check && npm run build:web"
   },
   "jest": {
