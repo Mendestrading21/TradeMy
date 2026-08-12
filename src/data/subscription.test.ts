@@ -1,4 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
+// L'identité de l'app est lue à sa SOURCE, pas recopiée : c'est tout l'objet du verrou ci-dessous.
+import appJson from '../../app.json';
 import {
   STORE_PRODUCTS,
   productById,
@@ -11,6 +13,7 @@ import {
   PAYWALL_ENABLED,
   GRACE_PERIOD_DAYS,
   type SubscriptionRecord,
+  APP_BUNDLE_ID,
 } from './subscription';
 
 /**
@@ -46,7 +49,8 @@ describe('catalogue des produits', () => {
       expect(p.appStoreProductId.length).toBeGreaterThan(0);
       expect(p.playStoreProductId.length).toBeGreaterThan(0);
       // Préfixés par le bundle identifier réel de l'app : aucune ambiguïté au moment de les créer.
-      expect(p.appStoreProductId.startsWith('com.patternlab.app')).toBe(true);
+      expect(p.appStoreProductId.startsWith(APP_BUNDLE_ID)).toBe(true);
+      expect(p.playStoreProductId.startsWith(APP_BUNDLE_ID)).toBe(true);
     }
   });
 
@@ -188,5 +192,20 @@ describe('la v1 reste GRATUITE tant qu’aucun achat réel n’existe (ADR-110)'
     expect(canAccess(noEntitlement())).toBe(true);
     expect(canAccess(resolveEntitlement(record({ expiresAt: at(-999) }), NOW))).toBe(true);
     expect(canAccess(resolveEntitlement(record(), NOW))).toBe(true);
+  });
+});
+
+describe('identité de l’application — le préfixe ne peut pas diverger', () => {
+  it('APP_BUNDLE_ID est EXACTEMENT le bundle identifier déclaré dans app.json, iOS et Android', () => {
+    // Un bundle identifier ne se change plus une fois la fiche créée chez Apple. Si cette constante
+    // et `app.json` divergeaient, les produits d'abonnement seraient déclarés sous un préfixe qui
+    // n'existe pas — et le défaut ne se verrait qu'au moment d'essayer de vendre.
+    expect(APP_BUNDLE_ID).toBe(appJson.expo.ios.bundleIdentifier);
+    expect(APP_BUNDLE_ID).toBe(appJson.expo.android.package);
+  });
+
+  it('le bundle identifier est en reverse-DNS et porte la marque publique', () => {
+    expect(APP_BUNDLE_ID).toMatch(/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$/);
+    expect(APP_BUNDLE_ID).toContain('trademy');
   });
 });

@@ -17,7 +17,7 @@ npm run check
 - [x] `name`, `slug`, `orientation` renseignés dans `app.json`
 - [x] `userInterfaceStyle` cohérent avec la marque sombre (`dark`)
 - [x] versions synchronisées : `app.json` = `package.json` = `APP_INFO.version`
-- [x] `ios.bundleIdentifier` et `android.package` en reverse-DNS (`com.patternlab.app`)
+- [x] `ios.bundleIdentifier` et `android.package` en reverse-DNS (`com.trademy.app`)
 - [x] icône et favicon présents sur le disque
 - [x] `expo-router` activé
 - [x] disclaimer éducatif présent, résumé de confidentialité (≥ 3 points), écran « À propos »

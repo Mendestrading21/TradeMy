@@ -6,20 +6,20 @@
     "description": "Apprends à lire les marchés, quelques minutes par jour. Application éducative gamifiée — aucun conseil financier.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "patternlab",
+    "scheme": "trademy",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0D16",
     "primaryColor": "#9270F0",
     "ios": {
       "icon": "./assets/images/icon.png",
-      "bundleIdentifier": "com.patternlab.app",
+      "bundleIdentifier": "com.trademy.app",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.patternlab.app",
+      "package": "com.trademy.app",
       "adaptiveIcon": {
         "backgroundColor": "#0A0D16",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
