@@ -1388,7 +1388,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'L’unité de temps, c’est…', options: ['La durée résumée par une bougie', 'Le prix d’ouverture', 'Le volume échangé', 'La couleur de la bougie'], correctIndex: 0, explanation: 'Chaque bougie condense O/H/L/C sur une durée fixe.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : les deux dimensions d'un graphique : ce qu'une bougie EST, et l'autre axe.
+    relatedConceptIds: ['concept.candle-anatomy', 'concept.echelle-des-prix'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1437,7 +1438,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'Une échelle très étirée…', options: ['Exagère l’ampleur perçue', 'Change le volume', 'Modifie la clôture', 'Inverse la tendance'], correctIndex: 0, explanation: 'L’étirement de l’axe change l’impression, pas les prix réels.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : l'axe vertical se lit avec l'axe horizontal, et c'est sur lui que se situent les niveaux.
+    relatedConceptIds: ['concept.candle-anatomy', 'concept.unite-de-temps', 'concept.support-resistance'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1496,7 +1498,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'Une mèche de rejet compte surtout…', options: ['À une zone significative', 'N’importe où', 'Seulement en clôture hebdo', 'Sur le volume'], correctIndex: 0, explanation: 'Le rejet n’a de sens qu’à une zone (support/résistance).' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : la mèche de rejet est la matière du marteau et de l'étoile filante ; elle rejette une ZONE.
+    relatedConceptIds: ['concept.hammer', 'concept.shooting-star', 'concept.support-resistance'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1555,7 +1558,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'Dans une tendance haussière, une correction…', options: ['Ne l’invalide pas tant que la structure tient', 'Signifie toujours un retournement', 'Efface la tendance', 'Augmente le volume'], correctIndex: 0, explanation: 'Tant que les creux montent, la tendance reste intacte.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : l'alternance poussée/respiration est la structure d'une tendance, et le drapeau EST une correction.
+    relatedConceptIds: ['concept.uptrend', 'concept.bull-flag', 'concept.price-action-intro'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1614,7 +1618,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'Après une cassure, un retest…', options: ['Vient tester le niveau franchi', 'Change l’unité de temps', 'Efface le volume', 'Garantit la continuation'], correctIndex: 0, explanation: 'Le retest teste le niveau cassé ; il peut confirmer ou invalider.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : le retest est le mécanisme par lequel un support devient résistance après une cassure.
+    relatedConceptIds: ['concept.polarity-flip', 'concept.support-resistance', 'concept.break-of-structure'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1673,7 +1678,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'La distribution se situe…', options: ['Au sommet d’une hausse', 'Au creux d’une baisse', 'En pleine impulsion', 'Sur l’axe du temps'], correctIndex: 0, explanation: 'C’est une phase latérale en sommet, miroir de l’accumulation.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : la distribution est le miroir exact de l'accumulation ; c'est un range lu au volume.
+    relatedConceptIds: ['concept.wyckoff-accumulation', 'concept.range', 'concept.volume'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
@@ -1732,7 +1738,8 @@ export const BATCH_CONCEPTS: LearningConcept[] = [
     miniQuizzes: [
       { question: 'Comment se protéger d’un fakeout ?', options: ['Attendre clôture / retest', 'Entrer plus tôt', 'Ignorer les niveaux', 'Augmenter la taille'], correctIndex: 0, explanation: 'La confirmation (clôture au-delà, retest) filtre beaucoup de fausses cassures.' },
     ],
-    relatedConceptIds: [],
+    // LOT C5 — parenté déclarée : un faux breakout est un faux signal appliqué à une cassure de niveau.
+    relatedConceptIds: ['concept.fakeout', 'concept.support-resistance', 'concept.break-of-structure'],
     sources: [{ label: 'Voix pédagogique Trademy', kind: 'editorial' }],
     version: 1,
     status: 'needsReview',
