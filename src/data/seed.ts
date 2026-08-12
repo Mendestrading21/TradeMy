@@ -737,6 +737,57 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT C6 — La séquence : la lecture passe d'une bougie à trois, et l'ordre décide ──
+  'skill.candle.sequence-reversal': [
+    {
+      id: 'lesson.candle-sequence-reversal',
+      slug: 'etoile-du-matin-trois-temps',
+      title: 'Le retournement en trois temps',
+      skillId: 'skill.candle.sequence-reversal',
+      objective: 'Lire une étoile du matin comme une SÉQUENCE de trois bougies dont l’ordre porte le sens.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Jusqu’ici, une bougie suffisait à poser une question. Ici il en faut trois — et si tu les lis dans le désordre, tu lis une autre figure.' },
+        { id: 's1', kind: 'observe', body: 'Une baisse est en cours. Première bougie baissière. Puis une toute petite bougie : le mouvement s’arrête. Puis une haussière qui remonte dans le corps de la première.' },
+        { id: 's2', kind: 'visual', conceptRef: 'etoile-du-matin' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'etoile-du-matin', body: 'Ce n’est pas la troisième bougie qui fait le retournement, c’est la PAUSE du milieu : elle marque le moment où la baisse cesse d’avancer.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'etoile-du-matin' },
+        { id: 's4', kind: 'explain', body: 'La confirmation se prend au-dessus du plus haut de la troisième bougie. L’invalidation se place sous le plus bas de la FIGURE — les trois bougies ensemble, pas la dernière seule.' },
+        { id: 's5', kind: 'falseSignal', body: 'Une troisième bougie faible, qui ne reprend rien du corps de la première, laisse la figure sans contenu : la pause n’a débouché sur rien.' },
+        { id: 's6', kind: 'summary', body: 'Étoile du matin = baissière, indécision, haussière, dans cet ordre, après une baisse. Lue à l’envers, c’est une étoile du soir — la figure miroir, baissière.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui distingue l’étoile du matin de l’étoile du soir ?', back: 'Les mêmes trois temps, dans l’ordre inverse : matin = baissière/indécision/haussière après une baisse ; soir = haussière/indécision/baissière après une hausse.' } },
+      ],
+      commonMistake: 'Chercher la figure dans la dernière bougie, alors que c’est la petite bougie du milieu qui la constitue.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.candle.sequence-momentum': [
+    {
+      id: 'lesson.candle-sequence-momentum',
+      slug: 'trois-soldats-poussee',
+      title: 'La poussée en trois temps',
+      skillId: 'skill.candle.sequence-momentum',
+      objective: 'Distinguer une poussée de trois bougies du même sens d’un essoufflement de fin de mouvement.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Trois bougies encore — mais cette fois elles vont toutes dans le MÊME sens. Il n’y a pas de pause au milieu : ce n’est pas un retournement, c’est une poussée.' },
+        { id: 's1', kind: 'observe', body: 'Trois bougies haussières consécutives, chacune clôturant plus haut que la précédente, avec des mèches courtes.' },
+        { id: 's2', kind: 'visual', conceptRef: 'trois-soldats' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'trois-soldats', body: 'La même séquence ne dit pas la même chose selon l’endroit : au départ d’un mouvement, c’est une poussée ; après une hausse déjà étirée, c’est un essoufflement.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'trois-soldats' },
+        { id: 's4', kind: 'explain', body: 'La confirmation se prend au-dessus de la CLÔTURE de la troisième, pas de son plus haut : ce sont les corps qui portent la conviction. L’invalidation se place sous le corps de la PREMIÈRE des trois — on est revenu au point de départ.' },
+        { id: 's5', kind: 'falseSignal', body: 'De longues mèches hautes sur les trois bougies trahissent un rejet à chaque séance, malgré des clôtures en hausse.' },
+        { id: 's6', kind: 'summary', body: 'Trois soldats = trois bougies du même sens, lues APRÈS avoir situé où l’on se trouve dans le mouvement. Les trois corbeaux sont la séquence miroir, baissière.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Où se lit d’abord une séquence de trois soldats ?', back: 'Dans le contexte : début de mouvement (poussée) ou hausse déjà étirée (essoufflement). La forme se lit ensuite.' } },
+      ],
+      commonMistake: 'Prendre trois bougies haussières de suite pour un signal d’autant plus fort que la hausse dure déjà.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
   // ─── LOT 4-N — Module guidé « Lire la structure » (world.structure) ──
   'skill.structure.uptrend': [
     {
@@ -1911,6 +1962,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.candle.context': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.context'],
   'skill.candle.rejection-high': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.rejection-high'],
   'skill.candle.rejection-low': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.rejection-low'],
+  // LOT C6 — la séquence : trois bougies, et l'ordre décide.
+  'skill.candle.sequence-reversal': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.sequence-reversal'],
+  'skill.candle.sequence-momentum': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.sequence-momentum'],
   // LOT 4-N — module « Lire la structure » : exercices dérivés des scénarios (une vérité par item).
   'skill.structure.uptrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.uptrend'],
   'skill.structure.downtrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.downtrend'],

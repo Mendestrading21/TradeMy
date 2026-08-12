@@ -39,6 +39,9 @@ const MODULE_CONCEPT_IDS = [
   'concept.hanging-man',
   'concept.shooting-star',
   'concept.inverted-hammer',
+  // LOT C6 — la SÉQUENCE : trois bougies, et l'ordre décide.
+  'concept.morning-star',
+  'concept.three-white-soldiers',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -57,7 +60,8 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
     }
     expect(ALL_EXERCISES.length).toBe(CANDLE_MODULE_SCENARIOS.length);
     // LOT C2 : 19 → 24. LOT C4 : 24 → 39 (trois compétences de plus, cinq objectifs réels chacune).
-    expect(ALL_EXERCISES.length).toBe(39);
+    // LOT C6 : 39 → 49 (deux compétences de séquence, cinq objectifs réels chacune).
+    expect(ALL_EXERCISES.length).toBe(49);
   });
 
   it('chaque compétence cible un concept RÉEL de world.candles', () => {
@@ -115,7 +119,7 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(8); // une reconnaissance par compétence du module.
+    expect(figures.length).toBe(10); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -128,11 +132,11 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // LOT C4 — même verrou que le monde des figures, et même leçon : l'invalidation se place du
-    // côté OPPOSÉ au sens du setup. Sept placements : quatre setups haussiers invalidés vers le BAS
-    // (marubozu, marteau, avalement haussier, marteau inversé) et trois baissiers vers le HAUT
-    // (avalement baissier, pendu, étoile filante).
-    expect(places.length).toBe(7);
+    // LOT C4 puis C6 — même verrou que le monde des figures, et même leçon : l'invalidation se place
+    // du côté OPPOSÉ au sens du setup. Neuf placements : six setups haussiers invalidés vers le BAS
+    // (marubozu, marteau, avalement haussier, marteau inversé, étoile du matin, trois soldats) et
+    // trois baissiers vers le HAUT (avalement baissier, pendu, étoile filante).
+    expect(places.length).toBe(9);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
     expect(versLeHaut).toHaveLength(3);
     for (const ex of places) {
@@ -153,6 +157,63 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
     for (const id of skillIds) expect(id.startsWith('skill.candle.')).toBe(true);
     // La revue mélange plusieurs compétences du module (pas une seule).
     expect(skillIds.size).toBeGreaterThanOrEqual(2);
+  });
+
+  // ── LOT C6 — la SÉQUENCE. Ces trois tests prouvent que le lot enseigne bien une idée neuve, et
+  //    que ses deux compétences ne sont pas des copies l'une de l'autre.
+  describe('LOT C6 — trois bougies, et l’ordre décide', () => {
+    const SEQUENCE_SKILLS = ['skill.candle.sequence-reversal', 'skill.candle.sequence-momentum'];
+
+    it('les deux compétences de séquence existent, portent 5 exercices chacune, et ciblent la figure de leur fiche', () => {
+      for (const id of SEQUENCE_SKILLS) {
+        expect(CANDLE_SKILLS.some((s) => s.id === id)).toBe(true);
+        expect(CANDLE_MODULE_EXERCISES_BY_SKILL[id]).toHaveLength(5);
+        // Une compétence = UN concept : l'invariante du corpus, respectée ici aussi.
+        const ciblés = new Set(CANDLE_MODULE_EXERCISES_BY_SKILL[id].map((e) => e.target?.conceptId));
+        expect(ciblés.size).toBe(1);
+        expect([...ciblés][0]).toBe(CANDLE_SKILL_CONCEPT_ID[id]);
+      }
+    });
+
+    it('la lecture ORDONNÉE porte réellement sur les trois temps — pas sur la forme d’une bougie', () => {
+      for (const id of SEQUENCE_SKILLS) {
+        const ordre = CANDLE_MODULE_EXERCISES_BY_SKILL[id].find((e) => e.type === 'order');
+        expect(ordre).toBeDefined();
+        if (ordre?.type !== 'order') throw new Error('exercice `order` attendu');
+        // Quatre temps énoncés : les trois bougies, puis ce qu'on attend ensuite.
+        expect(ordre.items).toHaveLength(4);
+        // La bonne réponse est l'ordre chronologique : c'est justement ce qui est enseigné.
+        expect(ordre.validation.correctOrder).toEqual([0, 1, 2, 3]);
+      }
+    });
+
+    it('chaque énoncé de séquence est DÉRIVÉ de la fiche : confirmation, invalidation et faux signal s’y retrouvent', () => {
+      const attendus: Record<string, { conceptId: string; confirme: RegExp; invalide: RegExp }> = {
+        // « Au-dessus du plus haut de la troisième bougie. » / « Clôture sous le plus bas de la figure. »
+        'skill.candle.sequence-reversal': {
+          conceptId: 'concept.morning-star',
+          confirme: /plus haut de la troisième/i,
+          invalide: /plus bas de la (figure|FIGURE)/i,
+        },
+        // « Au-dessus de la clôture de la troisième bougie. » / « Clôture sous le corps de la première des trois. »
+        'skill.candle.sequence-momentum': {
+          conceptId: 'concept.three-white-soldiers',
+          confirme: /clôture de la troisième/i,
+          invalide: /corps de la (première|PREMIÈRE)/i,
+        },
+      };
+      for (const [skillId, attendu] of Object.entries(attendus)) {
+        const fiche = V5_CONCEPTS.find((c) => c.id === attendu.conceptId)!;
+        // La fiche déclare bien ces deux champs — sinon l'exercice serait inventé.
+        expect(fiche.confirmationZone).toBeTruthy();
+        expect(fiche.invalidation).toBeTruthy();
+        const textes = CANDLE_MODULE_EXERCISES_BY_SKILL[skillId]
+          .map((e) => [e.prompt, e.feedback.rule ?? '', e.feedback.whenItFails ?? '', e.feedback.correct].join(' '))
+          .join(' ');
+        expect(textes).toMatch(attendu.confirme);
+        expect(textes).toMatch(attendu.invalide);
+      }
+    });
   });
 
   it('aucun exercice ne contient BUY/SELL ni promesse de gain', () => {
