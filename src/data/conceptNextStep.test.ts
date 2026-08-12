@@ -71,7 +71,11 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // drapeau baissier, ÉTÉ inversée). Chaque baisse correspond à un lot qui a donné à ces fiches
     // leur propre compétence guidée — jamais à un relâchement de la règle.
     // LOT C4 : 17 → 14 (pendu, étoile filante, marteau inversé).
-    expect(LIBRARY_ONLY.length).toBe(14);
+    // LOT C6 : 14 → 12 (étoile du matin, trois soldats blancs). Deux seulement, et non quatre :
+    // le corpus impose une compétence = UN concept (56/56 sans exception avant ce lot), donc les
+    // deux figures MIROIR — étoile du soir, trois corbeaux — restent en bibliothèque. Elles sont
+    // enseignées dans les leçons et les faux signaux, mais pas encore entraînées pour elles-mêmes.
+    expect(LIBRARY_ONLY.length).toBe(12);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 

@@ -17,6 +17,14 @@
  *   6. Le contexte décide      → `concept.hanging-man` (LOT C4)
  *   7. Le rejet par le haut    → `concept.shooting-star` (LOT C4)
  *   8. Le même rejet, l'autre histoire → `concept.inverted-hammer` (LOT C4, HAUSSIER)
+ *   9. Le retournement en trois temps → `concept.morning-star` (LOT C6)
+ *  10. La poussée en trois temps     → `concept.three-white-soldiers` (LOT C6)
+ *
+ * LOT C6 introduit la première idée VRAIMENT nouvelle depuis le pilote : jusqu'ici tout le module lit
+ * UNE bougie (marubozu, marteau, doji, pendu, étoile filante, marteau inversé) ou DEUX lues comme un
+ * bloc (avalement). Les quatre figures de séquence en demandent TROIS, et l'ORDRE décide : lue à
+ * l'envers, une étoile du matin devient une étoile du soir. La mécanique `read-order` cesse donc
+ * d'être un exercice d'énonciation pour devenir la chose enseignée elle-même.
  *
  * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget) — jamais inventés.
  * `concept.doji` ne documente pas d'invalidation : on ne lui attache donc AUCUN exercice d'invalidation
@@ -47,6 +55,10 @@ export const CANDLE_SKILLS: Skill[] = [
   { id: 'skill.candle.context', name: 'Le contexte décide', description: 'Marteau ou pendu : même forme, sens opposé — c’est ce qui précède qui tranche.' },
   { id: 'skill.candle.rejection-high', name: 'Le rejet par le haut', description: 'Lire une étoile filante : longue mèche haute après une hausse, près d’une résistance.' },
   { id: 'skill.candle.rejection-low', name: 'Le même rejet, l’autre histoire', description: 'Le marteau inversé : même forme que l’étoile filante, mais après une baisse — donc haussier.' },
+  // LOT C6 — la SÉQUENCE. Jusqu'ici le module lit une bougie (ou deux comme un bloc). Ici il en faut
+  // TROIS, et l'ordre décide : lue à l'envers, une étoile du matin devient une étoile du soir.
+  { id: 'skill.candle.sequence-reversal', name: 'Le retournement en trois temps', description: 'L’étoile du matin : baissière, indécision, haussière — c’est la PAUSE du milieu qui fait le retournement.' },
+  { id: 'skill.candle.sequence-momentum', name: 'La poussée en trois temps', description: 'Trois soldats : trois bougies du même sens. Une continuation — sauf en fin de course, où c’est l’épuisement.' },
 ];
 
 // Concepts réels du monde `world.candles` reliés à chaque compétence (source : learningContent V5).
@@ -58,6 +70,10 @@ const BEARISH_ENGULFING = 'concept.bearish-engulfing';
 const HANGING_MAN = 'concept.hanging-man';
 const SHOOTING_STAR = 'concept.shooting-star';
 const INVERTED_HAMMER = 'concept.inverted-hammer';
+const MORNING_STAR = 'concept.morning-star';
+const EVENING_STAR = 'concept.evening-star';
+const THREE_WHITE_SOLDIERS = 'concept.three-white-soldiers';
+const THREE_BLACK_CROWS = 'concept.three-black-crows';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -69,6 +85,8 @@ export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.candle.context': HANGING_MAN,
   'skill.candle.rejection-high': SHOOTING_STAR,
   'skill.candle.rejection-low': INVERTED_HAMMER,
+  'skill.candle.sequence-reversal': MORNING_STAR,
+  'skill.candle.sequence-momentum': THREE_WHITE_SOLDIERS,
 };
 export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.pressure': 'marubozu',
@@ -79,6 +97,8 @@ export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.context': 'pendu',
   'skill.candle.rejection-high': 'etoile-filante',
   'skill.candle.rejection-low': 'marteau-inverse',
+  'skill.candle.sequence-reversal': 'etoile-du-matin',
+  'skill.candle.sequence-momentum': 'trois-soldats',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -750,6 +770,199 @@ const REJECTION_LOW_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 9 — Le retournement en trois temps (étoile du matin / étoile du soir) ────────
+// LOT C6. Première figure du module qui exige TROIS bougies. Tout est dérivé des fiches :
+//   `definitionShort` : « Trois bougies : baissière, petite d'indécision, puis haussière — après une baisse. »
+//   `confirmationZone` : « Au-dessus du plus haut de la troisième bougie. »
+//   `invalidation`     : « Clôture sous le plus bas de la figure. »
+//   `falseSignals`     : « Troisième bougie faible qui ne reprend rien. »
+// Le miroir (étoile du soir) sert de contre-exemple DANS la même compétence : c'est la même
+// séquence lue à l'envers, et c'est précisément ce que l'apprenant doit savoir distinguer.
+const SEQUENCE_REVERSAL_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.sequence-reversal.recognize',
+    skillId: 'skill.candle.sequence-reversal',
+    target: target(MORNING_STAR, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.morning-star.v1',
+    variant: 'morning-star',
+    visualType: 'candlestick-pattern',
+    prompt: 'Cette séquence apparaît APRÈS UNE BAISSE. Quelle figure est-ce ?',
+    options: [
+      'Une étoile du matin (baissière, indécision, haussière)',
+      'Une étoile du soir (haussière, indécision, baissière)',
+      'Trois soldats blancs (trois bougies haussières de suite)',
+    ],
+    correctIndex: 0,
+    a11y:
+      'Trois bougies : une baissière au corps net, une très petite au milieu, puis une haussière qui remonte dans le corps de la première. L’ensemble suit une baisse.',
+    difficulty: 'medium',
+    rule: 'L’étoile du matin est une séquence de trois bougies : baissière, indécision, haussière — dans cet ordre, après une baisse.',
+  },
+  {
+    // La mécanique `read-order` cesse d'être un exercice d'énonciation : ici l'ORDRE est la chose
+    // enseignée. Une étoile du matin lue à l'envers EST une étoile du soir.
+    id: 'ex.candle.sequence-reversal.interpret',
+    skillId: 'skill.candle.sequence-reversal',
+    target: target(MORNING_STAR, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets les trois temps de l’étoile du matin dans l’ordre.',
+    steps: [
+      'Une baisse est en cours : la première bougie est baissière',
+      'Le mouvement s’arrête : une toute petite bougie, l’indécision',
+      'La troisième bougie est haussière et remonte dans le corps de la première',
+      'On attend le dépassement du plus haut de cette troisième bougie',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Ici l’ORDRE est la figure : c’est la petite bougie du milieu, la pause, qui sépare la baisse de la reprise. Sans elle, il n’y a pas d’étoile.',
+  },
+  {
+    id: 'ex.candle.sequence-reversal.confirm',
+    skillId: 'skill.candle.sequence-reversal',
+    target: target(MORNING_STAR, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette étoile du matin ?',
+    context:
+      'Après une baisse, une bougie baissière, puis une toute petite bougie d’indécision, puis une bougie haussière. La séquence est complète.',
+    options: [
+      'Le prix dépasse le plus haut de la troisième bougie.',
+      'La petite bougie du milieu suffit : l’indécision annonce le retournement.',
+      'Les trois bougies formées dans cet ordre valent confirmation à elles seules.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La confirmation se prend AU-DESSUS du plus haut de la troisième bougie — pas à la formation de la figure.',
+    whenItFails:
+      'Une troisième bougie faible, qui ne reprend rien du corps de la première, laisse la figure sans contenu.',
+    a11y:
+      'Contexte : après une baisse, la séquence baissière, indécision, haussière est complète. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.sequence-reversal.invalidate',
+    skillId: 'skill.candle.sequence-reversal',
+    target: target(MORNING_STAR, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 421,
+    prompt:
+      'Ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas de la figure.',
+    difficulty: 'hard',
+    rule: 'L’étoile du matin est invalidée par une clôture sous le plus bas de la FIGURE — les trois bougies, pas seulement la dernière.',
+    whenItFails:
+      'Placer l’invalidation sous la seule troisième bougie la met trop haut : la figure entière est le niveau de référence.',
+  },
+  {
+    // Le contre-exemple est le MIROIR de la figure, et il est dans le corpus : `concept.evening-star`
+    // se confirme SOUS le plus bas de sa troisième bougie. C'est l'erreur attendue.
+    id: 'ex.candle.sequence-reversal.avoid',
+    skillId: 'skill.candle.sequence-reversal',
+    target: target(MORNING_STAR, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur les étoiles du matin et du soir.',
+    statements: [
+      'Une troisième bougie faible, qui ne reprend rien, vide la figure de son sens.',
+      'Étoile du matin et étoile du soir se confirment du même côté, puisqu’elles ont la même forme.',
+      'Les mêmes trois bougies lues dans l’autre sens ne racontent pas la même histoire.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 10 — La poussée en trois temps (trois soldats / trois corbeaux) ────────────
+// LOT C6. Même exigence de séquence, mais l'histoire est CONTRAIRE : ici les trois bougies vont
+// dans le MÊME sens. Ce n'est pas un retournement, c'est une continuation. Dérivé des fiches :
+//   `definitionShort` : « Trois bougies haussières successives, chacune clôturant plus haut. »
+//   `confirmationZone` : « Au-dessus de la clôture de la troisième bougie. »
+//   `invalidation`     : « Clôture sous le corps de la première des trois. »
+//   `falseSignals`     : « Bougies aux longues mèches hautes (rejet) » ; « Après une hausse déjà étirée. »
+const SEQUENCE_MOMENTUM_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.sequence-momentum.recognize',
+    skillId: 'skill.candle.sequence-momentum',
+    target: target(THREE_WHITE_SOLDIERS, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.three-white-soldiers.v1',
+    variant: 'three-white-soldiers',
+    visualType: 'candlestick-pattern',
+    prompt: 'Quelle séquence reconnais-tu ?',
+    options: [
+      'Trois soldats blancs (trois haussières, chacune clôturant plus haut)',
+      'Une étoile du matin (baissière, indécision, haussière)',
+      'Trois corbeaux noirs (trois baissières, chacune clôturant plus bas)',
+    ],
+    correctIndex: 0,
+    a11y:
+      'Trois bougies haussières consécutives aux corps nets, chacune clôturant plus haut que la précédente, avec peu de mèche.',
+    difficulty: 'easy',
+    rule: 'Trois soldats : trois bougies du MÊME sens à la suite. Contrairement à l’étoile, il n’y a pas de pause au milieu — c’est une poussée, pas un retournement.',
+  },
+  {
+    id: 'ex.candle.sequence-momentum.interpret',
+    skillId: 'skill.candle.sequence-momentum',
+    target: target(THREE_WHITE_SOLDIERS, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture de trois soldats blancs.',
+    steps: [
+      'Regarde d’abord où l’on se trouve : début de mouvement, ou hausse déjà étirée ?',
+      'Vérifie que les trois bougies clôturent bien chacune plus haut',
+      'Regarde les mèches hautes : longues, elles trahissent un rejet',
+      'Attends le dépassement de la clôture de la troisième',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La position dans le mouvement se lit AVANT la forme : les trois mêmes bougies sont une poussée au départ, un épuisement en fin de course.',
+  },
+  {
+    id: 'ex.candle.sequence-momentum.confirm',
+    skillId: 'skill.candle.sequence-momentum',
+    target: target(THREE_WHITE_SOLDIERS, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette poussée ?',
+    context:
+      'Trois bougies haussières se sont succédé, chacune clôturant plus haut que la précédente, avec des mèches courtes.',
+    options: [
+      'Le prix dépasse la clôture de la troisième bougie.',
+      'Trois bougies haussières de suite se passent de confirmation.',
+      'Il suffit que la troisième bougie soit la plus longue des trois.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La poussée se confirme au-dessus de la CLÔTURE de la troisième — pas de son plus haut : ce sont les corps qui portent la conviction.',
+    whenItFails:
+      'Après une hausse déjà étirée, la même séquence signale plutôt un essoufflement que le début de quelque chose.',
+    a11y:
+      'Contexte : trois bougies haussières consécutives à mèches courtes, chacune clôturant plus haut. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.sequence-momentum.invalidate',
+    skillId: 'skill.candle.sequence-momentum',
+    target: target(THREE_WHITE_SOLDIERS, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 517,
+    prompt:
+      'Ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule: 'Les trois soldats sont invalidés par une clôture sous le corps de la PREMIÈRE des trois : la poussée est annulée quand on revient à son point de départ.',
+    whenItFails:
+      'La séquence miroir — trois corbeaux — est BAISSIÈRE : elle s’invalide au-dessus du corps de sa première bougie, donc en haut.',
+  },
+  {
+    id: 'ex.candle.sequence-momentum.avoid',
+    skillId: 'skill.candle.sequence-momentum',
+    target: target(THREE_WHITE_SOLDIERS, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur les trois soldats.',
+    statements: [
+      'De longues mèches hautes sur les trois bougies trahissent un rejet, malgré les clôtures en hausse.',
+      'Trois bougies haussières de suite sont un signal d’autant plus fort que la hausse dure déjà depuis longtemps.',
+      'Trois soldats et trois corbeaux sont la même séquence de sens opposé, et s’invalident de côtés opposés.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.candle.pressure': PRESSURE_SCENARIOS,
@@ -760,6 +973,8 @@ export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]
   'skill.candle.context': CONTEXT_SCENARIOS,
   'skill.candle.rejection-high': REJECTION_HIGH_SCENARIOS,
   'skill.candle.rejection-low': REJECTION_LOW_SCENARIOS,
+  'skill.candle.sequence-reversal': SEQUENCE_REVERSAL_SCENARIOS,
+  'skill.candle.sequence-momentum': SEQUENCE_MOMENTUM_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */
