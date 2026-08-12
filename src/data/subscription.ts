@@ -29,9 +29,20 @@ export type SubscriptionPlanId = 'monthly' | 'annual' | 'lifetime';
 export type EntitlementSource = 'app_store' | 'play_store' | 'promo' | 'demo';
 
 /**
+ * Bundle identifier réel de l'application — SOURCE UNIQUE de ce préfixe.
+ *
+ * Il était auparavant recopié dans chaque identifiant de produit. Un bundle identifier ne se change
+ * plus une fois la fiche créée chez Apple : une divergence entre `app.json` et ce catalogue
+ * produirait des produits inachetables, et le défaut ne se verrait qu'au moment de vendre. La
+ * valeur est donc déclarée ici une fois, et un test la confronte à `app.json` — côté iOS ET côté
+ * Android.
+ */
+export const APP_BUNDLE_ID = 'com.trademy.app';
+
+/**
  * Produit vendable. Les identifiants magasin sont ceux à CRÉER côté propriétaire ; ils sont
- * préfixés par le bundle identifier réel de l'app (`com.patternlab.app`, cf. `app.json`) pour
- * qu'aucune ambiguïté ne subsiste au moment de les déclarer dans App Store Connect.
+ * préfixés par `APP_BUNDLE_ID` pour qu'aucune ambiguïté ne subsiste au moment de les déclarer
+ * dans App Store Connect.
  */
 export interface StoreProduct {
   id: SubscriptionPlanId;
@@ -55,24 +66,24 @@ export interface StoreProduct {
 export const STORE_PRODUCTS: readonly StoreProduct[] = [
   {
     id: 'monthly',
-    appStoreProductId: 'com.patternlab.app.sub.monthly',
-    playStoreProductId: 'com.patternlab.app.sub.monthly',
+    appStoreProductId: `${APP_BUNDLE_ID}.sub.monthly`,
+    playStoreProductId: `${APP_BUNDLE_ID}.sub.monthly`,
     label: 'Mensuel',
     periodDays: 30,
     trialDays: 7,
   },
   {
     id: 'annual',
-    appStoreProductId: 'com.patternlab.app.sub.annual',
-    playStoreProductId: 'com.patternlab.app.sub.annual',
+    appStoreProductId: `${APP_BUNDLE_ID}.sub.annual`,
+    playStoreProductId: `${APP_BUNDLE_ID}.sub.annual`,
     label: 'Annuel',
     periodDays: 365,
     trialDays: 7,
   },
   {
     id: 'lifetime',
-    appStoreProductId: 'com.patternlab.app.lifetime',
-    playStoreProductId: 'com.patternlab.app.lifetime',
+    appStoreProductId: `${APP_BUNDLE_ID}.lifetime`,
+    playStoreProductId: `${APP_BUNDLE_ID}.lifetime`,
     label: 'Accès définitif',
     periodDays: null,
     trialDays: 0,

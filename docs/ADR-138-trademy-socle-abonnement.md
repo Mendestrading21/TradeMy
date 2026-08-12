@@ -2,6 +2,11 @@
 
 - **Statut** : accepté (demande propriétaire du 11/08/2026 : « une app où je peux créer des
   abonnements sur l'App Store »).
+> **Mise à jour — ADR-147.** Les identifiants cités plus bas étaient préfixés par
+> `com.patternlab.app`. Le bundle identifier est devenu **`com.trademy.app`** avant toute création
+> de fiche chez Apple. Les identifiants de produits à créer sont donc `com.trademy.app.sub.monthly`,
+> `…sub.annual` et `…lifetime`. Le texte d'origine est conservé tel quel — un ADR se complète, il ne
+> se réécrit pas — mais **c'est cette note qui fait foi** pour les identifiants.
 - **Contexte** : le canon interdit d'ajouter « une dépendance, une migration persistante, un
   paiement ou un service externe sans besoin démontré ET décision documentée » (CLAUDE.md). Le
   besoin est ici explicitement demandé ; cet ADR est la décision.
