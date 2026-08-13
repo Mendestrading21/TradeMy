@@ -39,6 +39,10 @@ const MODULE_CONCEPT_IDS = [
   'concept.descending-triangle',
   'concept.bear-flag',
   'concept.inverse-head-shoulders',
+  // LOT C7 — la pente ment (les deux biseaux), et la figure sans direction.
+  'concept.rising-wedge',
+  'concept.falling-wedge',
+  'concept.symmetrical-triangle',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -58,7 +62,8 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     expect(ALL_EXERCISES.length).toBe(PATTERNS_MODULE_SCENARIOS.length);
     // 4 compétences × 4 items = 16 exercices dérivés.
     // LOT C3 : 25 → 40. Trois compétences miroir de plus, cinq objectifs réels chacune.
-    expect(ALL_EXERCISES.length).toBe(40);
+    // LOT C7 : 40 → 55. Deux biseaux + le triangle symétrique, cinq objectifs réels chacun.
+    expect(ALL_EXERCISES.length).toBe(55);
   });
 
   it('chaque compétence cible un concept RÉEL de world.patterns', () => {
@@ -125,7 +130,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(8); // une reconnaissance par compétence du module.
+    expect(figures.length).toBe(11); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -137,13 +142,24 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // LOT C3 — le verrou porte maintenant la LEÇON du lot : l'invalidation se place du côté OPPOSÉ
-    // au sens du setup. Six placements : trois setups haussiers (double creux, drapeau haussier,
-    // ÉTÉ inversée) invalidés vers le BAS, trois setups baissiers (double sommet, triangle
-    // descendant, drapeau baissier) invalidés vers le HAUT.
-    expect(places.length).toBe(6);
+    // LOT C3 — le verrou porte la LEÇON du lot : l'invalidation se place du côté OPPOSÉ au sens du
+    // setup. Six placements : trois setups haussiers (double creux, drapeau haussier, ÉTÉ inversée)
+    // invalidés vers le BAS, trois baissiers (double sommet, triangle descendant, drapeau baissier)
+    // invalidés vers le HAUT.
+    //
+    // LOT C7 — 6 → 8, et le verrou devient plus fort qu'un compteur. Les deux biseaux ajoutés
+    // prouvent que la règle suit le SENS et non la PENTE : le biseau ASCENDANT (dessin qui monte,
+    // setup baissier) s'invalide vers le HAUT, le biseau DESCENDANT (dessin qui descend, setup
+    // haussier) vers le BAS. Si un jour quelqu'un « corrige » un biseau pour l'aligner sur sa pente,
+    // ce test tombe.
+    expect(places.length).toBe(8);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
-    expect(versLeHaut).toHaveLength(3);
+    expect(versLeHaut).toHaveLength(4);
+    // Le triangle symétrique, NEUTRE, n'a aucun placement : il n'a pas de côté.
+    const conceptsPlacés = new Set(places.map((ex) => ex.target?.conceptId));
+    expect(conceptsPlacés.has('concept.symmetrical-triangle')).toBe(false);
+    expect(conceptsPlacés.has('concept.rising-wedge')).toBe(true);
+    expect(conceptsPlacés.has('concept.falling-wedge')).toBe(true);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
       expect(ex.hint).toBeTruthy();
@@ -161,6 +177,76 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     const skillIds = new Set(cp.map((e) => e.skillId));
     for (const id of skillIds) expect(id.startsWith('skill.patterns.')).toBe(true);
     expect(skillIds.size).toBeGreaterThanOrEqual(2);
+  });
+
+  // ── LOT C7 — la pente ment, et une figure n'annonce rien. Ces tests prouvent que la leçon vient
+  //    du CORPUS et non de moi, et qu'elle est bien exercée.
+  describe('LOT C7 — la pente ment, et une figure n’annonce rien', () => {
+    it('le CORPUS lui-même dit que les biseaux se lisent à l’inverse de leur pente', () => {
+      // Ce n'est pas une opinion pédagogique : `visualSpec.direction` le déclare, et c'est
+      // exactement ce qui rend ces deux fiches enseignables.
+      const montant = V5_CONCEPTS.find((c) => c.id === 'concept.rising-wedge')!;
+      const descendant = V5_CONCEPTS.find((c) => c.id === 'concept.falling-wedge')!;
+      expect(montant.visualSpec?.variant).toBe('rising-wedge');
+      expect(montant.visualSpec?.direction).toBe('bearish'); // dessin qui MONTE, lecture BAISSIÈRE
+      expect(descendant.visualSpec?.variant).toBe('falling-wedge');
+      expect(descendant.visualSpec?.direction).toBe('bullish'); // dessin qui DESCEND, lecture haussière
+    });
+
+    it('les huit compétences ANTÉRIEURES suivent leur pente : les biseaux sont bien l’exception', () => {
+      // Si un jour une autre figure du module devenait contre-intuitive, la leçon « c'est
+      // l'exception » deviendrait fausse — ce test la protège.
+      const contreIntuitives = ['concept.rising-wedge', 'concept.falling-wedge'];
+      const dessinMonte = /rising|ascending|bull|inverse-head|bottom/;
+      for (const [skillId, conceptId] of Object.entries(PATTERNS_SKILL_CONCEPT_ID)) {
+        if (contreIntuitives.includes(conceptId)) continue;
+        const c = V5_CONCEPTS.find((x) => x.id === conceptId)!;
+        const dir = c.visualSpec?.direction;
+        if (dir === 'neutral') continue; // le triangle symétrique : traité par le test suivant
+        const monte = dessinMonte.test(c.visualSpec?.variant ?? '');
+        expect(`${skillId}:${monte ? 'bullish' : 'bearish'}`).toBe(`${skillId}:${dir}`);
+      }
+    });
+
+    it('le triangle symétrique n’a AUCUN placement d’invalidation — parce qu’il n’a pas de côté', () => {
+      const sym = V5_CONCEPTS.find((c) => c.id === 'concept.symmetrical-triangle')!;
+      expect(sym.visualSpec?.direction).toBe('neutral');
+      // Sa fiche déclare bien une invalidation — mais c'est un RETOUR DEDANS, pas un extrême.
+      expect(sym.invalidation).toBeTruthy();
+      const items = PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.no-direction'];
+      expect(items).toHaveLength(5);
+      expect(items.some((e) => e.type === 'place_invalidation')).toBe(false);
+      // L'objectif reste COUVERT : il est exercé par un scénario conditionnel, pas escamoté.
+      const invalidate = items.find((e) => e.target?.objectiveId.endsWith('::invalidate'));
+      expect(invalidate?.type).toBe('scenario');
+    });
+
+    it('chaque énoncé de biseau est DÉRIVÉ de sa fiche : confirmation et invalidation s’y retrouvent', () => {
+      const attendus: Record<string, { conceptId: string; confirme: RegExp; invalide: RegExp }> = {
+        // « Sous la droite basse cassée. » / « Sortie par le haut du biseau. »
+        'skill.patterns.wedge': {
+          conceptId: 'concept.rising-wedge',
+          confirme: /droite basse/i,
+          invalide: /par le haut/i,
+        },
+        // « Au-dessus de la trendline supérieure. » / « Poursuite franche de la baisse sous le biseau. »
+        'skill.patterns.wedge-mirror': {
+          conceptId: 'concept.falling-wedge',
+          confirme: /droite haute/i,
+          invalide: /sous le biseau|poursuite franche/i,
+        },
+      };
+      for (const [skillId, attendu] of Object.entries(attendus)) {
+        const fiche = V5_CONCEPTS.find((c) => c.id === attendu.conceptId)!;
+        expect(fiche.confirmationZone).toBeTruthy();
+        expect(fiche.invalidation).toBeTruthy();
+        const textes = PATTERNS_MODULE_EXERCISES_BY_SKILL[skillId]
+          .map((e) => [e.prompt, e.feedback.rule ?? '', e.feedback.whenItFails ?? '', e.feedback.correct].join(' '))
+          .join(' ');
+        expect(textes).toMatch(attendu.confirme);
+        expect(textes).toMatch(attendu.invalide);
+      }
+    });
   });
 
   it('aucun exercice ne contient BUY/SELL ni promesse de gain', () => {
