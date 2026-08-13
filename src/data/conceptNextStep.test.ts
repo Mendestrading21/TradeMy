@@ -83,7 +83,7 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // baissier) et la dette reste à 3 — les trois arrivent AVEC leur compétence guidée. C'est la
     // règle que la série C avait établie, appliquée cette fois dès l'écriture de la fiche.
     expect(LIBRARY_ONLY.length).toBe(3);
-    expect(V5_CONCEPTS.length).toBe(70);
+    expect(V5_CONCEPTS.length).toBe(72);
   });
 
   it('une fiche de bibliothèque le DIT — au lieu d’afficher un statut qui ne bougera jamais', () => {

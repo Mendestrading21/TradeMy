@@ -14,6 +14,8 @@
  *   5. La moyenne mobile       → `concept.moving-average`   (LOT G1)
  *   6. Le croisement haussier  → `concept.golden-cross`     (LOT G1)
  *   7. Le croisement baissier  → `concept.death-cross`      (LOT G1)
+ *   8. L'amplitude moyenne     → `concept.atr`              (LOT G2)
+ *   9. Les retracements        → `concept.fibonacci`        (LOT G2)
  *
  * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : parmi les quatre
  * premières compétences, SEULE la divergence documente une invalidation (« poursuite de la tendance
@@ -24,6 +26,12 @@
  * croisements sont les premières notions du monde à porter un vrai côté d'invalidation : plancher
  * pour le haussier (`place-invalidation`), plafond pour le baissier (`place-extreme`). Et le CALCUL
  * y entre, parce que la moyenne mobile est une notion dont la définition est une opération.
+ *
+ * LOT G2 partage le module en deux familles, et c'est la première fois qu'on peut le dire : les
+ * sept premières compétences répondent « COMMENT va le marché » (une force, un élan, une volatilité
+ * relative, un désaccord, un résumé). Les deux dernières répondent « à quel PRIX » — une distance
+ * pour l'ATR, des niveaux pour les retracements. C'est la question que pose une invalidation, et
+ * aucune fiche du monde ne l'abordait.
  * Statuts éditoriaux inchangés (`needsReview`). Aucun vocabulaire BUY/SELL.
  */
 import { buildScenarioExercises, type LearningScenario, type Exercise } from '../engines/exercise';
@@ -49,6 +57,10 @@ export const INDICATORS_SKILLS: Skill[] = [
   { id: 'skill.indicators.moving-average', name: 'La moyenne mobile', description: 'Calculer une moyenne des dernières clôtures et voir ce que le lissage coûte en réactivité.' },
   { id: 'skill.indicators.cross-up', name: 'Le croisement haussier', description: 'Situer un croisement de moyennes par rapport au retournement du prix — il le suit, jamais l’inverse.' },
   { id: 'skill.indicators.cross-down', name: 'Le croisement baissier', description: 'Le miroir exact, plafond compris : l’invalidation d’un setup baissier se pose au-dessus.' },
+  // LOT G2 — les deux seules compétences du monde qui répondent « à quel PRIX » : une distance,
+  // puis des niveaux. Tout le reste du module répond « comment va le marché ».
+  { id: 'skill.indicators.atr', name: 'L’amplitude moyenne', description: 'Lire une volatilité en unités de prix, et la convertir en distance d’invalidation.' },
+  { id: 'skill.indicators.fibonacci', name: 'Les retracements', description: 'Lire des niveaux CHOISIS entre deux extrêmes — et savoir ce qui les efface.' },
 ];
 
 // Concepts réels du monde `world.indicators` reliés à chaque compétence.
@@ -59,6 +71,8 @@ const DIVERGENCE = 'concept.divergence';
 const MA = 'concept.moving-average';
 const CROSS_UP = 'concept.golden-cross';
 const CROSS_DOWN = 'concept.death-cross';
+const ATR = 'concept.atr';
+const FIBONACCI = 'concept.fibonacci';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -69,6 +83,8 @@ export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.indicators.moving-average': MA,
   'skill.indicators.cross-up': CROSS_UP,
   'skill.indicators.cross-down': CROSS_DOWN,
+  'skill.indicators.atr': ATR,
+  'skill.indicators.fibonacci': FIBONACCI,
 };
 export const INDICATORS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.indicators.rsi': 'rsi',
@@ -78,6 +94,8 @@ export const INDICATORS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.indicators.moving-average': 'moyenne-mobile',
   'skill.indicators.cross-up': 'croisement-haussier-de-moyennes',
   'skill.indicators.cross-down': 'croisement-baissier-de-moyennes',
+  'skill.indicators.atr': 'atr',
+  'skill.indicators.fibonacci': 'retracements-de-fibonacci',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -617,6 +635,166 @@ const CROSS_DOWN_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 8 — L'amplitude moyenne (LOT G2) ──────────────────────
+// recognize · interpret (CALCUL) · confirm · avoid-false-signal. Pas d'objectif `invalidate` :
+// l'ATR n'est pas un setup, il SERT à en placer une. La fiche ne documente donc rien à invalider.
+//
+// Le calcul, ici, n'est pas une variante de plus : c'est l'usage entier de l'indicateur. Un ATR
+// qu'on ne convertit pas en distance ne sert à rien — c'est un nombre qu'on regarde.
+const ATR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.atr.recognize',
+    skillId: 'skill.indicators.atr',
+    target: target(ATR, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.atr.v1',
+    variant: 'atr',
+    visualType: 'indicator',
+    prompt: 'Que mesure la courbe affichée sous le prix ?',
+    options: [
+      'L’amplitude moyenne des bougies récentes, en unités de prix',
+      'La force des hausses face aux baisses, bornée de 0 à 100',
+      'L’écart entre deux moyennes mobiles',
+    ],
+    correctIndex: 0,
+    a11y: 'Sous le prix, une courbe graduée en unités de prix : la moyenne des amplitudes récentes. Elle monte pendant l’élargissement des bougies, culmine une bougie après la plus large, puis redescend.',
+    difficulty: 'easy',
+    rule: 'L’ATR se lit dans la même unité que le prix — c’est ce qui le distingue d’un oscillateur borné.',
+  },
+  {
+    id: 'ex.indicators.atr.compute',
+    skillId: 'skill.indicators.atr',
+    target: target(ATR, 'interpret'),
+    interaction: 'compute',
+    prompt:
+      'L’ATR vaut 4 €. Ton entrée théorique est à 100 € et tu situes l’invalidation à deux ATR en dessous. À quel prix se pose-t-elle ?',
+    unit: '€',
+    answer: 92,
+    tolerance: 0,
+    method:
+      'Invalidation = entrée − 2 × ATR = 100 − 2 × 4 = 92 €. C’est tout l’intérêt d’une amplitude exprimée en unités de prix : elle se convertit directement en distance. Un pourcentage fixe, lui, ignorerait que l’amplitude du moment a pu doubler.',
+    difficulty: 'medium',
+    rule: 'L’ATR donne une distance dans l’unité du prix : il sert à situer une invalidation, jamais à annoncer un sens.',
+  },
+  {
+    id: 'ex.indicators.atr.confirm',
+    skillId: 'skill.indicators.atr',
+    target: target(ATR, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette lecture ?',
+    context:
+      'L’ATR a doublé en quelques bougies. Le prix, lui, vient de casser un plus-bas et enchaîne les clôtures sous ce niveau.',
+    options: [
+      'La structure de prix : l’ATR a seulement dit que les bougies s’élargissaient, c’est le prix qui donne le sens.',
+      'La hausse de l’ATR : elle indiquait déjà que le mouvement irait à la baisse.',
+      'Rien à vérifier : un ATR qui double annonce toujours une accélération dans le sens précédent.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une amplitude n’est pas signée : seule la structure de prix dit dans quel sens elle s’est produite.',
+  },
+  {
+    id: 'ex.indicators.atr.avoid',
+    skillId: 'skill.indicators.atr',
+    target: target(ATR, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur l’ATR.',
+    statements: [
+      'Une baisse violente fait monter l’ATR autant qu’une hausse violente.',
+      'Un ATR en hausse indique que le prix va probablement monter.',
+      'Étant une moyenne, l’ATR reste sous l’amplitude de la bougie la plus large.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 9 — Les retracements (LOT G2) ─────────────────────────
+// Les cinq natures. Le retracement d'une impulsion HAUSSIÈRE est un setup haussier : son invalidation
+// est un plancher (le niveau 100 %, le départ du mouvement) → `place-invalidation`, comme le
+// croisement haussier. La leçon propre à cette fiche est ailleurs : les niveaux sont CHOISIS.
+const FIBONACCI_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.fibonacci.recognize',
+    skillId: 'skill.indicators.fibonacci',
+    target: target(FIBONACCI, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.fib.v1',
+    variant: 'fibonacci',
+    visualType: 'indicator',
+    prompt: 'Que représentent les traits horizontaux étiquetés en pourcentages ?',
+    options: [
+      'Des niveaux de retracement, placés entre les deux extrêmes du mouvement',
+      'Des bandes de volatilité recalculées à chaque bougie',
+      'Les plus-hauts et plus-bas de chaque séance',
+    ],
+    correctIndex: 0,
+    a11y: 'Une impulsion haussière puis un repli, traversés de traits horizontaux étiquetés en pourcentages. Le mouvement va de 43,40 à 62,60 ; le niveau 50 % tombe à 53,00, et le repli s’arrête à 53,40, juste au-dessus.',
+    difficulty: 'medium',
+    rule: 'Une grille de retracement découpe l’écart entre DEUX points : le 0 % au sommet, le 100 % au départ du mouvement.',
+  },
+  {
+    id: 'ex.indicators.fibonacci.interpret',
+    skillId: 'skill.indicators.fibonacci',
+    target: target(FIBONACCI, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la construction d’une grille de retracement.',
+    steps: [
+      'Identifie une impulsion dont le début et la fin sont clairs',
+      'Choisis les deux points : le départ du mouvement et son extrémité',
+      'Place les fractions entre ces deux points (38,2 %, 50 %, 61,8 %…)',
+      'Observe si le repli RALENTIT dans la zone, au lieu de la traverser',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Les ratios sont fixes ; les niveaux, non. Ils dépendent entièrement des deux points choisis à l’étape 2.',
+  },
+  {
+    id: 'ex.indicators.fibonacci.confirm',
+    skillId: 'skill.indicators.fibonacci',
+    target: target(FIBONACCI, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce retracement ?',
+    context:
+      'Après une impulsion haussière, le repli ralentit entre les niveaux 50 % et 61,8 %. Sur les bougies suivantes, un plus-bas tient et un plus-haut local est repris.',
+    options: [
+      'La structure dans la zone : un plus-bas conservé puis un plus-haut repris — pas le contact du trait.',
+      'Le contact du niveau 61,8 % : c’est le ratio le plus fiable, il valide à lui seul.',
+      'Le fait que la grille ait été tracée correctement : cela suffit à valider le rebond.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Un niveau est une zone d’attention. Ce qui confirme, c’est ce que le prix y fait — jamais le trait lui-même.',
+  },
+  {
+    id: 'ex.indicators.fibonacci.invalidate',
+    skillId: 'skill.indicators.fibonacci',
+    target: target(FIBONACCI, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 1040,
+    prompt:
+      'Pose le niveau qui efface entièrement ce repli : le départ du mouvement, le plancher de la période.',
+    difficulty: 'hard',
+    rule: 'Sous le niveau 100 % — le départ de l’impulsion — il n’y a plus de mouvement à retracer : la grille n’a plus d’objet.',
+    whenItFails:
+      'Le repli peut dépasser 78,6 % sans rien effacer : seul le passage sous le départ du mouvement invalide.',
+  },
+  {
+    id: 'ex.indicators.fibonacci.avoid',
+    skillId: 'skill.indicators.fibonacci',
+    target: target(FIBONACCI, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur les retracements.',
+    statements: [
+      'Deux personnes qui choisissent des points différents obtiennent des niveaux différents.',
+      'Le niveau 50 % est l’un des ratios de la suite de Fibonacci.',
+      'Le prix traverse la plupart des niveaux sans s’y arrêter.',
+    ],
+    errorIndex: 1,
+    difficulty: 'hard',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const INDICATORS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.indicators.rsi': RSI_SCENARIOS,
@@ -626,6 +804,8 @@ export const INDICATORS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenar
   'skill.indicators.moving-average': MA_SCENARIOS,
   'skill.indicators.cross-up': CROSS_UP_SCENARIOS,
   'skill.indicators.cross-down': CROSS_DOWN_SCENARIOS,
+  'skill.indicators.atr': ATR_SCENARIOS,
+  'skill.indicators.fibonacci': FIBONACCI_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */
