@@ -66,14 +66,24 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
     for (const id of ['skill.risk.reward', 'skill.risk.sizing']) {
       expect(getExercises(id).map((e) => e.type)).toContain('numeric');
     }
-    // Et le calcul reste réservé aux compétences dont la réponse EST un nombre. Une seule autre le
-    // porte : la leçon libre « Actions », qui fait calculer une part du capital (« sur 1 000
-    // actions, combien pour 1 % ? ») — elle le faisait avant ce lot, et c'est légitime. Ailleurs,
-    // un champ numérique n'enseignerait rien.
+    // Et le calcul reste réservé aux compétences dont la réponse EST un nombre. Ailleurs, un champ
+    // numérique n'enseignerait rien.
+    //
+    // LOT C8 — la liste s'ouvre au monde 1 : le rendement du dividende (2 ÷ 50) et le PER (36 ÷ 3)
+    // sont les deux seules notions du corpus dont la définition EST une division. Elles ne se
+    // lisent sur aucun graphique ; sans poser l'opération une fois, on ne comprend pas pourquoi un
+    // rendement élevé ou un PER bas peuvent tromper — c'est le DÉNOMINATEUR qui a bougé.
+    // « skill.actions » portait déjà un calcul (une part du capital) avant le LOT D3.
     const avecCalcul = GUIDED_SKILL_IDS.filter((id) =>
       getExercises(id).some((e) => e.type === 'numeric'),
     ).sort();
-    expect(avecCalcul).toEqual(['skill.actions', 'skill.risk.reward', 'skill.risk.sizing']);
+    expect(avecCalcul).toEqual([
+      'skill.actions',
+      'skill.foundations.dividend',
+      'skill.foundations.per',
+      'skill.risk.reward',
+      'skill.risk.sizing',
+    ]);
   });
 
   it('« reconnaître » n’est plus une seule et même question répétée', () => {

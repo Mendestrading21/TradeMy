@@ -82,7 +82,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // LOT C4 : 53 → 56 (les trois confusions de contexte des chandeliers).
     // LOT C6 : 56 → 58 (les deux séquences de trois bougies : retournement et poussée).
     // LOT C7 : 58 → 61 (les deux biseaux + la figure sans direction).
-    expect(REPO_TRUTH.skills).toBe(61);
+    // LOT C8 : 61 → 63 (dividende et PER rejoignent le module du monde 1).
+    expect(REPO_TRUTH.skills).toBe(63);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);

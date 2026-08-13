@@ -129,6 +129,21 @@ function tapLabelSync(root: ReactTestInstance, labelIncludes: string): void {
   if (!b) throw new Error(`Aucun contrôle avec libellé « ${labelIncludes} »`);
   act(() => (b.props.onPress as () => void)());
 }
+/**
+ * Saisit un nombre dans le champ RÉELLEMENT rendu du player numérique (LOT D3), puis valide.
+ * LOT C8 — le checkpoint du monde 1 tire désormais des calculs : le dividende et le PER sont les
+ * deux notions du corpus dont la définition EST une division. Le helper les traite comme les autres
+ * mécaniques : par le contrôle affiché, jamais en appelant la logique directement.
+ */
+async function answerNumeric(root: ReactTestInstance, valeur: number): Promise<void> {
+  const champ = root
+    .findAll((n) => String(n.props?.accessibilityLabel ?? '') === 'Réponse numérique')
+    .at(0);
+  if (!champ) throw new Error('Aucun champ « Réponse numérique » rendu');
+  act(() => (champ.props.onChangeText as (t: string) => void)(String(valeur)));
+  await flush();
+  await tapText(root, 'Valider');
+}
 function readOrder(root: ReactTestInstance, items: string[]): number[] {
   const byPos: string[] = [];
   for (const n of pressables(root)) {
@@ -203,6 +218,9 @@ async function answerCorrect(root: ReactTestInstance, ex: Exercise): Promise<voi
       await flush();
       await tapText(root, 'Valider mon niveau');
       return;
+    case 'numeric':
+      await answerNumeric(root, ex.validation.answer);
+      return;
     default:
       throw new Error(`type non géré: ${ex.type}`);
   }
@@ -235,6 +253,11 @@ async function answerWrong(root: ReactTestInstance, ex: Exercise): Promise<void>
       tapLabelSync(root, 'Descendre');
       await flush();
       await tapText(root, 'Valider mon niveau');
+      return;
+    case 'numeric':
+      // Hors tolérance dans les deux sens possibles : la bonne réponse plus le double de la
+      // tolérance, jamais une valeur qui pourrait passer par arrondi.
+      await answerNumeric(root, ex.validation.answer + Math.max(1, (ex.validation.tolerance ?? 0) * 2 + 1));
       return;
     default:
       throw new Error(`wrong non géré: ${ex.type}`);

@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { allLessonsFlat } from './repoTruth';
-import { ALL_MODULE_SKILLS, getLessons } from './seed';
+import { ALL_MODULE_SKILLS, getLessons, getExercises } from './seed';
 import { V5_CONCEPTS } from './learningContent';
 import { conceptBySlug } from './learningConcept';
 import { datasetByKey } from '../engines/visual/visualDatasets';
@@ -20,15 +20,30 @@ import { datasetByKey } from '../engines/visual/visualDatasets';
  *     nommée ici, ce qui interdit toute régression silencieuse ailleurs.
  */
 
-/** Leçon purement notionnelle (action vs obligation) : aucune figure de marché à manipuler. */
-const SANS_FIGURE = ['lesson.action-vs-bond'];
+/**
+ * Leçons purement notionnelles : aucune figure de marché à manipuler.
+ *
+ * LOT C8 — la liste passe de une à trois. Le dividende et le PER n'ont pas de série de bougies :
+ * leur `visualSpec.type` est `mechanism`, un schéma. Leur donner une étape `interaction` pointant
+ * vers leur concept passerait le test 3 ci-dessous (le concept existe) tout en produisant un rendu
+ * VIDE — exactement ce que ce fichier cherche à interdire. On ne contourne pas le verrou : on dit
+ * la vérité, et le test suivant exige alors une contrepartie vérifiable.
+ */
+const SANS_FIGURE = ['lesson.action-vs-bond', 'lesson.foundations-dividend', 'lesson.foundations-per'];
 
 describe('LOT E1 — la manipulation fait partie de chaque leçon', () => {
-  it('chaque compétence du parcours propose au moins une manipulation', () => {
+  it('une compétence sans manipulation de leçon fait CALCULER : le geste existe, il est ailleurs', () => {
+    // LOT C8 — la règle n'est plus « toutes, sans exception » mais quelque chose de plus fort qu'une
+    // liste de noms : une compétence peut n'avoir aucune manipulation dans sa leçon À CONDITION que
+    // son geste soit porté par un exercice `numeric`. Le canon demande de MANIPULER ; pour une
+    // notion qui est une division, manipuler c'est poser l'opération, pas déplacer une ligne.
     const sansManip = ALL_MODULE_SKILLS.filter(
       (s) => !getLessons(s.id).some((l) => l.steps.some((st) => st.kind === 'interaction')),
     ).map((s) => s.id);
-    expect(sansManip).toEqual([]);
+    expect(sansManip.sort()).toEqual(['skill.foundations.dividend', 'skill.foundations.per']);
+    for (const id of sansManip) {
+      expect(getExercises(id).map((e) => e.type)).toContain('numeric');
+    }
   });
 
   it('toutes les leçons portent une manipulation, sauf la leçon notionnelle documentée', () => {
