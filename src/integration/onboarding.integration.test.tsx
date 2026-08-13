@@ -56,6 +56,7 @@ import { TrademyIcon } from '@/design-system';
 import { OBJECTIVES, LEVELS, DAILY_OPTIONS, TOPICS, SKILLS, skillById, recommendStartSkill, exercisesForMinutes } from '@/data';
 import { recentEvents, clearRecentEvents } from '@/analytics';
 import { findEmoji } from './emojiGuard';
+import { APP_INFO } from '@/lib/appInfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ExpoRouter from 'expo-router';
 import * as Data from '@/data';
@@ -147,7 +148,11 @@ beforeEach(() => { routerCalls.length = 0; completeCalls.length = 0; clearRecent
 describe('Onboarding de production — 7 étapes, canon, logique préservée (LOT 4-I)', () => {
   it('rend la 1re étape, expose 7 étapes, progresse et navigue avant/arrière ; aucun emoji au montage', () => {
     const r = mount();
-    expect(hasText(r.root, 'Bienvenue sur TradeMy')).toBe(true);
+    // La marque affichée est la MARQUE PUBLIQUE, pas le nom du dépôt. Cette ligne figeait
+    // « Bienvenue sur TradeMy » : le défaut n'était pas seulement non couvert, il était protégé.
+    // L'assertion dérive désormais de la source unique, comme l'écran.
+    // Le titre est désormais INTERPOLÉ (enfants tableau) : `hasJoinedText`, comme la ligne suivante.
+    expect(hasJoinedText(r.root, `Bienvenue sur ${APP_INFO.name}`)).toBe(true);
     // Libellé visible (interpolé, enfants tableau) + nom accessible (chaîne unique) cohérents.
     expect(hasJoinedText(r.root, 'Étape 1 / 7 · Bienvenue')).toBe(true);
     expect(hasA11yLabel(r.root, 'Étape 1 sur 7 : Bienvenue')).toBe(true);
