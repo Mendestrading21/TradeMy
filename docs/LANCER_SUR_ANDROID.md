@@ -42,10 +42,11 @@ L'ordre ci-dessous n'est pas décoratif : il va du plus probablement cassé au p
 1. **Les gestes de placement.** Dans une session, l'exercice « place la ligne d'invalidation »
    demande de faire glisser une ligne sur le graphique. C'est l'interaction la plus exposée : elle
    dépend de Gesture Handler et de Reanimated ensemble. Vérifier qu'elle répond au doigt et que la
-   ligne suit sans à-coups. **Il y en a maintenant 20 dans le parcours** (10 dans les chandeliers,
-   10 dans les figures) : en croiser une est quasi certain.
-2. **Le champ de calcul.** Depuis le LOT C8, le monde 1 et le monde du risque posent des questions à
-   réponse chiffrée (PER, rendement du dividende, ratio, taille de position). Vérifier que le clavier
+   ligne suit sans à-coups. La série G en a ajouté trois dans le monde des indicateurs (croisement
+   haussier, croisement baissier, retracements) : en croiser une est quasi certain.
+2. **Le champ de calcul.** Sept compétences posent une question à réponse chiffrée : le rendement
+   du dividende et le PER (monde 1), le ratio et la taille de position (monde du risque), la moyenne
+   mobile et l'ATR converti en distance (monde des indicateurs). Vérifier que le clavier
    numérique s'ouvre, que le bouton « Valider » reste désactivé tant que rien n'est saisi, et qu'il
    ne masque pas le champ sur un petit écran.
 3. **Toto et Bobo.** Ils doivent respirer au repos, bondir sur une bonne réponse, se balancer sur une
@@ -88,7 +89,7 @@ Sur Android, autoriser l'installation depuis une source inconnue lorsque le syst
 
 ## Ce qui a été vérifié, et quand
 
-Vérifications refaites **après la série C complète** (LOTS C6 à C10), sur `main` :
+Vérifications refaites **après la série G complète** (LOTS G1 à G4), sur `main` :
 
 - **L'app se bundle pour les deux plateformes.** `expo export --platform android` : 1973 modules,
   succès. `--platform ios` : 1881 modules, succès. C'est l'étape qui échouerait en premier dans un
@@ -97,7 +98,12 @@ Vérifications refaites **après la série C complète** (LOTS C6 à C10), sur `
   tient : **zéro occurrence** de `TradeMy/assets` dans les bundles Android et iOS régénérés.
 - **`expo-doctor` : 18 vérifications sur 20.** Les 2 échecs sont des appels réseau bloqués par
   l'environnement d'exécution (schéma de config et annuaire React Native), pas des défauts du projet.
-- **Gate complète verte** : 1642 tests, export web de 300 pages HTML et 2175 références.
+- **Gate complète verte** à chaque lot fusionné ; le compte exact appartient au rapport du lot,
+  pas à cette page.
+- **Passe de bout en bout dans Chromium** sur l'export web réel (390 × 844) : onboarding complet,
+  les cinq espaces, une session entière, neuf écrans secondaires, 404, reduced-motion, 320 px,
+  zoom, coupure réseau — **zéro erreur console, zéro exception**. Ce que ça ne couvre PAS : le
+  toucher, la fluidité, le clavier, la mémoire. C'est précisément l'objet de cette page.
 
 ### Poids mesuré du bundle
 

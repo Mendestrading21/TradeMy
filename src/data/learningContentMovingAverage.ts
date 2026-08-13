@@ -54,6 +54,11 @@ export const MOVING_AVERAGE_CONCEPTS: LearningConcept[] = [
       'Une moyenne décrit le passé récent. Elle ne contient aucune information sur la bougie suivante.',
       'Le lissage a un prix : ce que la ligne gagne en stabilité, elle le perd en réactivité.',
       'Deux moyennes de périodes différentes racontent deux histoires différentes de la même série — d’où l’obligation d’annoncer laquelle.',
+      // LOT G4 — la variante exponentielle existe et se rencontre partout ; la nommer évite qu'un
+      // élève croie que « moyenne mobile » désigne une seule chose. Ce que la fiche NE dit pas :
+      // « l’exponentielle est meilleure ». Sur la série de cette fiche, l’écart entre les deux se
+      // mesure en dixièmes de point — invisible à l’œil, donc non illustrable ici.
+      'Il existe des variantes : la moyenne EXPONENTIELLE pèse davantage les clôtures récentes, la simple les traite à égalité. Cette fiche emploie la simple ; l’écart entre les deux dépend de la série et n’est pas toujours visible.',
     ],
     neutralScenario: {
       conditions: [
