@@ -8,6 +8,7 @@
 import { DEFAULT_DISCLAIMER, type LearningConcept } from './learningConcept';
 import { BATCH_CONCEPTS } from './learningContentBatch';
 import { MOVING_AVERAGE_CONCEPTS } from './learningContentMovingAverage';
+import { PRICE_TOOLS_CONCEPTS } from './learningContentPriceTools';
 
 const CORE_V5_CONCEPTS: LearningConcept[] = [
   {
@@ -2536,4 +2537,7 @@ export const V5_CONCEPTS: LearningConcept[] = [
   // LOT G1 — la moyenne mobile et ses deux croisements : trois variantes que le moteur savait
   // déjà dessiner et qu'aucune fiche ne nommait (ouverture de la série G).
   ...MOVING_AVERAGE_CONCEPTS,
+  // LOT G2 — l'ATR et les retracements : les deux seules variantes du moteur qui répondent
+  // « à quel PRIX », là où tout le reste du monde 7 répond « comment ».
+  ...PRICE_TOOLS_CONCEPTS,
 ];

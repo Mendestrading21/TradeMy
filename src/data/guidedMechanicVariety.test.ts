@@ -79,6 +79,10 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
     // définition EST une opération (une somme divisée par un nombre), et cette opération donne à
     // voir le retard mieux qu'aucune phrase. Six clôtures montant de 40 à 50 produisent une ligne à
     // 45 : cinq points sous le dernier prix, et ces cinq points ne viennent que du calcul.
+    //
+    // LOT G2 — l'ATR rejoint la liste, et le critère reste le même : la réponse EST un nombre, et
+    // sans l'opération la notion n'a pas d'usage. Un ATR qu'on ne convertit pas en distance est un
+    // nombre qu'on regarde ; converti (entrée − 2 × ATR), il devient un niveau d'invalidation.
     const avecCalcul = GUIDED_SKILL_IDS.filter((id) =>
       getExercises(id).some((e) => e.type === 'numeric'),
     ).sort();
@@ -86,6 +90,7 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
       'skill.actions',
       'skill.foundations.dividend',
       'skill.foundations.per',
+      'skill.indicators.atr',
       'skill.indicators.moving-average',
       'skill.risk.reward',
       'skill.risk.sizing',
