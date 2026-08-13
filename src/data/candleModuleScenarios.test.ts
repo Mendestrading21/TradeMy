@@ -42,6 +42,9 @@ const MODULE_CONCEPT_IDS = [
   // LOT C6 — la SÉQUENCE : trois bougies, et l'ordre décide.
   'concept.morning-star',
   'concept.three-white-soldiers',
+  // LOT C9 — le RAPPORT entre deux bougies : contenance et niveau partagé.
+  'concept.harami',
+  'concept.tweezer',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -61,7 +64,8 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
     expect(ALL_EXERCISES.length).toBe(CANDLE_MODULE_SCENARIOS.length);
     // LOT C2 : 19 → 24. LOT C4 : 24 → 39 (trois compétences de plus, cinq objectifs réels chacune).
     // LOT C6 : 39 → 49 (deux compétences de séquence, cinq objectifs réels chacune).
-    expect(ALL_EXERCISES.length).toBe(49);
+    // LOT C9 : 49 → 59 (harami et pincettes, cinq objectifs réels chacun).
+    expect(ALL_EXERCISES.length).toBe(59);
   });
 
   it('chaque compétence cible un concept RÉEL de world.candles', () => {
@@ -119,7 +123,7 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(10); // une reconnaissance par compétence du module.
+    expect(figures.length).toBe(12); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -132,13 +136,19 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
 
   it('cohérence invalidation : la cible placée EST l’extrême RÉEL, du bon côté du graphique', () => {
     const places = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
-    // LOT C4 puis C6 — même verrou que le monde des figures, et même leçon : l'invalidation se place
-    // du côté OPPOSÉ au sens du setup. Neuf placements : six setups haussiers invalidés vers le BAS
-    // (marubozu, marteau, avalement haussier, marteau inversé, étoile du matin, trois soldats) et
-    // trois baissiers vers le HAUT (avalement baissier, pendu, étoile filante).
-    expect(places.length).toBe(9);
+    // LOT C4 puis C6 puis C9 — même verrou que le monde des figures, et même leçon : l'invalidation
+    // se place du côté OPPOSÉ au sens du setup. Dix placements : six setups haussiers invalidés vers
+    // le BAS (marubozu, marteau, avalement haussier, marteau inversé, étoile du matin, trois
+    // soldats) et quatre baissiers vers le HAUT (avalement baissier, pendu, étoile filante,
+    // pincettes de sommet).
+    expect(places.length).toBe(10);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
-    expect(versLeHaut).toHaveLength(3);
+    expect(versLeHaut).toHaveLength(4);
+    // LOT C9 — le HARAMI est NEUTRE : comme le triangle symétrique du LOT C7, il n'a pas de côté,
+    // donc aucun placement. Son invalidation est un COMPORTEMENT (la tendance d'origine repart).
+    const conceptsPlacés = new Set(places.map((ex) => ex.target?.conceptId));
+    expect(conceptsPlacés.has('concept.harami')).toBe(false);
+    expect(conceptsPlacés.has('concept.tweezer')).toBe(true);
     for (const ex of places) {
       if (ex.type !== 'place_invalidation') continue;
       expect(ex.hint).toBeTruthy();
@@ -205,6 +215,59 @@ describe('Module guidé « Lire les chandeliers » — modèle officiel (world.c
       for (const [skillId, attendu] of Object.entries(attendus)) {
         const fiche = V5_CONCEPTS.find((c) => c.id === attendu.conceptId)!;
         // La fiche déclare bien ces deux champs — sinon l'exercice serait inventé.
+        expect(fiche.confirmationZone).toBeTruthy();
+        expect(fiche.invalidation).toBeTruthy();
+        const textes = CANDLE_MODULE_EXERCISES_BY_SKILL[skillId]
+          .map((e) => [e.prompt, e.feedback.rule ?? '', e.feedback.whenItFails ?? '', e.feedback.correct].join(' '))
+          .join(' ');
+        expect(textes).toMatch(attendu.confirme);
+        expect(textes).toMatch(attendu.invalide);
+      }
+    });
+  });
+
+  // ── LOT C9 — le RAPPORT entre deux bougies. Ces tests prouvent que la relation est bien la chose
+  //    enseignée, et que le harami neutre est traité comme le triangle symétrique du LOT C7.
+  describe('LOT C9 — la relation entre deux bougies', () => {
+    it('les deux compétences existent, portent 5 exercices, et ciblent la fiche annoncée', () => {
+      for (const id of ['skill.candle.containment', 'skill.candle.twin-level']) {
+        expect(CANDLE_SKILLS.some((s) => s.id === id)).toBe(true);
+        expect(CANDLE_MODULE_EXERCISES_BY_SKILL[id]).toHaveLength(5);
+        const ciblés = new Set(CANDLE_MODULE_EXERCISES_BY_SKILL[id].map((e) => e.target?.conceptId));
+        expect(ciblés.size).toBe(1);
+        expect([...ciblés][0]).toBe(CANDLE_SKILL_CONCEPT_ID[id]);
+      }
+    });
+
+    it('le CORPUS dit que le harami est neutre — d’où l’absence de placement, comme au LOT C7', () => {
+      const harami = V5_CONCEPTS.find((c) => c.id === 'concept.harami')!;
+      expect(harami.visualSpec?.direction).toBe('neutral');
+      // Sa fiche déclare bien une invalidation, mais c'est un COMPORTEMENT, pas un extrême.
+      expect(harami.invalidation).toBeTruthy();
+      const items = CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.containment'];
+      expect(items.some((e) => e.type === 'place_invalidation')).toBe(false);
+      // L'objectif reste COUVERT : il passe par un scénario conditionnel, jamais escamoté.
+      const invalidate = items.find((e) => e.target?.objectiveId.endsWith('::invalidate'));
+      expect(invalidate?.type).toBe('scenario');
+    });
+
+    it('chaque énoncé est DÉRIVÉ de sa fiche : confirmation et invalidation s’y retrouvent', () => {
+      const attendus: Record<string, { conceptId: string; confirme: RegExp; invalide: RegExp }> = {
+        // « À la sortie de la petite bougie » / « Poursuite nette de la tendance d'origine »
+        'skill.candle.containment': {
+          conceptId: 'concept.harami',
+          confirme: /sortie de la petite bougie/i,
+          invalide: /tendance d’origine/i,
+        },
+        // « À la sortie du niveau » / « Franchissement franc du niveau testé »
+        'skill.candle.twin-level': {
+          conceptId: 'concept.tweezer',
+          confirme: /sortie du niveau/i,
+          invalide: /franchissement franc/i,
+        },
+      };
+      for (const [skillId, attendu] of Object.entries(attendus)) {
+        const fiche = V5_CONCEPTS.find((c) => c.id === attendu.conceptId)!;
         expect(fiche.confirmationZone).toBeTruthy();
         expect(fiche.invalidation).toBeTruthy();
         const textes = CANDLE_MODULE_EXERCISES_BY_SKILL[skillId]

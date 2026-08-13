@@ -19,12 +19,20 @@
  *   8. Le même rejet, l'autre histoire → `concept.inverted-hammer` (LOT C4, HAUSSIER)
  *   9. Le retournement en trois temps → `concept.morning-star` (LOT C6)
  *  10. La poussée en trois temps     → `concept.three-white-soldiers` (LOT C6)
+ *  11. La bougie contenue            → `concept.harami` (LOT C9)
+ *  12. Le même extrême, deux fois    → `concept.tweezer` (LOT C9)
  *
  * LOT C6 introduit la première idée VRAIMENT nouvelle depuis le pilote : jusqu'ici tout le module lit
  * UNE bougie (marubozu, marteau, doji, pendu, étoile filante, marteau inversé) ou DEUX lues comme un
  * bloc (avalement). Les quatre figures de séquence en demandent TROIS, et l'ORDRE décide : lue à
  * l'envers, une étoile du matin devient une étoile du soir. La mécanique `read-order` cesse donc
  * d'être un exercice d'énonciation pour devenir la chose enseignée elle-même.
+ *
+ * LOT C9 ajoute la dernière façon de lire dont le module manquait : le RAPPORT entre deux bougies.
+ * On lisait une FORME (une bougie), un BLOC (l'avalement) ou une SÉQUENCE (trois bougies ordonnées).
+ * Le harami et les pincettes ne se lisent d'aucune de ces façons : ce qui compte est la relation
+ * géométrique entre deux bougies voisines — l'une CONTIENT l'autre, ou les deux butent au MÊME prix.
+ * La forme de chaque bougie prise isolément n'y suffit jamais.
  *
  * Objectifs ciblés = objectifs RÉELS dérivés des champs du concept (learningTarget) — jamais inventés.
  * `concept.doji` ne documente pas d'invalidation : on ne lui attache donc AUCUN exercice d'invalidation
@@ -59,6 +67,9 @@ export const CANDLE_SKILLS: Skill[] = [
   // TROIS, et l'ordre décide : lue à l'envers, une étoile du matin devient une étoile du soir.
   { id: 'skill.candle.sequence-reversal', name: 'Le retournement en trois temps', description: 'L’étoile du matin : baissière, indécision, haussière — c’est la PAUSE du milieu qui fait le retournement.' },
   { id: 'skill.candle.sequence-momentum', name: 'La poussée en trois temps', description: 'Trois soldats : trois bougies du même sens. Une continuation — sauf en fin de course, où c’est l’épuisement.' },
+  // LOT C9 — le RAPPORT entre deux bougies : ni la forme de l'une, ni l'ordre de trois.
+  { id: 'skill.candle.containment', name: 'La bougie contenue', description: 'Le harami : une petite bougie tout entière dans le corps de la précédente. La tendance ralentit sans encore se retourner.' },
+  { id: 'skill.candle.twin-level', name: 'Le même extrême, deux fois', description: 'Les pincettes : deux bougies qui butent au même prix. C’est le NIVEAU qui parle, pas la bougie.' },
 ];
 
 // Concepts réels du monde `world.candles` reliés à chaque compétence (source : learningContent V5).
@@ -74,6 +85,8 @@ const MORNING_STAR = 'concept.morning-star';
 const EVENING_STAR = 'concept.evening-star';
 const THREE_WHITE_SOLDIERS = 'concept.three-white-soldiers';
 const THREE_BLACK_CROWS = 'concept.three-black-crows';
+const HARAMI = 'concept.harami';
+const TWEEZER = 'concept.tweezer';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -87,6 +100,8 @@ export const CANDLE_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.candle.rejection-low': INVERTED_HAMMER,
   'skill.candle.sequence-reversal': MORNING_STAR,
   'skill.candle.sequence-momentum': THREE_WHITE_SOLDIERS,
+  'skill.candle.containment': HARAMI,
+  'skill.candle.twin-level': TWEEZER,
 };
 export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.pressure': 'marubozu',
@@ -99,6 +114,8 @@ export const CANDLE_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.candle.rejection-low': 'marteau-inverse',
   'skill.candle.sequence-reversal': 'etoile-du-matin',
   'skill.candle.sequence-momentum': 'trois-soldats',
+  'skill.candle.containment': 'harami',
+  'skill.candle.twin-level': 'pincettes',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -963,6 +980,214 @@ const SEQUENCE_MOMENTUM_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 11 — La bougie contenue (harami) ──────────────────────────────────────────
+// LOT C9. Dérivé de la fiche :
+//   `definitionShort` : « Une petite bougie contenue dans le corps de la grande précédente : la
+//                        tendance ralentit. »
+//   `confirmationZone` : « À la sortie de la petite bougie, dans le SENS CONFIRMÉ. »
+//   `invalidation`     : « Poursuite nette de la tendance d'origine. »
+//   `falseSignals`     : « Harami en plein milieu d'une impulsion forte. »
+//
+// Le corpus déclare `direction: 'neutral'`, et cela se voit dans sa confirmation : « dans le sens
+// CONFIRMÉ », pas dans un sens annoncé. Même conséquence que pour le triangle symétrique au LOT C7 :
+// une figure sans direction n'a pas de côté, donc AUCUN placement d'invalidation. Son invalidation
+// est « la tendance d'origine repart » — un comportement, pas un extrême. L'objectif est couvert par
+// un scénario conditionnel, jamais escamoté.
+const CONTAINMENT_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.containment.recognize',
+    skillId: 'skill.candle.containment',
+    target: target(HARAMI, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.bullish-harami.v1',
+    variant: 'bullish-harami',
+    visualType: 'candlestick-pattern',
+    prompt: 'Regarde le RAPPORT entre les deux bougies. Quelle figure est-ce ?',
+    options: [
+      'Un harami (la seconde bougie tient entièrement dans le corps de la première)',
+      'Un avalement (la seconde bougie ENGLOBE la première — l’inverse)',
+      'Des pincettes (deux bougies qui butent sur le même extrême)',
+    ],
+    correctIndex: 0,
+    a11y:
+      'Une grande bougie, puis une petite dont le corps tient entièrement à l’intérieur du corps de la précédente.',
+    difficulty: 'medium',
+    rule: 'Harami et avalement sont la même relation lue dans l’autre sens : dans le harami la seconde est CONTENUE, dans l’avalement elle CONTIENT.',
+  },
+  {
+    id: 'ex.candle.containment.interpret',
+    skillId: 'skill.candle.containment',
+    target: target(HARAMI, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un harami.',
+    steps: [
+      'Repère la grande bougie qui vient d’étendre la tendance',
+      'Vérifie que la suivante tient ENTIÈREMENT dans son corps',
+      'Lis ce que dit cette contenance : le mouvement n’étend plus rien, il ralentit',
+      'Attends la sortie de la petite bougie pour connaître le sens',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Un harami ne dit pas « ça se retourne » : il dit « ça ralentit ». Une séance qui ne dépasse plus la précédente a cessé d’avancer.',
+  },
+  {
+    id: 'ex.candle.containment.confirm',
+    skillId: 'skill.candle.containment',
+    target: target(HARAMI, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce harami ?',
+    context:
+      'Après une longue bougie qui a étendu la tendance, la séance suivante est petite et tient entièrement dans le corps de la précédente.',
+    options: [
+      'La sortie de la petite bougie — et c’est elle qui donne le sens, dans un camp ou dans l’autre.',
+      'La contenance suffit : une bougie enfermée annonce le retournement.',
+      'La taille de la première bougie décide du sens de la suite.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le harami donne un niveau de décision, pas une direction : c’est la sortie de la petite bougie qui tranche.',
+    whenItFails: 'En plein milieu d’une impulsion forte, une pause d’une séance ne signifie rien.',
+    a11y:
+      'Contexte : une longue bougie de tendance, puis une petite entièrement contenue dans son corps. Trois conclusions possibles à départager.',
+  },
+  {
+    // Figure NEUTRE : pas de placement. Même règle qu'au LOT C7 pour le triangle symétrique — son
+    // invalidation est un COMPORTEMENT (« la tendance d'origine repart »), pas un extrême à poser.
+    id: 'ex.candle.containment.invalidate',
+    skillId: 'skill.candle.containment',
+    target: target(HARAMI, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'La séance suivante repart franchement dans le sens de la tendance d’origine. Qu’est-ce que cela dit du harami ?',
+    context:
+      'Une tendance baissière, une longue bougie rouge, puis un harami. La séance d’après, le prix casse à la baisse et clôture sous le bas de la grande bougie.',
+    options: [
+      'Le harami est invalidé : la tendance d’origine a repris, la pause n’a rien changé.',
+      'Le harami reste valable : il annonçait un retournement, il faut lui laisser du temps.',
+      'La cassure confirme le harami dans le sens baissier.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Le harami s’invalide par la POURSUITE de la tendance d’origine. N’ayant pas de direction propre, il n’a pas de côté d’invalidation à placer.',
+    whenItFails:
+      'Une sortie par le bas n’est pas non plus « un harami baissier confirmé » : la figure a simplement cessé d’exister.',
+    a11y:
+      'Contexte : tendance baissière, longue bougie rouge, harami, puis cassure et clôture sous le bas de la grande bougie. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.containment.avoid',
+    skillId: 'skill.candle.containment',
+    target: target(HARAMI, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le harami.',
+    statements: [
+      'En plein milieu d’une impulsion forte, un harami ne signifie pas grand-chose.',
+      'Une bougie contenue dans la précédente annonce un retournement de tendance.',
+      'C’est la sortie de la petite bougie qui donne le sens, pas la figure elle-même.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 12 — Le même extrême, deux fois (pincettes) ───────────────────────────────
+// LOT C9. Dérivé de la fiche :
+//   `definitionShort` : « Deux bougies qui butent sur un même extrême : un niveau qui tient à deux
+//                        reprises. »
+//   `confirmationZone` : « À la sortie du niveau, dans le sens confirmé. »
+//   `invalidation`     : « Franchissement franc du NIVEAU testé. »
+//   `falseSignals`     : « Pincettes au milieu de nulle part, sans niveau. »
+//
+// L'idée propre à cette compétence : ce n'est pas la bougie qui parle, c'est le PRIX auquel elles
+// s'arrêtent toutes les deux. Le corpus la relie d'ailleurs à `concept.support-resistance`, pas à
+// une autre figure de chandelier. `direction: 'bearish'` (pincettes de sommet) ⇒ invalidation en
+// HAUT, donc mécanique `place-extreme`.
+const TWIN_LEVEL_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.candle.twin-level.recognize',
+    skillId: 'skill.candle.twin-level',
+    target: target(TWEEZER, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'candle.tweezer-top.v1',
+    variant: 'tweezer-top',
+    visualType: 'candlestick-pattern',
+    prompt: 'Regarde à quel PRIX les deux bougies s’arrêtent. Quelle figure est-ce ?',
+    options: [
+      'Des pincettes (deux bougies qui butent sur le même extrême)',
+      'Un harami (la seconde bougie contenue dans le corps de la première)',
+      'Un avalement (la seconde bougie englobe la première)',
+    ],
+    correctIndex: 0,
+    a11y:
+      'Deux bougies voisines dont les plus hauts s’arrêtent au même niveau, formant une ligne horizontale au sommet.',
+    difficulty: 'medium',
+    rule: 'Ici la forme des bougies importe peu : ce qui fait la figure, c’est qu’elles s’arrêtent au MÊME prix, deux fois.',
+  },
+  {
+    id: 'ex.candle.twin-level.interpret',
+    skillId: 'skill.candle.twin-level',
+    target: target(TWEEZER, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture de pincettes.',
+    steps: [
+      'Repère les deux extrêmes qui s’arrêtent au même prix',
+      'Trace le niveau horizontal qu’ils dessinent',
+      'Vérifie que ce niveau existait DÉJÀ avant ces deux bougies',
+      'Attends la sortie du niveau pour connaître le sens',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La troisième étape est celle qu’on saute : deux bougies au même prix ne valent que si ce prix comptait déjà.',
+  },
+  {
+    id: 'ex.candle.twin-level.confirm',
+    skillId: 'skill.candle.twin-level',
+    target: target(TWEEZER, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ces pincettes ?',
+    context:
+      'Deux séances consécutives butent exactement sur le même plus haut, au contact d’une résistance déjà visible sur le graphique.',
+    options: [
+      'La sortie du niveau testé, qui donne le sens.',
+      'Le double contact suffit : un niveau touché deux fois est un niveau qui tient.',
+      'La couleur de la seconde bougie indique la suite.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le double test dit que le niveau EXISTE, pas qu’il tiendra. C’est la sortie qui décide.',
+    whenItFails: 'Des pincettes au milieu de nulle part, sans niveau préexistant, ne testent rien.',
+    a11y:
+      'Contexte : deux séances consécutives butant sur le même plus haut, au contact d’une résistance déjà visible. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.candle.twin-level.invalidate',
+    skillId: 'skill.candle.twin-level',
+    target: target(TWEEZER, 'invalidate'),
+    // Setup BAISSIER (pincettes de sommet) ⇒ invalidation en HAUT : mécanique `place-extreme`.
+    interaction: 'place-extreme',
+    chartSeed: 842,
+    prompt:
+      'Ces pincettes de sommet sont un setup BAISSIER : elles s’invalident vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule: 'Les pincettes sont invalidées par un franchissement FRANC du niveau testé : le setup étant baissier, l’invalidation se place au-dessus.',
+    whenItFails:
+      'Un dépassement de quelques centimes n’est pas un franchissement franc : c’est souvent la mèche qui va chercher les invalidations trop serrées.',
+  },
+  {
+    id: 'ex.candle.twin-level.avoid',
+    skillId: 'skill.candle.twin-level',
+    target: target(TWEEZER, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur les pincettes.',
+    statements: [
+      'Sans niveau préexistant, deux bougies au même prix ne testent rien.',
+      'Ce sont les formes des deux bougies qui font la figure.',
+      'Le double test montre que le niveau existe — il ne garantit pas qu’il tiendra.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.candle.pressure': PRESSURE_SCENARIOS,
@@ -975,6 +1200,8 @@ export const CANDLE_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]
   'skill.candle.rejection-low': REJECTION_LOW_SCENARIOS,
   'skill.candle.sequence-reversal': SEQUENCE_REVERSAL_SCENARIOS,
   'skill.candle.sequence-momentum': SEQUENCE_MOMENTUM_SCENARIOS,
+  'skill.candle.containment': CONTAINMENT_SCENARIOS,
+  'skill.candle.twin-level': TWIN_LEVEL_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */
