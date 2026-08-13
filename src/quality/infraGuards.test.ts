@@ -5,9 +5,15 @@ import { join } from 'node:path';
 /**
  * Garde-fous P0 — infrastructure (LOT 1 « Fiabilité pédagogique »).
  *
- * Deux invariants qui ne peuvent pas se tester par le code applicatif :
+ * Trois invariants qui ne peuvent pas se tester par le code applicatif :
  *  - le déploiement ne doit jamais contourner la gate complète ;
+ *  - la CI doit prouver la gate AVANT fusion, sur pull request ;
  *  - le web ne doit jamais bloquer le zoom (accessibilité WCAG 1.4.4 / 1.4.10).
+ *
+ * ADR-153 — un quatrième bloc gardait `scripts/capture-pilot.mjs` (déterminisme et non-destruction
+ * des captures d'écran). Le grand ménage a supprimé les scripts de capture et les 22,6 Mo d'images
+ * qu'ils produisaient : la preuve vivante du rendu, ce sont les tests d'intégration qui montent les
+ * écrans réels. Un garde-fou sans objet a été retiré avec son objet, pas neutralisé.
  */
 const ROOT = process.cwd();
 
@@ -48,26 +54,5 @@ describe('P0 — accessibilité web : zoom (WCAG 1.4.4)', () => {
     const content = match![1];
     expect(content).not.toMatch(/user-scalable\s*=\s*no/i);
     expect(content).not.toMatch(/maximum-scale/i);
-  });
-});
-
-describe('LOT 4-A — preuves visuelles déterministes et non destructives', () => {
-  const capture = readFileSync(join(ROOT, 'scripts', 'capture-pilot.mjs'), 'utf8');
-
-  it('produit dans un dossier isolé et ne supprime jamais les PNG du dossier fourni', () => {
-    expect(capture).toMatch(/mkdtempSync\(join\(OUT,\s*['"]\.capture-run-/);
-    expect(capture).toMatch(/renameSync\(join\(RUN_OUT/);
-    expect(capture).not.toMatch(/\bunlinkSync\b/);
-  });
-
-  it('compare la route exacte au lieu d’accepter une sous-chaîne', () => {
-    expect(capture).toMatch(/pathname !== expectedPathname/);
-    expect(capture).not.toMatch(/pathname\.includes\(path\)/);
-  });
-
-  it('verrouille les paliers réussi et à revoir avant de nommer les captures', () => {
-    expect(capture).toMatch(/assertResultTier\(p,\s*['"]success['"],\s*['"]progression finale['"]\)/);
-    expect(capture).toMatch(/assertResultTier\(p,\s*['"]retry['"],\s*['"]checkpoint échoué['"]\)/);
-    expect(capture).toMatch(/assertResultTier\(p,\s*['"]success['"],\s*['"]checkpoint réussi['"]\)/);
   });
 });
