@@ -42,17 +42,22 @@ L'ordre ci-dessous n'est pas décoratif : il va du plus probablement cassé au p
 1. **Les gestes de placement.** Dans une session, l'exercice « place la ligne d'invalidation »
    demande de faire glisser une ligne sur le graphique. C'est l'interaction la plus exposée : elle
    dépend de Gesture Handler et de Reanimated ensemble. Vérifier qu'elle répond au doigt et que la
-   ligne suit sans à-coups.
-2. **Toto et Bobo.** Ils doivent respirer au repos, bondir sur une bonne réponse, se balancer sur une
+   ligne suit sans à-coups. **Il y en a maintenant 20 dans le parcours** (10 dans les chandeliers,
+   10 dans les figures) : en croiser une est quasi certain.
+2. **Le champ de calcul.** Depuis le LOT C8, le monde 1 et le monde du risque posent des questions à
+   réponse chiffrée (PER, rendement du dividende, ratio, taille de position). Vérifier que le clavier
+   numérique s'ouvre, que le bouton « Valider » reste désactivé tant que rien n'est saisi, et qu'il
+   ne masque pas le champ sur un petit écran.
+3. **Toto et Bobo.** Ils doivent respirer au repos, bondir sur une bonne réponse, se balancer sur une
    mise en garde, se pencher quand ils désignent quelque chose. Sur un téléphone d'entrée de gamme,
    regarder si le mouvement reste fluide.
-3. **Les graphiques.** Ils sont dessinés en SVG. Vérifier qu'ils s'affichent en entier, sans
+4. **Les graphiques.** Ils sont dessinés en SVG. Vérifier qu'ils s'affichent en entier, sans
    débordement, et qu'ils restent nets.
-4. **La reprise de session.** Commencer une session, quitter l'app, la rouvrir : elle doit reprendre
+5. **La reprise de session.** Commencer une session, quitter l'app, la rouvrir : elle doit reprendre
    là où elle s'est arrêtée.
-5. **Le mode hors ligne.** Activer le mode avion et parcourir l'app : tout le contenu doit rester
+6. **Le mode hors ligne.** Activer le mode avion et parcourir l'app : tout le contenu doit rester
    accessible.
-6. **« Réduire les animations ».** Dans les réglages Android (Accessibilité → Supprimer les
+7. **« Réduire les animations ».** Dans les réglages Android (Accessibilité → Supprimer les
    animations), activer l'option et rouvrir l'app : les mascottes doivent devenir **strictement
    fixes**, sans ombre animée, et rester lisibles au lecteur d'écran.
 
@@ -81,26 +86,38 @@ Sur Android, autoriser l'installation depuis une source inconnue lorsque le syst
 
 ---
 
-## Ce qui a été vérifié avant d'écrire ce guide
+## Ce qui a été vérifié, et quand
 
-- **L'app se bundle pour iOS et pour Android** — c'est ce que fait `expo export`, et c'est la même
-  étape qui échouerait en premier dans un build EAS. Les deux passent.
-- **`expo-doctor` : 18 vérifications sur 20**, dont la correspondance des versions avec le SDK 57.
-  Les 2 échecs sont des appels réseau bloqués par l'environnement d'exécution, pas des défauts du
-  projet.
-- **Le chemin de déploiement web ne fuit plus dans le bundle natif.** Il était appliqué à toutes les
-  plateformes : le bytecode d'un export iOS contenait le motif `^https?://.*?/TradeMy/assets/`.
-  Corrigé — le chemin de base n'est plus posé que par `scripts/export-web.mjs`, et le bytecode
-  Android régénéré n'en contient plus trace.
+Vérifications refaites **après la série C complète** (LOTS C6 à C10), sur `main` :
+
+- **L'app se bundle pour les deux plateformes.** `expo export --platform android` : 1973 modules,
+  succès. `--platform ios` : 1881 modules, succès. C'est l'étape qui échouerait en premier dans un
+  build EAS.
+- **Le chemin de déploiement web ne fuit toujours pas dans le bundle natif.** Le correctif d'ADR-146
+  tient : **zéro occurrence** de `TradeMy/assets` dans les bundles Android et iOS régénérés.
+- **`expo-doctor` : 18 vérifications sur 20.** Les 2 échecs sont des appels réseau bloqués par
+  l'environnement d'exécution (schéma de config et annuaire React Native), pas des défauts du projet.
+- **Gate complète verte** : 1642 tests, export web de 300 pages HTML et 2175 références.
+
+### Poids mesuré du bundle
+
+| | Android | iOS |
+|---|---|---|
+| Total | **12 Mo** | **10 Mo** |
+| dont bytecode JS | 5,5 Mo | — |
+| dont assets | 5,5 Mo | — |
+
+Sur les assets, **4,4 Mo sont les huit rendus 3D des mascottes** (de 448 à 724 Ko pièce), en une
+seule densité d'écran. S'y ajoutent l'icône de l'app (736 Ko) et l'écran de démarrage (332 Ko).
+
+C'est perceptible sur un téléphone modeste ou une connexion lente. Le canon interdisant de
+redimensionner les rendus de mascottes, **la décision appartient au propriétaire** — et elle mérite
+d'être prise après avoir vu l'app démarrer sur un vrai appareil, pas avant.
 
 ## Ce qui n'a pas pu être vérifié, et qu'il faut donc regarder
 
-- **Le poids des mascottes.** Les huit rendus 3D pèsent **4,5 Mo à eux seuls**, en une seule densité
-  d'écran. Sur un téléphone modeste ou une connexion lente, c'est perceptible. Le canon interdisant
-  de redimensionner ces images, la décision revient au propriétaire — mais elle mérite d'être prise
-  après avoir vu l'app démarrer sur un vrai appareil.
-- **Tout ce qui touche au rendu réel** : fluidité, températures, mémoire, tailles d'écran. Aucun test
-  ne remplace le fait de tenir l'app dans la main.
+**Tout ce qui touche au rendu réel** : fluidité, températures, mémoire, tailles d'écran, ouverture du
+clavier, comportement du geste au doigt. Aucun test ne remplace le fait de tenir l'app dans la main.
 
 ## Si quelque chose casse
 
