@@ -55,10 +55,24 @@ export function IndicatorPanel({
   // ── Superpositions sur le prix ──────────────────────────────────────
   const overlays: React.ReactNode[] = [];
   if (config.kind === 'ma') {
-    const fast = sma(closes, config.fast ?? 3);
-    const slow = sma(closes, config.slow ?? 6);
-    overlays.push(<Polyline key="ma-slow" points={poly(slow, xAt, yP)} fill="none" stroke={colors.bearish} strokeWidth={1.6} />);
-    overlays.push(<Polyline key="ma-fast" points={poly(fast, xAt, yP)} fill="none" stroke={colors.bullish} strokeWidth={1.6} />);
+    // LOT G1 — les deux moyennes ne sont PAS peintes aux couleurs du marché. Elles l'étaient
+    // (rapide en vert, lente en rouge), et cela se lisait « ligne haussière / ligne baissière »
+    // alors que les deux dérivent du même prix : la couleur y distingue une PÉRIODE, pas un sens.
+    // Traitement des superpositions dérivées, déjà employé par les bandes de Bollinger juste en
+    // dessous : annotation (cyan) pour la ligne qu'on lit, ligne discrète en pointillés pour la
+    // référence lente. Le canon réserve vert et rouge à la direction du marché.
+    const fastP = config.fast ?? 3;
+    const slowP = config.slow ?? 6;
+    const fast = sma(closes, fastP);
+    const slow = sma(closes, slowP);
+    overlays.push(<Polyline key="ma-slow" points={poly(slow, xAt, yP)} fill="none" stroke={colors.textMuted} strokeWidth={1.4} strokeDasharray="5 3" />);
+    overlays.push(<Polyline key="ma-fast" points={poly(fast, xAt, yP)} fill="none" stroke={colors.technical} strokeWidth={1.6} />);
+    // Sans légende, « la rapide passe au-dessus de la lente » est indécidable à l'œil.
+    overlays.push(
+      <SvgText key="ma-legend" x={3} y={10} fill={colors.textMuted} fontSize={9}>
+        {`rapide ${fastP} · lente ${slowP}`}
+      </SvgText>,
+    );
   } else if (config.kind === 'bollinger') {
     const b = bollinger(closes, config.period ?? 5, config.k ?? 2);
     overlays.push(<Polyline key="bb-up" points={poly(b.upper, xAt, yP)} fill="none" stroke={colors.technical} strokeWidth={1.3} />);
