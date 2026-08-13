@@ -6,18 +6,24 @@
  *
  * Principe pédagogique central : un indicateur DÉRIVE du prix — il résume, il ne prédit pas. Ses
  * seuils et croisements sont des repères de contexte, jamais des ordres : la structure de prix
- * confirme (ou contredit) toujours la lecture. Quatre compétences, une par concept réel du monde :
- *   1. Le RSI                 → `concept.rsi`
- *   2. Le MACD                → `concept.macd`
+ * confirme (ou contredit) toujours la lecture. Une compétence par concept réel du monde :
+ *   1. Le RSI                  → `concept.rsi`
+ *   2. Le MACD                 → `concept.macd`
  *   3. Les bandes de Bollinger → `concept.bollinger`
- *   4. La divergence          → `concept.divergence`
+ *   4. La divergence           → `concept.divergence`
+ *   5. La moyenne mobile       → `concept.moving-average`   (LOT G1)
+ *   6. Le croisement haussier  → `concept.golden-cross`     (LOT G1)
+ *   7. Le croisement baissier  → `concept.death-cross`      (LOT G1)
  *
- * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : SEULE la divergence
- * documente une invalidation (« poursuite de la tendance qui efface le désaccord ») → un seul
- * exercice `invalidate`, par scénario conditionnel (RSI, MACD et Bollinger ne documentent que
- * confirmation + faux signal). Aucune invalidation-plancher → AUCUN placement dans ce module
- * (4 mécaniques distinctes, comme le module Anatomie). La divergence porte 5 exercices (ses cinq
- * natures sont documentées) — 17 exercices au total.
+ * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : parmi les quatre
+ * premières compétences, SEULE la divergence documente une invalidation (« poursuite de la tendance
+ * qui efface le désaccord ») → un seul exercice `invalidate` par scénario conditionnel ; RSI, MACD,
+ * Bollinger et la moyenne mobile n'en documentent aucune, et le module n'en invente pas.
+ *
+ * LOT G1 change deux choses dans ce module. Le PLACEMENT graphique y entre, parce que les deux
+ * croisements sont les premières notions du monde à porter un vrai côté d'invalidation : plancher
+ * pour le haussier (`place-invalidation`), plafond pour le baissier (`place-extreme`). Et le CALCUL
+ * y entre, parce que la moyenne mobile est une notion dont la définition est une opération.
  * Statuts éditoriaux inchangés (`needsReview`). Aucun vocabulaire BUY/SELL.
  */
 import { buildScenarioExercises, type LearningScenario, type Exercise } from '../engines/exercise';
@@ -37,6 +43,12 @@ export const INDICATORS_SKILLS: Skill[] = [
   { id: 'skill.indicators.macd', name: 'Le MACD', description: 'Lire l’élan par deux moyennes, leur croisement et l’histogramme — un repère retardé.' },
   { id: 'skill.indicators.bollinger', name: 'Les bandes de Bollinger', description: 'Lire la volatilité : compression, expansion et marche le long d’une bande.' },
   { id: 'skill.indicators.divergence', name: 'La divergence', description: 'Repérer un désaccord prix/oscillateur comme signe d’essoufflement — à confirmer.' },
+  // LOT G1 — la moyenne mobile ouvre la série G. Elle vient APRÈS les quatre premières compétences
+  // bien qu'elle soit la plus simple : le MACD, les bandes et le RSI ont déjà appris que l'indicateur
+  // dérive du prix ; la moyenne, elle, sert à mesurer COMBIEN il en dérive en retard.
+  { id: 'skill.indicators.moving-average', name: 'La moyenne mobile', description: 'Calculer une moyenne des dernières clôtures et voir ce que le lissage coûte en réactivité.' },
+  { id: 'skill.indicators.cross-up', name: 'Le croisement haussier', description: 'Situer un croisement de moyennes par rapport au retournement du prix — il le suit, jamais l’inverse.' },
+  { id: 'skill.indicators.cross-down', name: 'Le croisement baissier', description: 'Le miroir exact, plafond compris : l’invalidation d’un setup baissier se pose au-dessus.' },
 ];
 
 // Concepts réels du monde `world.indicators` reliés à chaque compétence.
@@ -44,6 +56,9 @@ const RSI = 'concept.rsi';
 const MACD = 'concept.macd';
 const BOLLINGER = 'concept.bollinger';
 const DIVERGENCE = 'concept.divergence';
+const MA = 'concept.moving-average';
+const CROSS_UP = 'concept.golden-cross';
+const CROSS_DOWN = 'concept.death-cross';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -51,12 +66,18 @@ export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.indicators.macd': MACD,
   'skill.indicators.bollinger': BOLLINGER,
   'skill.indicators.divergence': DIVERGENCE,
+  'skill.indicators.moving-average': MA,
+  'skill.indicators.cross-up': CROSS_UP,
+  'skill.indicators.cross-down': CROSS_DOWN,
 };
 export const INDICATORS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.indicators.rsi': 'rsi',
   'skill.indicators.macd': 'macd',
   'skill.indicators.bollinger': 'bandes-de-bollinger',
   'skill.indicators.divergence': 'divergence',
+  'skill.indicators.moving-average': 'moyenne-mobile',
+  'skill.indicators.cross-up': 'croisement-haussier-de-moyennes',
+  'skill.indicators.cross-down': 'croisement-baissier-de-moyennes',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -347,12 +368,264 @@ const DIVERGENCE_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 5 — La moyenne mobile (LOT G1) ────────────────────────
+// recognize · interpret (CALCUL) · confirm (scénario) · avoid-false-signal.
+// Pas d'objectif `invalidate` : une moyenne n'est pas un setup, elle n'a rien à invalider — la
+// fiche ne documente donc aucune invalidation, et le module n'en invente pas.
+//
+// Le calcul n'est pas un ornement. La moyenne mobile est, avec le rendement du dividende et le PER,
+// la seule notion du corpus dont la DÉFINITION est une opération : une somme divisée par un nombre.
+// Et l'opération donne à voir le retard mieux qu'aucune phrase : six clôtures montant de 40 à 50
+// donnent une ligne à 45, cinq points sous le dernier prix.
+const MA_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.ma.recognize',
+    skillId: 'skill.indicators.moving-average',
+    target: target(MA, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.ma.v1',
+    variant: 'moving-average',
+    visualType: 'indicator',
+    prompt: 'Que sont les deux lignes tracées PAR-DESSUS les bougies ?',
+    options: [
+      'Deux moyennes mobiles de périodes différentes : une rapide et une lente',
+      'Les deux bandes de Bollinger, à plus ou moins deux écarts-types',
+      'Le MACD et sa ligne de signal, qui se lisent dans un panneau séparé',
+    ],
+    correctIndex: 0,
+    a11y: 'Deux lignes lissées superposées aux bougies : une moyenne à 3 périodes, qui suit le prix de près, et une moyenne à 6 périodes, plus lisse et plus lente. Sur cette série hésitante, elles se croisent à deux reprises.',
+    difficulty: 'easy',
+    rule: 'Une moyenne mobile se trace SUR le prix : elle est faite des clôtures elles-mêmes, pas d’un calcul affiché à part.',
+  },
+  {
+    id: 'ex.indicators.ma.compute',
+    skillId: 'skill.indicators.moving-average',
+    target: target(MA, 'interpret'),
+    interaction: 'compute',
+    prompt:
+      'Les six dernières clôtures sont 40, 42, 44, 46, 48 et 50. Que vaut la moyenne mobile à 6 périodes ?',
+    unit: 'points de prix',
+    answer: 45,
+    tolerance: 0,
+    method:
+      'Moyenne = somme ÷ nombre de périodes = (40 + 42 + 44 + 46 + 48 + 50) ÷ 6 = 270 ÷ 6 = 45. Le prix vient pourtant de clôturer à 50 : la ligne est cinq points en dessous. Ce n’est pas une erreur — c’est exactement le retard que le lissage coûte.',
+    difficulty: 'medium',
+    rule: 'Une moyenne mobile est la moyenne des N dernières clôtures : elle résume le passé récent, donc elle traîne derrière le dernier prix.',
+  },
+  {
+    id: 'ex.indicators.ma.confirm',
+    skillId: 'skill.indicators.moving-average',
+    target: target(MA, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette lecture ?',
+    context:
+      'Le prix évolue au-dessus de sa moyenne à 6 périodes depuis plusieurs bougies, et il vient de reprendre un plus-haut local.',
+    options: [
+      'La structure de prix : la moyenne confirme ce que le prix a déjà fait, elle ne l’annonce pas.',
+      'La position au-dessus de la moyenne : elle suffit à établir la suite du mouvement.',
+      'Rien à vérifier : au-dessus de sa moyenne, un prix continue de monter.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Une moyenne se confirme par la structure de prix — « au-dessus de sa moyenne » est une constatation arithmétique, pas un scénario.',
+  },
+  {
+    id: 'ex.indicators.ma.avoid',
+    skillId: 'skill.indicators.moving-average',
+    target: target(MA, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur la moyenne mobile.',
+    statements: [
+      'Une moyenne à 6 périodes n’a sa première valeur qu’à la sixième bougie.',
+      'Une période plus longue rend la ligne plus lisse ET plus réactive.',
+      'Dans un marché hésitant, deux moyennes peuvent se croiser plusieurs fois sans tendance derrière.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 6 — Le croisement haussier (LOT G1) ───────────────────
+// recognize · interpret (lecture ordonnée) · confirm · invalidate (PLACEMENT) · avoid-false-signal.
+// Setup HAUSSIER ⇒ l'invalidation est un plancher : mécanique `place-invalidation`, qui vise le plus
+// BAS réel de la série. Premier placement graphique du monde des indicateurs.
+const CROSS_UP_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.cross-up.recognize',
+    skillId: 'skill.indicators.cross-up',
+    target: target(CROSS_UP, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.golden-cross.v1',
+    variant: 'golden-cross',
+    visualType: 'indicator',
+    prompt: 'Que viennent de faire les deux moyennes ?',
+    options: [
+      'La rapide est repassée AU-DESSUS de la lente : un croisement haussier',
+      'La rapide est repassée SOUS la lente : un croisement baissier',
+      'Elles se sont écartées sans se croiser : une simple expansion',
+    ],
+    correctIndex: 0,
+    a11y: 'Le prix baisse, forme son plus bas à la quatrième bougie, puis remonte. La moyenne à 3 périodes ne repasse au-dessus de la moyenne à 6 périodes qu’à la septième bougie : trois bougies après le retournement du prix.',
+    difficulty: 'easy',
+    rule: 'Un croisement haussier, c’est la moyenne courte qui franchit la longue par le bas — un point précis, sur une bougie précise.',
+  },
+  {
+    id: 'ex.indicators.cross-up.interpret',
+    skillId: 'skill.indicators.cross-up',
+    target: target(CROSS_UP, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre ce qui s’est réellement passé.',
+    steps: [
+      'Le prix baisse : la moyenne rapide évolue sous la lente',
+      'Le prix cesse de faire des plus-bas et forme son plancher',
+      'Les clôtures remontent et tirent la moyenne rapide vers le haut',
+      'La rapide franchit la lente : le croisement est constaté, trois bougies après le plancher',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Le prix tourne d’abord, les moyennes le constatent ensuite : l’ordre ne s’inverse jamais.',
+  },
+  {
+    id: 'ex.indicators.cross-up.confirm',
+    skillId: 'skill.indicators.cross-up',
+    target: target(CROSS_UP, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce croisement haussier ?',
+    context:
+      'La moyenne rapide vient de repasser au-dessus de la lente. Sur les bougies suivantes, les plus-bas tiennent et un plus-haut local est repris.',
+    options: [
+      'La structure de prix qui tient après le croisement — des plus-bas conservés et un plus-haut repris.',
+      'Le croisement lui-même : dès qu’il a lieu, la hausse est établie.',
+      'La longueur des périodes choisies : plus elles sont longues, plus le croisement est valide.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Un croisement se confirme par ce que fait le prix APRÈS, jamais par le croisement seul.',
+  },
+  {
+    id: 'ex.indicators.cross-up.invalidate',
+    skillId: 'skill.indicators.cross-up',
+    target: target(CROSS_UP, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 1020,
+    prompt:
+      'Pose le niveau sous lequel ce setup haussier n’a plus lieu d’être : le plancher de la période.',
+    difficulty: 'hard',
+    rule: 'L’invalidation d’un croisement haussier est un PLANCHER : sous le plus bas de la jambe qui l’a produit, la rapide repasse sous la lente et le constat tombe.',
+    whenItFails:
+      'Trop serrée, l’invalidation saute au premier bruit ; trop large, elle ne protège plus rien.',
+  },
+  {
+    id: 'ex.indicators.cross-up.avoid',
+    skillId: 'skill.indicators.cross-up',
+    target: target(CROSS_UP, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le croisement haussier.',
+    statements: [
+      'Le croisement se produit après que le prix a déjà formé son plus bas.',
+      'Le croisement annonce la hausse à venir avant que le prix ne bouge.',
+      'En range, la rapide traverse la lente dans les deux sens sans qu’aucune tendance suive.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 7 — Le croisement baissier (LOT G1) ───────────────────
+// Même cinq objectifs, un seul changement de mécanique — et il est central : setup BAISSIER ⇒
+// l'invalidation est un PLAFOND, donc `place-extreme` (qui vise le plus HAUT réel). `place-invalidation`
+// viserait le plancher et enseignerait le contraire de la fiche. Même règle qu'au LOT C10.
+const CROSS_DOWN_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.cross-down.recognize',
+    skillId: 'skill.indicators.cross-down',
+    target: target(CROSS_DOWN, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.death-cross.v1',
+    variant: 'death-cross',
+    visualType: 'indicator',
+    prompt: 'Que viennent de faire les deux moyennes ?',
+    options: [
+      'La rapide est repassée SOUS la lente : un croisement baissier',
+      'La rapide est repassée AU-DESSUS de la lente : un croisement haussier',
+      'Elles se sont resserrées sans se croiser : une compression',
+    ],
+    correctIndex: 0,
+    a11y: 'Le prix monte, forme son plus haut à la quatrième bougie, puis baisse. La moyenne à 3 périodes ne repasse sous la moyenne à 6 périodes qu’à la septième bougie : trois bougies après le retournement du prix.',
+    difficulty: 'easy',
+    rule: 'Un croisement baissier, c’est la moyenne courte qui franchit la longue par le haut — le miroir exact du croisement haussier.',
+  },
+  {
+    id: 'ex.indicators.cross-down.interpret',
+    skillId: 'skill.indicators.cross-down',
+    target: target(CROSS_DOWN, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre ce qui s’est réellement passé.',
+    steps: [
+      'Le prix monte : la moyenne rapide évolue au-dessus de la lente',
+      'Le prix cesse de faire des plus-hauts et forme son sommet',
+      'Les clôtures redescendent et tirent la moyenne rapide vers le bas',
+      'La rapide passe sous la lente : le croisement est constaté, trois bougies après le sommet',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Le prix tourne d’abord, les moyennes le constatent ensuite — dans ce sens aussi.',
+  },
+  {
+    id: 'ex.indicators.cross-down.confirm',
+    skillId: 'skill.indicators.cross-down',
+    target: target(CROSS_DOWN, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce croisement baissier ?',
+    context:
+      'La moyenne rapide vient de repasser sous la lente. Sur les bougies suivantes, les plus-hauts cèdent et un plus-bas local est repris.',
+    options: [
+      'La structure de prix qui reste sous le sommet — des plus-hauts qui cèdent et un plus-bas repris.',
+      'Le nom de la figure : un « croisement de la mort » se passe de confirmation.',
+      'Le croisement seul, dès qu’il est visible sur le graphique.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le nom dramatique d’une figure ne mesure pas sa portée : seule la structure de prix confirme.',
+  },
+  {
+    id: 'ex.indicators.cross-down.invalidate',
+    skillId: 'skill.indicators.cross-down',
+    target: target(CROSS_DOWN, 'invalidate'),
+    interaction: 'place-extreme',
+    chartSeed: 1376,
+    prompt:
+      'Pose le niveau au-dessus duquel ce setup baissier n’a plus lieu d’être : le plafond de la période.',
+    difficulty: 'hard',
+    rule: 'L’invalidation d’un croisement baissier est un PLAFOND : au-dessus du plus haut atteint, la rapide repasse au-dessus de la lente et le constat tombe.',
+    whenItFails:
+      'Poser un plancher sous un setup baissier est l’erreur symétrique la plus fréquente : le niveau qui compte est au-dessus.',
+  },
+  {
+    id: 'ex.indicators.cross-down.avoid',
+    skillId: 'skill.indicators.cross-down',
+    target: target(CROSS_DOWN, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le croisement baissier.',
+    statements: [
+      'C’est le même calcul que le croisement haussier, au sens près.',
+      'Son nom plus dramatique traduit une portée statistique plus forte.',
+      'Son invalidation se pose au-dessus, au plus haut de la jambe qui l’a produit.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const INDICATORS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.indicators.rsi': RSI_SCENARIOS,
   'skill.indicators.macd': MACD_SCENARIOS,
   'skill.indicators.bollinger': BOLLINGER_SCENARIOS,
   'skill.indicators.divergence': DIVERGENCE_SCENARIOS,
+  'skill.indicators.moving-average': MA_SCENARIOS,
+  'skill.indicators.cross-up': CROSS_UP_SCENARIOS,
+  'skill.indicators.cross-down': CROSS_DOWN_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

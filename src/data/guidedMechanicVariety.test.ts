@@ -74,6 +74,11 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
     // lisent sur aucun graphique ; sans poser l'opération une fois, on ne comprend pas pourquoi un
     // rendement élevé ou un PER bas peuvent tromper — c'est le DÉNOMINATEUR qui a bougé.
     // « skill.actions » portait déjà un calcul (une part du capital) avant le LOT D3.
+    //
+    // LOT G1 — la moyenne mobile rejoint la liste pour la même raison, et pour une de plus : sa
+    // définition EST une opération (une somme divisée par un nombre), et cette opération donne à
+    // voir le retard mieux qu'aucune phrase. Six clôtures montant de 40 à 50 produisent une ligne à
+    // 45 : cinq points sous le dernier prix, et ces cinq points ne viennent que du calcul.
     const avecCalcul = GUIDED_SKILL_IDS.filter((id) =>
       getExercises(id).some((e) => e.type === 'numeric'),
     ).sort();
@@ -81,6 +86,7 @@ describe('LOT D2 — la variété des mécaniques du parcours guidé', () => {
       'skill.actions',
       'skill.foundations.dividend',
       'skill.foundations.per',
+      'skill.indicators.moving-average',
       'skill.risk.reward',
       'skill.risk.sizing',
     ]);

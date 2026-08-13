@@ -3,8 +3,14 @@
  *
  * Même rigueur que les modules précédents : câblage, couverture d'objectifs RÉELS (jamais
  * inventés), mécaniques distinctes, gradabilité, cohérence indicateur/dataset, honnêteté du
- * placement (aucune invalidation-plancher documentée → AUCUN placement dans ce module),
- * checkpoint propre, vocabulaire.
+ * placement, checkpoint propre, vocabulaire.
+ *
+ * LOT G1 — le module passe de quatre à sept compétences, et deux verrous CHANGENT de sens plutôt
+ * que de disparaître. « Aucun placement dans ce module » était vrai tant qu'aucun concept du monde
+ * ne documentait un côté d'invalidation ; les deux croisements de moyennes en documentent un, et
+ * de sens OPPOSÉ. Le verrou devient donc : le placement existe, et chaque côté est le bon —
+ * plancher pour le haussier, plafond pour le baissier. Une règle affaiblie aurait laissé passer
+ * l'erreur exacte que la fiche du croisement baissier enseigne à éviter.
  */
 import { describe, it, expect } from '@jest/globals';
 import {
@@ -20,6 +26,8 @@ import { objectiveId, parseObjectiveId, objectiveByIdIn, type ObjectiveKind } fr
 import { V5_CONCEPTS } from './learningContent';
 import { conceptsByWorld } from './learningConcept';
 import { scenarioInteractionTypes, gradeExercise } from '../engines/exercise';
+import { SCENARIO_CANDLE_COUNT, highestHigh, lowestLow } from '../engines/exercise/scenario';
+import { generateCandles } from '../engines/pattern/demoChart';
 import { VISUAL_DATASETS } from '../engines/visual/visualDatasets';
 
 /**
@@ -33,6 +41,11 @@ const EXPECTED: Record<string, ObjectiveKind[]> = {
   'concept.bollinger': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
   // La divergence documente ses 5 natures (dont l'invalidation) → 5 exercices.
   'concept.divergence': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
+  // LOT G1 — la moyenne mobile n'est pas un setup : elle ne documente aucune invalidation, comme
+  // le RSI. Les deux croisements, eux, en documentent une chacun, de sens opposé.
+  'concept.moving-average': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
+  'concept.golden-cross': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
+  'concept.death-cross': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
 };
 
 const ALL_EXERCISES = Object.values(INDICATORS_MODULE_EXERCISES_BY_SKILL).flat();
@@ -44,8 +57,9 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(INDICATORS_MODULE_SCENARIOS.length);
-    // 3 compétences × 4 items + la divergence × 5 (seule à documenter ses 5 natures) = 17 exercices.
-    expect(ALL_EXERCISES.length).toBe(17);
+    // 4 compétences × 4 items (RSI, MACD, Bollinger, moyenne mobile) + 3 × 5 (divergence et les
+    // deux croisements, qui documentent leurs cinq natures) = 31 exercices.
+    expect(ALL_EXERCISES.length).toBe(31);
   });
 
   it('chaque compétence cible un concept RÉEL de world.indicators', () => {
@@ -73,16 +87,48 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
     expect(kinds).toEqual(new Set(['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal']));
   });
 
-  it('honnêteté du placement : aucune invalidation-plancher documentée → AUCUN placement dans ce module', () => {
-    // Les invalidations des quatre concepts sont contextuelles (poursuite de tendance, prix qui
-    // contredit l'élan, fausse sortie de compression) — jamais un plancher horizontal.
-    expect(ALL_EXERCISES.some((e) => e.type === 'place_invalidation')).toBe(false);
+  it('honnêteté du placement : il n’existe QUE là où un concept documente un côté d’invalidation', () => {
+    // Avant le LOT G1, aucun concept du monde n'en documentait : le module n'avait aucun placement.
+    // Les deux croisements en documentent un — et un seul chacun.
+    const placements = ALL_EXERCISES.filter((e) => e.type === 'place_invalidation');
+    expect(placements.map((e) => e.skillId).sort()).toEqual([
+      'skill.indicators.cross-down',
+      'skill.indicators.cross-up',
+    ]);
+    // Les quatre concepts sans côté documenté (RSI, MACD, Bollinger, moyenne mobile) n'en ont AUCUN.
+    for (const id of ['skill.indicators.rsi', 'skill.indicators.macd', 'skill.indicators.bollinger', 'skill.indicators.moving-average']) {
+      expect(getExercises(id).some((e) => e.type === 'place_invalidation')).toBe(false);
+    }
     const types = new Set(ALL_EXERCISES.map((e) => e.type));
-    expect(types).toEqual(new Set(['identify_figure', 'order', 'scenario', 'find_error']));
+    expect(types).toEqual(
+      new Set(['identify_figure', 'order', 'scenario', 'find_error', 'place_invalidation', 'numeric']),
+    );
     for (const s of INDICATORS_SKILLS) {
       const kinds = scenarioInteractionTypes(INDICATORS_MODULE_SCENARIOS_BY_SKILL[s.id]);
       expect(kinds.length).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it('le CÔTÉ de chaque placement suit la direction de sa fiche — la cible est recalculée', () => {
+    // Le verrou qui compte. Les deux exercices partagent le player `place_invalidation`, mais leur
+    // cible est calculée par des mécaniques opposées : `place-invalidation` vise le plus BAS réel
+    // de la série, `place-extreme` le plus HAUT. Se tromper de mécanique aurait produit un exercice
+    // qui enseigne exactement la faute que la fiche du croisement baissier met en garde.
+    const cible = (skillId: string) => {
+      const ex = getExercises(skillId).find((e) => e.type === 'place_invalidation');
+      expect(ex).toBeDefined();
+      if (ex?.type !== 'place_invalidation') throw new Error('placement introuvable');
+      const candles = generateCandles(ex.chartSeed, SCENARIO_CANDLE_COUNT);
+      return { attendu: ex.validation.targetPrice, bas: lowestLow(candles), haut: highestHigh(candles) };
+    };
+    // Setup HAUSSIER : l'invalidation est un plancher.
+    const haussier = cible('skill.indicators.cross-up');
+    expect(haussier.attendu).toBe(haussier.bas);
+    expect(haussier.attendu).not.toBe(haussier.haut);
+    // Setup BAISSIER : l'invalidation est un plafond.
+    const baissier = cible('skill.indicators.cross-down');
+    expect(baissier.attendu).toBe(baissier.haut);
+    expect(baissier.attendu).not.toBe(baissier.bas);
   });
 
   it('chaque exercice se corrige (une bonne réponse existe et est acceptée par le grader réel)', () => {
@@ -93,6 +139,8 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
         case 'scenario': answer = ex.validation.correctIndex; break;
         case 'find_error': answer = ex.validation.errorIndex; break;
         case 'order': answer = ex.validation.correctOrder; break;
+        case 'numeric': answer = ex.validation.answer; break;
+        case 'place_invalidation': answer = ex.validation.targetPrice; break;
         default: throw new Error(`type inattendu: ${ex.type}`);
       }
       expect(gradeExercise(ex, answer).correct).toBe(true);
@@ -101,7 +149,7 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
 
   it('cohérence indicateur : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(4);
+    expect(figures.length).toBe(7);
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(ex.visualType).toBe('indicator');

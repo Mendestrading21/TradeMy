@@ -7,6 +7,7 @@
  */
 import { DEFAULT_DISCLAIMER, type LearningConcept } from './learningConcept';
 import { BATCH_CONCEPTS } from './learningContentBatch';
+import { MOVING_AVERAGE_CONCEPTS } from './learningContentMovingAverage';
 
 const CORE_V5_CONCEPTS: LearningConcept[] = [
   {
@@ -2529,4 +2530,10 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
  * Corpus V5 complet = concepts amorce + lots éditoriaux. Le batch « bibliothèque » (Exp-Max Lot 4)
  * se surface automatiquement (glossaire, carte des mondes, fiches) via ce même tableau.
  */
-export const V5_CONCEPTS: LearningConcept[] = [...CORE_V5_CONCEPTS, ...BATCH_CONCEPTS];
+export const V5_CONCEPTS: LearningConcept[] = [
+  ...CORE_V5_CONCEPTS,
+  ...BATCH_CONCEPTS,
+  // LOT G1 — la moyenne mobile et ses deux croisements : trois variantes que le moteur savait
+  // déjà dessiner et qu'aucune fiche ne nommait (ouverture de la série G).
+  ...MOVING_AVERAGE_CONCEPTS,
+];

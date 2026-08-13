@@ -55,7 +55,7 @@ const LIBRARY_ONLY = V5_CONCEPTS.filter((c) => !isRepresentativeConcept(c));
 const REPRESENTATIVE = V5_CONCEPTS.filter((c) => isRepresentativeConcept(c));
 
 describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () => {
-  it('AUCUNE fiche n’est une impasse : les 67 savent nommer leur raison', () => {
+  it('AUCUNE fiche n’est une impasse : toutes savent nommer leur raison', () => {
     for (const c of V5_CONCEPTS) {
       const step = conceptNextStep(c, VIDE);
       expect(step.reason.length).toBeGreaterThan(20);
@@ -79,8 +79,11 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // LOT C8 : 9 → 7 (dividende, PER — le monde 1 n'a plus de fiche inentraînable).
     // LOT C9 : 7 → 5 (harami, pincettes).
     // LOT C10 : 5 → 3 (tasse-anse, triple creux).
+    // LOT G1 : le corpus GRANDIT de trois fiches (moyenne mobile, croisement haussier, croisement
+    // baissier) et la dette reste à 3 — les trois arrivent AVEC leur compétence guidée. C'est la
+    // règle que la série C avait établie, appliquée cette fois dès l'écriture de la fiche.
     expect(LIBRARY_ONLY.length).toBe(3);
-    expect(V5_CONCEPTS.length).toBe(67);
+    expect(V5_CONCEPTS.length).toBe(70);
   });
 
   it('une fiche de bibliothèque le DIT — au lieu d’afficher un statut qui ne bougera jamais', () => {

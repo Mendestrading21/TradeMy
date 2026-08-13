@@ -85,7 +85,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // LOT C8 : 61 → 63 (dividende et PER rejoignent le module du monde 1).
     // LOT C9 : 63 → 65 (la contenance et le niveau partagé).
     // LOT C10 : 65 → 67 (la courbure du chemin, le niveau qui s'use).
-    expect(REPO_TRUTH.skills).toBe(67);
+    // LOT G1 : 67 → 70 (la moyenne mobile et ses deux croisements — ouverture de la série G).
+    expect(REPO_TRUTH.skills).toBe(70);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);
