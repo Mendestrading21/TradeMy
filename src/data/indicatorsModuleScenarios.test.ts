@@ -50,6 +50,10 @@ const EXPECTED: Record<string, ObjectiveKind[]> = {
   // Les retracements, si : sous le départ du mouvement, il n'y a plus rien à retracer.
   'concept.atr': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
   'concept.fibonacci': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
+  // LOT G3 — un oscillateur situe, il ne propose pas de scénario : le stochastique n'a pas plus
+  // d'invalidation que le RSI. La divergence cachée, elle, repose sur une structure — donc si.
+  'concept.stochastic': ['recognize', 'interpret', 'confirm', 'avoid-false-signal'],
+  'concept.hidden-divergence': ['recognize', 'interpret', 'confirm', 'invalidate', 'avoid-false-signal'],
 };
 
 const ALL_EXERCISES = Object.values(INDICATORS_MODULE_EXERCISES_BY_SKILL).flat();
@@ -61,9 +65,9 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
       expect(getExercises(s.id).length).toBeGreaterThanOrEqual(3);
     }
     expect(ALL_EXERCISES.length).toBe(INDICATORS_MODULE_SCENARIOS.length);
-    // 5 compétences × 4 items (RSI, MACD, Bollinger, moyenne mobile, ATR) + 4 × 5 (divergence, les
-    // deux croisements et les retracements, qui documentent leurs cinq natures) = 40 exercices.
-    expect(ALL_EXERCISES.length).toBe(40);
+    // 6 compétences × 4 items (RSI, MACD, Bollinger, moyenne mobile, ATR, stochastique) + 5 × 5
+    // (divergence, les deux croisements, les retracements et la divergence cachée) = 49 exercices.
+    expect(ALL_EXERCISES.length).toBe(49);
   });
 
   it('chaque compétence cible un concept RÉEL de world.indicators', () => {
@@ -99,9 +103,10 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
       'skill.indicators.cross-down',
       'skill.indicators.cross-up',
       'skill.indicators.fibonacci',
+      'skill.indicators.hidden-divergence',
     ]);
     // Les concepts sans côté documenté (RSI, MACD, Bollinger, moyenne mobile, ATR) n'en ont AUCUN.
-    for (const id of ['skill.indicators.rsi', 'skill.indicators.macd', 'skill.indicators.bollinger', 'skill.indicators.moving-average', 'skill.indicators.atr']) {
+    for (const id of ['skill.indicators.rsi', 'skill.indicators.macd', 'skill.indicators.bollinger', 'skill.indicators.moving-average', 'skill.indicators.atr', 'skill.indicators.stochastic']) {
       expect(getExercises(id).some((e) => e.type === 'place_invalidation')).toBe(false);
     }
     const types = new Set(ALL_EXERCISES.map((e) => e.type));
@@ -154,7 +159,7 @@ describe('Module guidé « Lire les indicateurs » — modèle officiel (world.i
 
   it('cohérence indicateur : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(9);
+    expect(figures.length).toBe(11);
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(ex.visualType).toBe('indicator');

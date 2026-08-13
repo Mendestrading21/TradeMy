@@ -16,6 +16,8 @@
  *   7. Le croisement baissier  → `concept.death-cross`      (LOT G1)
  *   8. L'amplitude moyenne     → `concept.atr`              (LOT G2)
  *   9. Les retracements        → `concept.fibonacci`        (LOT G2)
+ *  10. Le stochastique         → `concept.stochastic`       (LOT G3)
+ *  11. La divergence cachée    → `concept.hidden-divergence` (LOT G3)
  *
  * Objectifs ciblés = objectifs RÉELS (learningTarget). Honnêteté du modèle : parmi les quatre
  * premières compétences, SEULE la divergence documente une invalidation (« poursuite de la tendance
@@ -61,6 +63,11 @@ export const INDICATORS_SKILLS: Skill[] = [
   // puis des niveaux. Tout le reste du module répond « comment va le marché ».
   { id: 'skill.indicators.atr', name: 'L’amplitude moyenne', description: 'Lire une volatilité en unités de prix, et la convertir en distance d’invalidation.' },
   { id: 'skill.indicators.fibonacci', name: 'Les retracements', description: 'Lire des niveaux CHOISIS entre deux extrêmes — et savoir ce qui les efface.' },
+  // LOT G3 — les deux notions qu'on confond avec ce qu'on sait déjà. Elles arrivent en DERNIER
+  // dans le module, et ce n'est pas décoratif : chacune ne s'apprend qu'en la comparant à celle
+  // qui la précède (le RSI, la divergence classique).
+  { id: 'skill.indicators.stochastic', name: 'Le stochastique', description: 'Situer la clôture dans le range récent — et voir pourquoi le RSI dit autre chose.' },
+  { id: 'skill.indicators.hidden-divergence', name: 'La divergence cachée', description: 'Le même désaccord, sur des creux : une continuation, et non un essoufflement.' },
 ];
 
 // Concepts réels du monde `world.indicators` reliés à chaque compétence.
@@ -73,6 +80,8 @@ const CROSS_UP = 'concept.golden-cross';
 const CROSS_DOWN = 'concept.death-cross';
 const ATR = 'concept.atr';
 const FIBONACCI = 'concept.fibonacci';
+const STOCHASTIC = 'concept.stochastic';
+const HIDDEN_DIV = 'concept.hidden-divergence';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -85,6 +94,8 @@ export const INDICATORS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.indicators.cross-down': CROSS_DOWN,
   'skill.indicators.atr': ATR,
   'skill.indicators.fibonacci': FIBONACCI,
+  'skill.indicators.stochastic': STOCHASTIC,
+  'skill.indicators.hidden-divergence': HIDDEN_DIV,
 };
 export const INDICATORS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.indicators.rsi': 'rsi',
@@ -96,6 +107,8 @@ export const INDICATORS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.indicators.cross-down': 'croisement-baissier-de-moyennes',
   'skill.indicators.atr': 'atr',
   'skill.indicators.fibonacci': 'retracements-de-fibonacci',
+  'skill.indicators.stochastic': 'stochastique',
+  'skill.indicators.hidden-divergence': 'divergence-cachee',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -795,6 +808,170 @@ const FIBONACCI_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 10 — Le stochastique (LOT G3) ─────────────────────────
+// recognize · interpret · confirm · avoid-false-signal. Pas d'objectif `invalidate` : un
+// oscillateur situe, il ne propose pas de scénario — comme le RSI, dont il est le voisin de palier.
+//
+// PAS de mécanique `compute` ici, et c'est un choix. Le critère posé au LOT G1 puis au LOT G2 est
+// « la réponse EST un nombre ET sans l'opération la notion n'a pas d'usage ». Il tient pour le PER,
+// la moyenne mobile et l'ATR converti en distance ; il ne tient PAS pour le stochastique : le
+// moteur calcule %K, et le travail de l'élève est de le LIRE. Poser la division ici aurait été une
+// mécanique de plus, pas une compréhension de plus.
+const STOCHASTIC_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.stochastic.recognize',
+    skillId: 'skill.indicators.stochastic',
+    target: target(STOCHASTIC, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.stochastic.v1',
+    variant: 'stochastic',
+    visualType: 'indicator',
+    prompt: 'À quoi reconnais-tu que cet oscillateur n’est PAS un RSI ?',
+    options: [
+      'À ses zones de référence : 80 et 20, quand le RSI emploie 70 et 30',
+      'À son échelle : il va de 0 à 100, contrairement au RSI',
+      'À sa position : il est tracé sur le prix, et non dans un panneau séparé',
+    ],
+    correctIndex: 0,
+    a11y: 'Sous le prix, deux courbes bornées de 0 à 100 avec des zones de référence à 80 et 20 : la position de la clôture dans le range des cinq dernières bougies, et sa version lissée. Elles balaient toute l’échelle à plusieurs reprises.',
+    difficulty: 'medium',
+    rule: 'Les deux vont de 0 à 100 et vivent tous deux sous le prix : ce sont les SEUILS qui les distinguent à l’œil — 80/20 contre 70/30.',
+  },
+  {
+    id: 'ex.indicators.stochastic.interpret',
+    skillId: 'skill.indicators.stochastic',
+    target: target(STOCHASTIC, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un stochastique.',
+    steps: [
+      'Repère la période : c’est elle qui définit le range de référence',
+      'Situe la clôture dans ce range : en haut, %K approche 100 ; en bas, 0',
+      'Regarde si %K traverse une zone de référence (au-dessus de 80, sous 20)',
+      'Demande-toi si tu es en range ou en tendance franche — en tendance, la saturation est normale',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'medium',
+    rule: 'Le stochastique se lit période d’abord, position ensuite, régime de marché toujours : c’est le régime qui dit si un extrême est remarquable.',
+  },
+  {
+    id: 'ex.indicators.stochastic.confirm',
+    skillId: 'skill.indicators.stochastic',
+    target: target(STOCHASTIC, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Le stochastique affiche 4 et le RSI 32 sur la même bougie. Que faut-il en conclure ?',
+    context:
+      'Sur la même série et la même bougie, le stochastique est au plus bas de son échelle tandis que le RSI reste largement au-dessus de sa zone de survente.',
+    options: [
+      'Rien de contradictoire : la clôture est en bas du range récent, mais les baisses n’ont pas dominé les hausses. Deux mesures, deux réponses.',
+      'L’un des deux indicateurs est mal réglé : sur la même série ils devraient concorder.',
+      'Le stochastique a raison, car il est plus réactif.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Aucun des deux n’a « raison » : l’un situe la clôture dans un range, l’autre compare l’ampleur des hausses et des baisses.',
+  },
+  {
+    id: 'ex.indicators.stochastic.avoid',
+    skillId: 'skill.indicators.stochastic',
+    target: target(STOCHASTIC, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le stochastique.',
+    statements: [
+      'Ses zones de référence sont 80 et 20.',
+      'Comme le RSI, il compare l’ampleur des hausses à celle des baisses.',
+      'En tendance franche, il peut saturer longtemps à un extrême.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 11 — La divergence cachée (LOT G3) ────────────────────
+// Les cinq natures. Lecture de CONTINUATION haussière ⇒ l'invalidation est un plancher (le creux
+// précédent du prix) : `place-invalidation`. La leçon propre à la fiche tient en une question —
+// est-ce que je compare des creux, ou des sommets ?
+const HIDDEN_DIV_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.indicators.hidden-div.recognize',
+    skillId: 'skill.indicators.hidden-divergence',
+    target: target(HIDDEN_DIV, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'indicator.hidden-divergence.v1',
+    variant: 'hidden-divergence',
+    visualType: 'indicator',
+    prompt: 'Que comparent les deux pointillés de ce graphique ?',
+    options: [
+      'Deux CREUX : celui du prix monte, celui de l’oscillateur descend',
+      'Deux SOMMETS : celui du prix monte, celui de l’oscillateur descend',
+      'Un creux du prix et un sommet de l’oscillateur',
+    ],
+    correctIndex: 0,
+    a11y: 'Le prix forme deux creux, le second plus haut que le premier ; l’oscillateur en dessous forme les deux creux correspondants, le second plus bas. Un désaccord qui, sur des creux, signale une continuation possible.',
+    difficulty: 'hard',
+    rule: 'Ce sont des CREUX. La divergence classique, elle, compare des sommets — et c’est toute la différence de conclusion.',
+  },
+  {
+    id: 'ex.indicators.hidden-div.interpret',
+    skillId: 'skill.indicators.hidden-divergence',
+    target: target(HIDDEN_DIV, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’une divergence cachée.',
+    steps: [
+      'Vérifie qu’une tendance haussière est déjà en place : sans elle, il n’y a rien à continuer',
+      'Repère les deux creux du prix, et constate que le second est plus HAUT',
+      'Compare les deux creux de l’oscillateur : le second est plus BAS',
+      'Conclus à une continuation POSSIBLE — jamais à un retournement',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La tendance d’abord, les creux ensuite : une divergence cachée confirme une structure existante, elle ne la crée pas.',
+  },
+  {
+    id: 'ex.indicators.hidden-div.confirm',
+    skillId: 'skill.indicators.hidden-divergence',
+    target: target(HIDDEN_DIV, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette divergence cachée ?',
+    context:
+      'Le prix a fait un creux plus haut que le précédent, l’oscillateur un creux plus bas. Sur les bougies suivantes, ce creux tient et un plus-haut local est repris.',
+    options: [
+      'La structure : des plus-bas croissants conservés et un plus-haut repris.',
+      'Le désaccord lui-même : dès qu’il apparaît, la continuation est acquise.',
+      'La profondeur du creux de l’oscillateur : plus il est bas, plus le signal est fort.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Comme toute divergence, elle se confirme par la structure de prix — jamais par l’oscillateur seul.',
+  },
+  {
+    id: 'ex.indicators.hidden-div.invalidate',
+    skillId: 'skill.indicators.hidden-divergence',
+    target: target(HIDDEN_DIV, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 1048,
+    prompt:
+      'Pose le niveau sous lequel la structure de plus-bas croissants tombe : le plancher de la période.',
+    difficulty: 'hard',
+    rule: 'Une divergence cachée haussière repose sur des plus-bas croissants. Sous le creux précédent, cette structure n’existe plus — et la lecture de continuation non plus.',
+    whenItFails:
+      'L’oscillateur peut continuer de baisser sans rien invalider : ce qui compte, c’est le creux du PRIX.',
+  },
+  {
+    id: 'ex.indicators.hidden-div.avoid',
+    skillId: 'skill.indicators.hidden-divergence',
+    target: target(HIDDEN_DIV, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur la divergence cachée.',
+    statements: [
+      'Elle compare des creux, là où la divergence classique compare des sommets.',
+      'Comme la divergence classique, elle annonce un essoufflement de la tendance.',
+      'Sans tendance établie au préalable, elle n’a rien à confirmer.',
+    ],
+    errorIndex: 1,
+    difficulty: 'hard',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const INDICATORS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.indicators.rsi': RSI_SCENARIOS,
@@ -806,6 +983,8 @@ export const INDICATORS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenar
   'skill.indicators.cross-down': CROSS_DOWN_SCENARIOS,
   'skill.indicators.atr': ATR_SCENARIOS,
   'skill.indicators.fibonacci': FIBONACCI_SCENARIOS,
+  'skill.indicators.stochastic': STOCHASTIC_SCENARIOS,
+  'skill.indicators.hidden-divergence': HIDDEN_DIV_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */
