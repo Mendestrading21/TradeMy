@@ -77,7 +77,8 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // enseignées dans les leçons et les faux signaux, mais pas encore entraînées pour elles-mêmes.
     // LOT C7 : 12 → 9 (biseau ascendant, biseau descendant, triangle symétrique).
     // LOT C8 : 9 → 7 (dividende, PER — le monde 1 n'a plus de fiche inentraînable).
-    expect(LIBRARY_ONLY.length).toBe(7);
+    // LOT C9 : 7 → 5 (harami, pincettes).
+    expect(LIBRARY_ONLY.length).toBe(5);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 

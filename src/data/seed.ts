@@ -747,6 +747,57 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT C9 — Le rapport entre deux bougies : contenance et niveau partagé ──
+  'skill.candle.containment': [
+    {
+      id: 'lesson.candle-containment',
+      slug: 'harami-bougie-contenue',
+      title: 'La bougie contenue',
+      skillId: 'skill.candle.containment',
+      objective: 'Lire un harami comme un RALENTISSEMENT, et non comme un retournement annoncé.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Tu sais lire une bougie, un bloc de deux, une séquence de trois. Voici la dernière façon : le RAPPORT entre deux bougies voisines.' },
+        { id: 's1', kind: 'observe', body: 'Une grande bougie qui étend la tendance. Puis une petite, dont le corps tient ENTIÈREMENT dans celui de la précédente.' },
+        { id: 's2', kind: 'visual', conceptRef: 'harami' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'harami', body: 'Une séance qui ne dépasse plus la précédente a cessé d’avancer. Le harami ne dit pas « ça se retourne » — il dit « ça ralentit ».' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'harami' },
+        { id: 's4', kind: 'explain', body: 'Harami et avalement sont la même relation lue à l’envers : ici la seconde bougie est CONTENUE, là elle CONTIENT. Et comme le harami n’annonce aucun sens, c’est la sortie de la petite bougie qui le donnera.' },
+        { id: 's5', kind: 'falseSignal', body: 'En plein milieu d’une impulsion forte, une pause d’une seule séance ne signifie pas grand-chose.' },
+        { id: 's6', kind: 'summary', body: 'Harami = petite bougie contenue dans le corps de la grande. Ralentissement, pas retournement ; la sortie donne le sens ; la reprise de la tendance d’origine l’annule.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Harami ou avalement ?', back: 'Même relation, sens inverse : dans le harami la seconde bougie est contenue, dans l’avalement elle englobe la première.' } },
+      ],
+      commonMistake: 'Lire un harami comme l’annonce d’un retournement, alors qu’il ne donne aucune direction.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.candle.twin-level': [
+    {
+      id: 'lesson.candle-twin-level',
+      slug: 'pincettes-meme-extreme',
+      title: 'Le même extrême, deux fois',
+      skillId: 'skill.candle.twin-level',
+      objective: 'Comprendre que ce sont des pincettes qui désignent un NIVEAU, pas une forme de bougie.',
+      difficulty: 'intermediate',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Toutes les figures vues jusqu’ici se lisent dans la forme des bougies. Celle-ci se lit dans un PRIX.' },
+        { id: 's1', kind: 'observe', body: 'Deux séances voisines qui s’arrêtent exactement au même plus haut. Elles dessinent une ligne horizontale.' },
+        { id: 's2', kind: 'visual', conceptRef: 'pincettes' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'pincettes', body: 'Peu importe à quoi ressemblent ces deux bougies : ce qui compte, c’est qu’elles butent deux fois au même endroit. Le marché y a rencontré quelque chose.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'pincettes' },
+        { id: 's4', kind: 'explain', body: 'Le double test montre que le niveau EXISTE — pas qu’il tiendra. C’est la sortie du niveau qui donne le sens. Et l’invalidation est un franchissement FRANC : quelques centimes au-dessus, c’est souvent la mèche qui va chercher les invalidations trop serrées.' },
+        { id: 's5', kind: 'falseSignal', body: 'Des pincettes au milieu de nulle part, sans niveau déjà visible avant elles, ne testent rien du tout.' },
+        { id: 's6', kind: 'summary', body: 'Pincettes = deux bougies qui butent au même prix. C’est le niveau qui parle ; il doit préexister ; la sortie décide.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Qu’est-ce qui fait des pincettes ?', back: 'Deux extrêmes au MÊME prix, sur un niveau qui existait déjà — pas la forme des deux bougies.' } },
+      ],
+      commonMistake: 'Repérer des pincettes n’importe où, sans vérifier que le niveau comptait avant elles.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
   // ─── LOT C6 — La séquence : la lecture passe d'une bougie à trois, et l'ordre décide ──
   'skill.candle.sequence-reversal': [
     {
@@ -2100,6 +2151,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   // LOT C6 — la séquence : trois bougies, et l'ordre décide.
   'skill.candle.sequence-reversal': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.sequence-reversal'],
   'skill.candle.sequence-momentum': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.sequence-momentum'],
+  // LOT C9 — le rapport entre deux bougies : contenance (harami) et niveau partagé (pincettes).
+  'skill.candle.containment': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.containment'],
+  'skill.candle.twin-level': CANDLE_MODULE_EXERCISES_BY_SKILL['skill.candle.twin-level'],
   // LOT 4-N — module « Lire la structure » : exercices dérivés des scénarios (une vérité par item).
   'skill.structure.uptrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.uptrend'],
   'skill.structure.downtrend': STRUCTURE_MODULE_EXERCISES_BY_SKILL['skill.structure.downtrend'],
