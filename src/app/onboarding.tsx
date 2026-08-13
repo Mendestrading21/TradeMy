@@ -23,6 +23,7 @@ import {
   type VisualSpec,
 } from '@/data';
 import { analytics } from '@/analytics';
+import { APP } from '@/lib/config';
 import { Disclaimer } from '@/components/Disclaimer';
 
 const STEPS = ['Bienvenue', 'Objectif', 'Niveau', 'Temps', 'Sujets', 'Diagnostic', 'Ton parcours'] as const;
@@ -163,7 +164,9 @@ export default function Onboarding() {
 
       {step === 0 && (
         <View style={styles.stepGap}>
-          <Text variant="h1">Bienvenue sur TradeMy</Text>
+          {/* La marque publique vient de la source unique `appInfo` : « TradeMy » est le nom du
+              DÉPÔT, pas celui du produit — l'écrire en dur l'avait fait dériver ici. */}
+          <Text variant="h1">Bienvenue sur {APP.name}</Text>
           <Text variant="body" color={theme.colors.textSecondary}>
             Apprends à lire un graphique en cinq minutes par jour. On personnalise ton
             parcours en quelques questions — aucun compte requis.
