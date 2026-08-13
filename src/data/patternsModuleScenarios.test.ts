@@ -43,6 +43,9 @@ const MODULE_CONCEPT_IDS = [
   'concept.rising-wedge',
   'concept.falling-wedge',
   'concept.symmetrical-triangle',
+  // LOT C10 — la courbure du chemin, et le niveau qui s'use.
+  'concept.cup-handle',
+  'concept.triple-bottom',
 ];
 const EXPECTED: Record<string, ObjectiveKind[]> = Object.fromEntries(
   MODULE_CONCEPT_IDS.map((id) => [
@@ -63,7 +66,8 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     // 4 compétences × 4 items = 16 exercices dérivés.
     // LOT C3 : 25 → 40. Trois compétences miroir de plus, cinq objectifs réels chacune.
     // LOT C7 : 40 → 55. Deux biseaux + le triangle symétrique, cinq objectifs réels chacun.
-    expect(ALL_EXERCISES.length).toBe(55);
+    // LOT C10 : 55 → 65. La tasse et le triple creux, cinq objectifs réels chacun.
+    expect(ALL_EXERCISES.length).toBe(65);
   });
 
   it('chaque compétence cible un concept RÉEL de world.patterns', () => {
@@ -130,7 +134,7 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
 
   it('cohérence figure : chaque reconnaissance montre un dataset RÉEL et le variant de sa fiche', () => {
     const figures = ALL_EXERCISES.filter((e) => e.type === 'identify_figure');
-    expect(figures.length).toBe(11); // une reconnaissance par compétence du module.
+    expect(figures.length).toBe(13); // une reconnaissance par compétence du module.
     for (const ex of figures) {
       if (ex.type !== 'identify_figure') continue;
       expect(VISUAL_DATASETS[ex.datasetKey]).toBeDefined();
@@ -152,7 +156,8 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
     // setup baissier) s'invalide vers le HAUT, le biseau DESCENDANT (dessin qui descend, setup
     // haussier) vers le BAS. Si un jour quelqu'un « corrige » un biseau pour l'aligner sur sa pente,
     // ce test tombe.
-    expect(places.length).toBe(8);
+    // LOT C10 : 8 → 10 placements ; la tasse et le triple creux sont haussiers, donc vers le BAS.
+    expect(places.length).toBe(10);
     const versLeHaut = places.filter((ex) => (ex.hint ?? '').includes('plus haut'));
     expect(versLeHaut).toHaveLength(4);
     // Le triangle symétrique, NEUTRE, n'a aucun placement : il n'a pas de côté.
@@ -193,19 +198,46 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
       expect(descendant.visualSpec?.direction).toBe('bullish'); // dessin qui DESCEND, lecture haussière
     });
 
-    it('les huit compétences ANTÉRIEURES suivent leur pente : les biseaux sont bien l’exception', () => {
-      // Si un jour une autre figure du module devenait contre-intuitive, la leçon « c'est
+    it('toute figure du module dont le NOM porte une pente la suit — sauf les biseaux', () => {
+      // Si un jour une autre figure à pente devenait contre-intuitive, la leçon « les biseaux sont
       // l'exception » deviendrait fausse — ce test la protège.
+      //
+      // LOT C10 — la portée est restreinte à ce qu'elle mesurait réellement : les figures dont le
+      // NOM DE VARIANT encode une pente ou un côté. La tasse (`cup-handle`) n'en porte aucun : sa
+      // direction vient de la COURBURE du chemin, pas d'une inclinaison — c'est justement la leçon
+      // de sa compétence. L'élargir par regex aurait masqué ce fait au lieu de le dire.
       const contreIntuitives = ['concept.rising-wedge', 'concept.falling-wedge'];
-      const dessinMonte = /rising|ascending|bull|inverse-head|bottom/;
+      const monteDansSonNom = /rising|ascending|bull|inverse-head|bottom/;
+      const descendDansSonNom = /falling|descending|bear|top|^head-shoulders/;
+      let vérifiées = 0;
       for (const [skillId, conceptId] of Object.entries(PATTERNS_SKILL_CONCEPT_ID)) {
         if (contreIntuitives.includes(conceptId)) continue;
         const c = V5_CONCEPTS.find((x) => x.id === conceptId)!;
         const dir = c.visualSpec?.direction;
         if (dir === 'neutral') continue; // le triangle symétrique : traité par le test suivant
-        const monte = dessinMonte.test(c.visualSpec?.variant ?? '');
+        const variant = c.visualSpec?.variant ?? '';
+        const monte = monteDansSonNom.test(variant);
+        const descend = descendDansSonNom.test(variant);
+        if (monte === descend) continue; // nom sans pente (la tasse) : rien à vérifier ici
+        vérifiées++;
         expect(`${skillId}:${monte ? 'bullish' : 'bearish'}`).toBe(`${skillId}:${dir}`);
       }
+      // Le test ne doit pas devenir vide sans qu'on le remarque.
+      expect(vérifiées).toBeGreaterThanOrEqual(8);
+    });
+
+    it('la TASSE est la seule figure du module dont le nom ne dit rien de sa direction', () => {
+      // LOT C10 — fait mesuré, et c'est la raison d'être de sa compétence : sa direction vient de
+      // la forme du creux (un U se digère, un V rebondit), pas d'une pente.
+      const monteDansSonNom = /rising|ascending|bull|inverse-head|bottom/;
+      const descendDansSonNom = /falling|descending|bear|top|^head-shoulders/;
+      const sansPente = Object.values(PATTERNS_SKILL_CONCEPT_ID).filter((id) => {
+        const c = V5_CONCEPTS.find((x) => x.id === id)!;
+        if (c.visualSpec?.direction === 'neutral') return false;
+        const v = c.visualSpec?.variant ?? '';
+        return monteDansSonNom.test(v) === descendDansSonNom.test(v);
+      });
+      expect(sansPente).toEqual(['concept.cup-handle']);
     });
 
     it('le triangle symétrique n’a AUCUN placement d’invalidation — parce qu’il n’a pas de côté', () => {
@@ -246,6 +278,46 @@ describe('Module guidé « Lire les figures » — modèle officiel (world.patte
         expect(textes).toMatch(attendu.confirme);
         expect(textes).toMatch(attendu.invalide);
       }
+    });
+  });
+
+  // ── LOT C10 — la courbure du chemin, et le niveau qui s'use.
+  describe('LOT C10 — la forme du chemin, et le niveau trop testé', () => {
+    it('les deux compétences existent, portent 5 exercices, et ciblent la fiche annoncée', () => {
+      for (const id of ['skill.patterns.curvature', 'skill.patterns.tested-level']) {
+        expect(PATTERNS_SKILLS.some((s) => s.id === id)).toBe(true);
+        expect(PATTERNS_MODULE_EXERCISES_BY_SKILL[id]).toHaveLength(5);
+        const ciblés = new Set(PATTERNS_MODULE_EXERCISES_BY_SKILL[id].map((e) => e.target?.conceptId));
+        expect(ciblés.size).toBe(1);
+        expect([...ciblés][0]).toBe(PATTERNS_SKILL_CONCEPT_ID[id]);
+      }
+    });
+
+    it('la leçon de la TASSE porte sur la courbure — le U et le V y sont nommés', () => {
+      // Le faux signal de la fiche est « Tasse en V (trop brutale) plutôt qu'en U » : la leçon
+      // n'existe que si cette opposition est réellement enseignée et exercée.
+      const fiche = V5_CONCEPTS.find((c) => c.id === 'concept.cup-handle')!;
+      expect((fiche.falseSignals ?? []).join(' ')).toMatch(/en V/i);
+      const textes = PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.curvature']
+        .map((e) => [e.prompt, e.feedback.rule ?? '', e.feedback.whenItFails ?? '', e.feedback.correct].join(' '))
+        .join(' ');
+      expect(textes).toMatch(/en V/i);
+      expect(textes).toMatch(/arrondi|en U/i);
+      // Et l'invalidation vient bien de l'ANSE, pas du fond de la tasse.
+      expect(textes).toMatch(/anse/i);
+    });
+
+    it('le TRIPLE CREUX enseigne que le niveau s’use — et c’est le faux signal à repérer', () => {
+      // « Cassure du plancher au troisième test » : le corpus contredit l'intuition « trois fois
+      // défendu = solide ». Ce test vérifie que c'est bien cette misconception qui est exercée.
+      const fiche = V5_CONCEPTS.find((c) => c.id === 'concept.triple-bottom')!;
+      expect((fiche.falseSignals ?? []).join(' ')).toMatch(/troisième test/i);
+      const avoid = PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.tested-level']
+        .find((e) => e.target?.objectiveId.endsWith('::avoid-false-signal'));
+      expect(avoid?.type).toBe('find_error');
+      if (avoid?.type !== 'find_error') throw new Error('exercice `find_error` attendu');
+      // L'affirmation FAUSSE est exactement la croyance « plus testé = plus solide ».
+      expect(avoid.statements[avoid.validation.errorIndex]).toMatch(/plus.*solide|valent mieux/i);
     });
   });
 

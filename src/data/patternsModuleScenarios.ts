@@ -56,6 +56,10 @@ export const PATTERNS_SKILLS: Skill[] = [
   // LOT C7 — la figure qui n'annonce RIEN. Seule figure `neutral` du monde : reconnaître ne suffit
   // plus, il faut attendre la sortie.
   { id: 'skill.patterns.no-direction', name: 'La figure sans direction', description: 'Le triangle symétrique ne dit pas où ça va : c’est la sortie confirmée qui décide.' },
+  // LOT C10 — deux idées que le monde n'enseignait pas : la COURBURE du chemin entre deux points,
+  // et le fait qu'un niveau trop testé s'AFFAIBLIT au lieu de se renforcer.
+  { id: 'skill.patterns.curvature', name: 'La forme du chemin', description: 'La tasse : un creux en U se digère, un creux en V rebondit. La courbure change tout.' },
+  { id: 'skill.patterns.tested-level', name: 'Le niveau trop testé', description: 'Trois creux valent-ils mieux que deux ? Non : un plancher sollicité trop souvent finit par céder.' },
 ];
 
 // Concepts réels du monde `world.patterns` reliés à chaque compétence.
@@ -70,6 +74,8 @@ const INVERSE_HNS = 'concept.inverse-head-shoulders';
 const RISING_WEDGE = 'concept.rising-wedge';
 const FALLING_WEDGE = 'concept.falling-wedge';
 const SYM_TRIANGLE = 'concept.symmetrical-triangle';
+const CUP_HANDLE = 'concept.cup-handle';
+const TRIPLE_BOTTOM = 'concept.triple-bottom';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -84,6 +90,8 @@ export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.patterns.wedge': RISING_WEDGE,
   'skill.patterns.wedge-mirror': FALLING_WEDGE,
   'skill.patterns.no-direction': SYM_TRIANGLE,
+  'skill.patterns.curvature': CUP_HANDLE,
+  'skill.patterns.tested-level': TRIPLE_BOTTOM,
 };
 export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.double': 'double-creux',
@@ -97,6 +105,8 @@ export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.wedge': 'biseau-ascendant',
   'skill.patterns.wedge-mirror': 'biseau-descendant',
   'skill.patterns.no-direction': 'triangle-symetrique',
+  'skill.patterns.curvature': 'tasse-anse',
+  'skill.patterns.tested-level': 'triple-creux',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -1091,6 +1101,196 @@ const NO_DIRECTION_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 12 — La forme du chemin (tasse avec anse) ─────────────────────────────────
+// LOT C10. Toutes les figures du module se définissent jusqu'ici par des POINTS (creux, sommets)
+// ou des LIGNES (ligne de cou, borne plate, trendlines). Celle-ci se définit par la COURBURE du
+// chemin entre deux points — et son propre faux signal ne parle que de ça :
+//   `definitionShort` : « Un arrondi en forme de "U" (tasse) suivi d'une petite consolidation (anse). »
+//   `falseSignals`    : « Tasse en V (trop brutale) plutôt qu'en U. »
+//   `confirmationZone` : « Au-dessus du bord supérieur de la tasse. »
+//   `invalidation`     : « Retour sous le creux de l'anse. »  → setup haussier ⇒ invalidation en BAS
+const CURVATURE_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.curvature.recognize',
+    skillId: 'skill.patterns.curvature',
+    target: target(CUP_HANDLE, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.cup-handle.v1',
+    variant: 'cup-handle',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Une tasse avec anse (un arrondi en U, puis une petite consolidation)',
+      'Un double creux (deux creux distincts séparés par un rebond, en W)',
+      'Un biseau descendant (deux droites descendantes qui convergent)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    a11y:
+      'Un creux large et arrondi en forme de U, remontant vers son bord de départ, suivi d’un petit repli étroit juste sous ce bord.',
+    rule: 'Ce qui fait la tasse n’est pas le nombre de creux mais la FORME du creux : un arrondi, pas deux points.',
+  },
+  {
+    id: 'ex.patterns.curvature.interpret',
+    skillId: 'skill.patterns.curvature',
+    target: target(CUP_HANDLE, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’une tasse avec anse.',
+    steps: [
+      'Repère le creux, et regarde sa FORME : arrondi ou pointu ?',
+      'Vérifie que le prix remonte vers le bord d’où il est parti',
+      'Repère l’anse : un petit repli, juste sous ce bord',
+      'Attends le franchissement du bord supérieur de la tasse',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La forme se lit AVANT tout le reste : sans arrondi, ce qui suit ne raconte pas la même histoire.',
+  },
+  {
+    id: 'ex.patterns.curvature.confirm',
+    skillId: 'skill.patterns.curvature',
+    target: target(CUP_HANDLE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme cette tasse avec anse ?',
+    context:
+      'Un creux large et arrondi a ramené le prix à son point de départ. Un petit repli s’est formé juste sous ce bord.',
+    options: [
+      'Le franchissement du bord supérieur de la tasse.',
+      'La formation de l’anse suffit : la digestion est terminée.',
+      'La profondeur de la tasse indique à elle seule l’ampleur de la suite.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La tasse se confirme AU-DESSUS de son bord supérieur — l’anse n’est qu’une pause, pas un signal.',
+    whenItFails:
+      'Un creux en V, brutal, n’a rien digéré : la même remontée n’a pas la même valeur.',
+    a11y:
+      'Contexte : un creux large et arrondi revenu à son point de départ, suivi d’un petit repli sous le bord. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.curvature.invalidate',
+    skillId: 'skill.patterns.curvature',
+    target: target(CUP_HANDLE, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 907,
+    prompt:
+      'Ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule: 'La tasse est invalidée par un retour sous le creux de l’ANSE : le setup étant haussier, l’invalidation se place en bas.',
+    whenItFails:
+      'Placer l’invalidation sous le fond de la TASSE la met beaucoup trop loin : c’est l’anse, la partie récente, qui sert de repère.',
+  },
+  {
+    id: 'ex.patterns.curvature.avoid',
+    skillId: 'skill.patterns.curvature',
+    target: target(CUP_HANDLE, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur la tasse avec anse.',
+    statements: [
+      'Un creux en V, trop brutal, ne vaut pas un creux arrondi : rien n’a été digéré.',
+      'Seule compte la remontée vers le bord : la forme du creux est un détail esthétique.',
+      'L’anse est une pause sous le bord, pas un signal en elle-même.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 13 — Le niveau trop testé (triple creux) ──────────────────────────────────
+// LOT C10. Le double creux est enseigné depuis le LOT 4-Q. Le triple creux n'en est PAS la
+// transposition : il porte une idée qui contredit l'intuition, et le corpus la nomme lui-même.
+//   `definitionShort` : « Trois creux à un niveau proche : un plancher défendu trois fois. »
+//   `falseSignals`    : « Cassure du plancher au TROISIÈME test. »
+// L'intuition dit « trois fois défendu, donc solide ». La réalité enseignée par la fiche est
+// l'inverse : chaque test consomme les acheteurs présents au niveau. C'est la seule figure du
+// module dont le faux signal porte sur sa PROPRE répétition.
+const TESTED_LEVEL_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.tested-level.recognize',
+    skillId: 'skill.patterns.tested-level',
+    target: target(TRIPLE_BOTTOM, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.triple-bottom.v1',
+    variant: 'triple-bottom',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un triple creux (trois creux à un niveau proche)',
+      'Un double creux (deux creux séparés par un rebond, en W)',
+      'Une épaule-tête-épaule inversée (trois creux, celui du milieu plus bas)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    a11y:
+      'Trois creux successifs s’arrêtant à peu près au même niveau, reliés par deux rebonds intermédiaires.',
+    rule: 'Trois creux au MÊME niveau : ni un W (deux creux), ni une ÉTÉ inversée (le creux du milieu plus bas).',
+  },
+  {
+    id: 'ex.patterns.tested-level.interpret',
+    skillId: 'skill.patterns.tested-level',
+    target: target(TRIPLE_BOTTOM, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un triple creux.',
+    steps: [
+      'Repère les trois creux qui s’arrêtent au même niveau',
+      'Trace la ligne de cou au-dessus, sur les rebonds intermédiaires',
+      'Demande-toi ce que chaque test a COÛTÉ : les acheteurs du niveau s’épuisent',
+      'Attends le franchissement de la ligne de cou',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La troisième étape est celle qui manque à l’intuition : un plancher ne se renforce pas à chaque test, il s’use.',
+  },
+  {
+    id: 'ex.patterns.tested-level.confirm',
+    skillId: 'skill.patterns.tested-level',
+    target: target(TRIPLE_BOTTOM, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce triple creux ?',
+    context:
+      'Trois creux se sont arrêtés au même niveau. Les deux rebonds intermédiaires dessinent une ligne de cou au-dessus.',
+    options: [
+      'Le franchissement de la ligne de cou.',
+      'Le troisième rebond suffit : un niveau tenu trois fois est un niveau solide.',
+      'La régularité des trois creux garantit que le quatrième test tiendra aussi.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'Le nombre de tests ne confirme rien. Seule la SORTIE par le haut, au-dessus de la ligne de cou, confirme la figure.',
+    whenItFails:
+      'Le troisième test est souvent celui qui cède : chaque passage a consommé les acheteurs présents au niveau.',
+    a11y:
+      'Contexte : trois creux au même niveau, ligne de cou tracée sur les rebonds intermédiaires. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.tested-level.invalidate',
+    skillId: 'skill.patterns.tested-level',
+    target: target(TRIPLE_BOTTOM, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 951,
+    prompt:
+      'Ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule: 'Le triple creux est invalidé par une clôture sous le triple plancher : le setup étant haussier, l’invalidation se place en bas.',
+    whenItFails:
+      'Une invalidation posée entre deux creux saute au moindre test : c’est SOUS le plancher qu’elle a un sens.',
+  },
+  {
+    id: 'ex.patterns.tested-level.avoid',
+    skillId: 'skill.patterns.tested-level',
+    target: target(TRIPLE_BOTTOM, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le triple creux.',
+    statements: [
+      'Le troisième test est souvent celui qui cède, les acheteurs du niveau s’étant épuisés.',
+      'Trois creux valent mieux que deux : plus un plancher est testé, plus il est solide.',
+      'Seul le franchissement de la ligne de cou confirme la figure.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.patterns.double': DOUBLE_SCENARIOS,
@@ -1104,6 +1304,8 @@ export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario
   'skill.patterns.wedge': WEDGE_SCENARIOS,
   'skill.patterns.wedge-mirror': WEDGE_MIRROR_SCENARIOS,
   'skill.patterns.no-direction': NO_DIRECTION_SCENARIOS,
+  'skill.patterns.curvature': CURVATURE_SCENARIOS,
+  'skill.patterns.tested-level': TESTED_LEVEL_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

@@ -1371,6 +1371,57 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT C10 — La forme du chemin, et le niveau qui s'use ──
+  'skill.patterns.curvature': [
+    {
+      id: 'lesson.patterns-curvature',
+      slug: 'tasse-anse-forme-du-chemin',
+      title: 'La forme du chemin',
+      skillId: 'skill.patterns.curvature',
+      objective: 'Lire la COURBURE d’un creux — un U se digère, un V rebondit — et non seulement ses extrémités.',
+      difficulty: 'advanced',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Toutes les figures vues jusqu’ici se définissent par des points ou des lignes. Celle-ci se définit par la FORME du chemin entre deux points.' },
+        { id: 's1', kind: 'observe', body: 'Un creux large et arrondi, en U, qui ramène le prix à son point de départ. Puis un petit repli juste sous ce bord : l’anse.' },
+        { id: 's2', kind: 'visual', conceptRef: 'tasse-anse' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'tasse-anse', body: 'Un U met du temps : les vendeurs se sont écoulés progressivement. Un V est brutal : rien ne s’est digéré, seul un choc a renvoyé le prix vers le haut.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'tasse-anse' },
+        { id: 's4', kind: 'explain', body: 'La confirmation se prend au-dessus du bord supérieur de la tasse. L’invalidation, elle, se place sous le creux de l’ANSE — pas sous le fond de la tasse, qui est bien trop loin.' },
+        { id: 's5', kind: 'falseSignal', body: 'Une tasse en V, trop brutale, n’a rien digéré : la même remontée n’a pas la même valeur.' },
+        { id: 's6', kind: 'summary', body: 'Tasse = creux arrondi revenu à son bord, puis anse. Confirmation au-dessus du bord ; invalidation sous l’anse ; un V n’est pas un U.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Pourquoi un creux en V ne vaut-il pas un creux en U ?', back: 'Parce que rien ne s’y est digéré : le U étale l’écoulement des vendeurs, le V n’est qu’un choc.' } },
+      ],
+      commonMistake: 'Ne regarder que les extrémités du creux, en ignorant la forme du chemin entre elles.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.patterns.tested-level': [
+    {
+      id: 'lesson.patterns-tested-level',
+      slug: 'triple-creux-niveau-use',
+      title: 'Le niveau trop testé',
+      skillId: 'skill.patterns.tested-level',
+      objective: 'Comprendre qu’un plancher sollicité trop souvent s’use, au lieu de se renforcer.',
+      difficulty: 'advanced',
+      estimatedMinutes: 6,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Tu connais le double creux. Voici le même niveau tenu une fois de plus. L’intuition dit « encore plus solide ». Elle a tort.' },
+        { id: 's1', kind: 'observe', body: 'Trois creux qui s’arrêtent au même niveau, reliés par deux rebonds intermédiaires.' },
+        { id: 's2', kind: 'visual', conceptRef: 'triple-creux' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'triple-creux', body: 'À chaque passage, les acheteurs présents à ce niveau se servent — et il en reste moins. Un plancher n’est pas un mur : c’est un stock qui se vide.' },
+        { id: 'sMan', kind: 'interaction', conceptRef: 'triple-creux' },
+        { id: 's4', kind: 'explain', body: 'Le nombre de tests ne confirme rien. Seul le franchissement de la ligne de cou confirme la figure ; l’invalidation reste une clôture sous le triple plancher.' },
+        { id: 's5', kind: 'falseSignal', body: 'Le troisième test est souvent celui qui cède — c’est ce que dit la fiche elle-même, et c’est exactement le contraire de ce qu’on croit.' },
+        { id: 's6', kind: 'summary', body: 'Triple creux = trois creux au même niveau. Confirmation au-dessus de la ligne de cou ; invalidation sous le plancher ; et plus un niveau est testé, plus il s’use.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Un plancher testé trois fois est-il plus solide ?', back: 'Non : chaque test consomme les acheteurs présents au niveau. Le troisième est souvent celui qui cède.' } },
+      ],
+      commonMistake: 'Croire qu’un niveau se renforce à chaque test, alors qu’il s’épuise.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
   // ─── LOT 4-R — Module guidé « Lire les indicateurs » (world.indicators) ──
   'skill.indicators.rsi': [
     {
@@ -2180,6 +2231,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   'skill.patterns.wedge': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.wedge'],
   'skill.patterns.wedge-mirror': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.wedge-mirror'],
   'skill.patterns.no-direction': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.no-direction'],
+  // LOT C10 — la courbure du chemin, et le niveau qui s'use.
+  'skill.patterns.curvature': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.curvature'],
+  'skill.patterns.tested-level': PATTERNS_MODULE_EXERCISES_BY_SKILL['skill.patterns.tested-level'],
   'skill.indicators.rsi': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.rsi'],
   'skill.indicators.macd': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.macd'],
   'skill.indicators.bollinger': INDICATORS_MODULE_EXERCISES_BY_SKILL['skill.indicators.bollinger'],

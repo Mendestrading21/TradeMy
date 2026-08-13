@@ -78,7 +78,8 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // LOT C7 : 12 → 9 (biseau ascendant, biseau descendant, triangle symétrique).
     // LOT C8 : 9 → 7 (dividende, PER — le monde 1 n'a plus de fiche inentraînable).
     // LOT C9 : 7 → 5 (harami, pincettes).
-    expect(LIBRARY_ONLY.length).toBe(5);
+    // LOT C10 : 5 → 3 (tasse-anse, triple creux).
+    expect(LIBRARY_ONLY.length).toBe(3);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 
