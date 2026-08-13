@@ -84,7 +84,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // LOT C7 : 58 → 61 (les deux biseaux + la figure sans direction).
     // LOT C8 : 61 → 63 (dividende et PER rejoignent le module du monde 1).
     // LOT C9 : 63 → 65 (la contenance et le niveau partagé).
-    expect(REPO_TRUTH.skills).toBe(65);
+    // LOT C10 : 65 → 67 (la courbure du chemin, le niveau qui s'use).
+    expect(REPO_TRUTH.skills).toBe(67);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);
