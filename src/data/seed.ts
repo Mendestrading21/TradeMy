@@ -123,6 +123,12 @@ import {
   PSYCHOLOGY_SKILL_CONCEPT_SLUG,
 } from './psychologyModuleScenarios';
 import {
+  FOUNDATIONS_SKILLS,
+  FOUNDATIONS_MODULE_EXERCISES_BY_SKILL,
+  FOUNDATIONS_SKILL_CONCEPT_ID,
+  FOUNDATIONS_SKILL_CONCEPT_SLUG,
+} from './foundationsModuleScenarios';
+import {
   SMC_SKILLS,
   SMC_MODULE_ID,
   SMC_MODULE_TITLE,
@@ -180,6 +186,10 @@ export const SKILLS: Skill[] = [
   { id: 'skill.trend', name: 'Tendance, support & résistance', description: 'Lire la direction du prix et ses niveaux clés.' },
   { id: 'skill.candles', name: 'Chandeliers japonais', description: 'Décoder une bougie : corps, mèches, couleur.' },
   { id: 'skill.patterns', name: 'Premières figures', description: 'Repérer une figure de retournement simple.' },
+  // LOT C8 — les deux notions du monde 1 qui ne se lisent pas sur un graphique : elles se
+  // CALCULENT. Elles rejoignent le module existant plutôt que d'en former un second : la
+  // complétion d'un monde est pilotée par SON module et SON checkpoint, un par monde.
+  ...FOUNDATIONS_SKILLS,
 ];
 
 export const PILOT_MODULE: ContentModule = {
@@ -1677,6 +1687,55 @@ const LESSONS: Record<string, Lesson[]> = {
       status: 'draft',
     },
   ],
+  // ─── LOT C8 — Module guidé « Ce que vaut une action » (world.foundations) ──
+  'skill.foundations.dividend': [
+    {
+      id: 'lesson.foundations-dividend',
+      slug: 'dividende-lecture',
+      title: 'Le dividende',
+      skillId: 'skill.foundations.dividend',
+      objective: 'Comprendre ce qu’est un dividende, et pourquoi le cours s’ajuste le jour du détachement.',
+      difficulty: 'beginner',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Tout le reste de Trademy t’apprend à lire un graphique. Cette notion-ci ne se lit pas : elle se calcule.' },
+        { id: 's1', kind: 'observe', body: 'Une entreprise gagne de l’argent sur l’année. Elle en reverse une part à ses actionnaires, en cash. Le jour du versement, le cours baisse d’environ ce montant.' },
+        { id: 's2', kind: 'visual', conceptRef: 'dividende' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'dividende', body: 'Cette baisse n’est pas une chute : c’est de l’argent qui a quitté l’entreprise pour aller dans la poche des actionnaires. Rien ne s’est perdu, tout a changé de place.' },
+        { id: 's4', kind: 'explain', body: 'Le rendement du dividende rapporte le dividende au PRIX : 2 € versés sur une action à 50 €, c’est 4 %. Ce rapport a donc deux façons de monter — le dividende augmente, ou le cours baisse. La seconde est la plus fréquente, et la moins réjouissante.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un rendement très élevé traduit souvent un cours qui a chuté, avec un dividende affiché pas encore revu. Et un dividende peut être réduit ou supprimé si le bénéfice baisse.' },
+        { id: 's6', kind: 'summary', body: 'Dividende = part du bénéfice reversée. Le cours s’ajuste au détachement. Rendement = dividende ÷ prix — regarde toujours lequel des deux a bougé.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Pourquoi un rendement du dividende très élevé doit-il alerter ?', back: 'Parce qu’il peut venir d’une chute du cours (le dénominateur), pas d’une hausse du dividende.' } },
+      ],
+      commonMistake: 'Lire un rendement élevé comme une bonne affaire, sans regarder pourquoi il est élevé.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
+  'skill.foundations.per': [
+    {
+      id: 'lesson.foundations-per',
+      slug: 'per-lecture',
+      title: 'Le PER',
+      skillId: 'skill.foundations.per',
+      objective: 'Calculer un PER et comprendre pourquoi ses extrêmes, bas comme haut, se lisent mal.',
+      difficulty: 'beginner',
+      estimatedMinutes: 5,
+      steps: [
+        { id: 's0', kind: 'intro', body: 'Une action à 20 € est-elle chère ? La question n’a aucun sens seule. Il faut la rapporter à ce que l’entreprise gagne.' },
+        { id: 's1', kind: 'observe', body: 'Prix de l’action : 20 €. Bénéfice par action : 2 € par an. On divise : 20 ÷ 2 = 10.' },
+        { id: 's2', kind: 'visual', conceptRef: 'per' },
+        { id: 's3', kind: 'hypothesis', conceptRef: 'per', body: 'Ce 10 se lit comme un prix : tu paies dix euros pour un euro de bénéfice annuel. Autrement dit, environ dix années de bénéfices au rythme actuel.' },
+        { id: 's4', kind: 'explain', body: 'Deux nombres, une division — mais les DEUX peuvent bouger. Un PER qui baisse peut venir d’un prix qui recule (le cas qu’on imagine) ou d’un bénéfice qui monte (bonne nouvelle)… ou d’un bénéfice qui s’effondre plus vite que le prix.' },
+        { id: 's5', kind: 'falseSignal', body: 'Un PER très bas peut signaler un bénéfice en train de s’effondrer. Un PER très élevé peut être justifié par une croissance forte — ou par un excès d’optimisme.' },
+        { id: 's6', kind: 'summary', body: 'PER = prix ÷ bénéfice par action. Il se lit en années de bénéfices. Ses extrêmes ne disent rien sans regarder LEQUEL des deux nombres les a produits.' },
+        { id: 's7', kind: 'flashcard', flashcard: { front: 'Un PER bas signifie-t-il une action bon marché ?', back: 'Pas nécessairement : le rapport baisse aussi quand le bénéfice s’effondre. Il faut regarder le dénominateur.' } },
+      ],
+      commonMistake: 'Traiter le PER comme un verdict (« bas = pas cher ») au lieu d’un rapport dont les deux termes bougent.',
+      sources: ['Voix pédagogique Trademy'],
+      status: 'draft',
+    },
+  ],
   // ─── LOT 4-W — Module guidé « Lire le Smart Money » (world.smc) ─────
   'skill.smc.orderblock': [
     {
@@ -2083,6 +2142,9 @@ const RAW_EXERCISES: Record<string, Exercise[]> = {
   // LOT 4-V — module guidé Psychologie : exercices dérivés des scénarios (source unique).
   'skill.psychology.fomo': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.fomo'],
   'skill.psychology.discipline': PSYCHOLOGY_MODULE_EXERCISES_BY_SKILL['skill.psychology.discipline'],
+  // LOT C8 — module Fondations : les deux notions du corpus qui se CALCULENT.
+  'skill.foundations.dividend': FOUNDATIONS_MODULE_EXERCISES_BY_SKILL['skill.foundations.dividend'],
+  'skill.foundations.per': FOUNDATIONS_MODULE_EXERCISES_BY_SKILL['skill.foundations.per'],
   // LOT 4-W — module guidé Smart Money : exercices dérivés des scénarios (source unique).
   'skill.smc.orderblock': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.orderblock'],
   'skill.smc.fvg': SMC_MODULE_EXERCISES_BY_SKILL['skill.smc.fvg'],
@@ -2124,6 +2186,7 @@ export const SKILL_CONCEPT_ID: Record<string, string> = {
   ...PRICEACTION_SKILL_CONCEPT_ID,
   ...RISK_SKILL_CONCEPT_ID,
   ...PSYCHOLOGY_SKILL_CONCEPT_ID,
+  ...FOUNDATIONS_SKILL_CONCEPT_ID,
   ...SMC_SKILL_CONCEPT_ID,
   ...WYCKOFF_SKILL_CONCEPT_ID,
   ...OPTIONS_SKILL_CONCEPT_ID,
@@ -2213,7 +2276,7 @@ export function pickVariant(objectiveId: string, round: number): Exercise | unde
 // Le checkpoint réunit quelques exercices de chaque compétence de SON module ; les exercices gardent
 // leur skillId réel → répondre met à jour la maîtrise réelle.
 export const CHECKPOINT_ID = 'checkpoint.read-chart';
-export const CHECKPOINT_TITLE = 'Revue — Lire un graphique';
+export const CHECKPOINT_TITLE = 'Revue — Premiers repères';
 
 export interface ModuleContent {
   id: string;
@@ -2230,7 +2293,10 @@ export interface ModuleContent {
 export const CONTENT_MODULES: ModuleContent[] = [
   {
     id: 'module.foundations.read-chart',
-    title: 'Lire un graphique',
+    // LOT C8 — le titre suit le contenu : le module couvre désormais aussi ce que VAUT une action
+    // (dividende, PER), qui ne se lit sur aucun graphique. L'IDENTIFIANT ne change pas — il est
+    // persisté dans la progression des apprenants, le renommer effacerait leur avancement.
+    title: 'Premiers repères',
     worldId: 'world.foundations',
     skills: SKILLS,
     checkpointId: CHECKPOINT_ID,
@@ -2459,6 +2525,7 @@ export const CONCEPT_BY_SKILL: Record<string, string> = {
   ...PRICEACTION_SKILL_CONCEPT_SLUG,
   ...RISK_SKILL_CONCEPT_SLUG,
   ...PSYCHOLOGY_SKILL_CONCEPT_SLUG,
+  ...FOUNDATIONS_SKILL_CONCEPT_SLUG,
   ...SMC_SKILL_CONCEPT_SLUG,
   ...WYCKOFF_SKILL_CONCEPT_SLUG,
   ...OPTIONS_SKILL_CONCEPT_SLUG,

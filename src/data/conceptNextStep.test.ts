@@ -76,7 +76,8 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // deux figures MIROIR — étoile du soir, trois corbeaux — restent en bibliothèque. Elles sont
     // enseignées dans les leçons et les faux signaux, mais pas encore entraînées pour elles-mêmes.
     // LOT C7 : 12 → 9 (biseau ascendant, biseau descendant, triangle symétrique).
-    expect(LIBRARY_ONLY.length).toBe(9);
+    // LOT C8 : 9 → 7 (dividende, PER — le monde 1 n'a plus de fiche inentraînable).
+    expect(LIBRARY_ONLY.length).toBe(7);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 
