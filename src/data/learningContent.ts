@@ -9,6 +9,7 @@ import { DEFAULT_DISCLAIMER, type LearningConcept } from './learningConcept';
 import { BATCH_CONCEPTS } from './learningContentBatch';
 import { MOVING_AVERAGE_CONCEPTS } from './learningContentMovingAverage';
 import { PRICE_TOOLS_CONCEPTS } from './learningContentPriceTools';
+import { CONFUSION_CONCEPTS } from './learningContentConfusions';
 
 const CORE_V5_CONCEPTS: LearningConcept[] = [
   {
@@ -1143,7 +1144,13 @@ const CORE_V5_CONCEPTS: LearningConcept[] = [
       'Un contexte de tendance mûre qui donne du sens à l’essoufflement.',
     ],
     contextRequired: ['Une tendance établie et des pivots clairs à comparer.'],
-    interpretationLimits: ['Une divergence peut persister longtemps sans retournement : ce n’est pas un minuteur.'],
+    interpretationLimits: [
+      'Une divergence peut persister longtemps sans retournement : ce n’est pas un minuteur.',
+      // LOT G3 — honnêteté du visuel, ajoutée en même temps que la divergence cachée : les deux
+      // figures affichent un oscillateur d'illustration fourni par la figure, non calculé sur le
+      // prix. Le taire aurait laissé croire que la courbe se déduit du graphique du dessus.
+      'Le graphique de cette fiche affiche un oscillateur d’ILLUSTRATION, choisi pour rendre le désaccord lisible. Sur un vrai graphique, il se calcule à partir du prix.',
+    ],
     bearishScenario: {
       conditions: ['Prix en plus-hauts croissants, oscillateur en plus-hauts décroissants.', 'Confirmation par une cassure de structure.'],
       invalidation: 'Le prix poursuit franchement et l’oscillateur repart avec lui.',
@@ -2540,4 +2547,7 @@ export const V5_CONCEPTS: LearningConcept[] = [
   // LOT G2 — l'ATR et les retracements : les deux seules variantes du moteur qui répondent
   // « à quel PRIX », là où tout le reste du monde 7 répond « comment ».
   ...PRICE_TOOLS_CONCEPTS,
+  // LOT G3 — le stochastique et la divergence cachée : les deux dernières variantes orphelines à
+  // porter un sujet distinct, et toutes deux confondues avec une notion déjà enseignée.
+  ...CONFUSION_CONCEPTS,
 ];

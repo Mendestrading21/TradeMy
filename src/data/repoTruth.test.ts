@@ -87,7 +87,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // LOT C10 : 65 → 67 (la courbure du chemin, le niveau qui s'use).
     // LOT G1 : 67 → 70 (la moyenne mobile et ses deux croisements — ouverture de la série G).
     // LOT G2 : 70 → 72 (l'amplitude moyenne et les retracements — les deux « où ? »).
-    expect(REPO_TRUTH.skills).toBe(72);
+    // LOT G3 : 72 → 74 (le stochastique et la divergence cachée — les deux confusions).
+    expect(REPO_TRUTH.skills).toBe(74);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);
