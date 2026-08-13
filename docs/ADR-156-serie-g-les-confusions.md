@@ -43,7 +43,13 @@ la notion n'a pas d'usage**. La seconde moitié ne tient pas ici. Le moteur calc
 l'élève est de le **lire**, et de comprendre pourquoi il diffère du RSI. Poser la division aurait
 ajouté une mécanique, pas une compréhension.
 
-La liste des compétences qui font calculer reste donc à quatre.
+La liste des compétences qui font calculer **n'a donc pas grandi** avec ce lot.
+
+> **Correction (LOT G4).** Cette section annonçait d'abord « la liste reste à quatre ». Le chiffre
+> était faux : elles sont **sept** (`skill.actions`, dividende, PER, moyenne mobile, ATR, ratio de
+> risque, taille de position). Ce qui reste vrai, et qui était le propos, c'est que le LOT G3 n'en a
+> ajouté aucune. Le compte exact est verrouillé par `guidedMechanicVariety.test.ts`, qui fige la
+> liste nominative — pas un nombre écrit dans un document.
 
 ## La divergence cachée : les mêmes pointillés, les pivots inverses
 
@@ -100,4 +106,5 @@ la fiche des bandes.)
 - Module « Lire les indicateurs » : 9 → 11 compétences, 40 → 49 exercices.
 - Variantes d'indicateur enseignées : **11 → 13** sur 15. Orphelines : **4 → 2**, dont une écartée
   par décision et une en question ouverte.
-- Compétences qui font calculer : **4**, inchangé — et c'est le résultat d'un refus.
+- Compétences qui font calculer : **inchangé** — et c'est le résultat d'un refus. (Le chiffre
+  d'origine, « 4 », était faux ; voir la correction ci-dessus. La liste nominative fait foi.)
