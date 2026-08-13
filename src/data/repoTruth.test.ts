@@ -81,7 +81,8 @@ describe('repoTruth — vérité du dépôt', () => {
     // restants du monde des figures — triangle descendant, drapeau baissier, ÉTÉ inversée).
     // LOT C4 : 53 → 56 (les trois confusions de contexte des chandeliers).
     // LOT C6 : 56 → 58 (les deux séquences de trois bougies : retournement et poussée).
-    expect(REPO_TRUTH.skills).toBe(58);
+    // LOT C7 : 58 → 61 (les deux biseaux + la figure sans direction).
+    expect(REPO_TRUTH.skills).toBe(61);
     expect(REPO_TRUTH.worlds).toBe(15);
     expect(REPO_TRUTH.categories).toBe(13);
     expect(REPO_TRUTH.visualTypes).toBe(11);

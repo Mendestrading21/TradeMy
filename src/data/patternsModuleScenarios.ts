@@ -48,6 +48,14 @@ export const PATTERNS_SKILLS: Skill[] = [
   { id: 'skill.patterns.triangle-mirror', name: 'Le triangle, retourné', description: 'Lire un triangle descendant : support plat, sommets qui descendent — et invalidation en haut.' },
   { id: 'skill.patterns.flag-mirror', name: 'Le drapeau, retourné', description: 'Lire une pause de continuation baissière : mât, canal, reprise — et invalidation en haut.' },
   { id: 'skill.patterns.reversal-mirror', name: 'Le retournement, retourné', description: 'Lire une épaule-tête-épaule inversée : figure HAUSSIÈRE, donc invalidation en bas.' },
+  // LOT C7 — la PENTE MENT. Les huit compétences ci-dessus suivent toutes leur dessin : ce qui monte
+  // se lit haussier, ce qui descend se lit baissier. Les biseaux sont l'exception, et le corpus le
+  // dit lui-même dans `visualSpec.direction`.
+  { id: 'skill.patterns.wedge', name: 'Quand la pente ment', description: 'Un biseau ascendant monte — et se lit BAISSIER : c’est la convergence qui parle, pas la pente.' },
+  { id: 'skill.patterns.wedge-mirror', name: 'La pente ment dans les deux sens', description: 'Un biseau descendant descend — et se lit haussier. La règle vaut aussi à l’envers.' },
+  // LOT C7 — la figure qui n'annonce RIEN. Seule figure `neutral` du monde : reconnaître ne suffit
+  // plus, il faut attendre la sortie.
+  { id: 'skill.patterns.no-direction', name: 'La figure sans direction', description: 'Le triangle symétrique ne dit pas où ça va : c’est la sortie confirmée qui décide.' },
 ];
 
 // Concepts réels du monde `world.patterns` reliés à chaque compétence.
@@ -59,6 +67,9 @@ const DOUBLE_TOP = 'concept.double-top';
 const DESC_TRIANGLE = 'concept.descending-triangle';
 const BEAR_FLAG = 'concept.bear-flag';
 const INVERSE_HNS = 'concept.inverse-head-shoulders';
+const RISING_WEDGE = 'concept.rising-wedge';
+const FALLING_WEDGE = 'concept.falling-wedge';
+const SYM_TRIANGLE = 'concept.symmetrical-triangle';
 
 /** Compétence → concept représentatif (id) et slug (lien « Découvrir la notion » de la fiche Monde). */
 export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
@@ -70,6 +81,9 @@ export const PATTERNS_SKILL_CONCEPT_ID: Record<string, string> = {
   'skill.patterns.triangle-mirror': DESC_TRIANGLE,
   'skill.patterns.flag-mirror': BEAR_FLAG,
   'skill.patterns.reversal-mirror': INVERSE_HNS,
+  'skill.patterns.wedge': RISING_WEDGE,
+  'skill.patterns.wedge-mirror': FALLING_WEDGE,
+  'skill.patterns.no-direction': SYM_TRIANGLE,
 };
 export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.double': 'double-creux',
@@ -80,6 +94,9 @@ export const PATTERNS_SKILL_CONCEPT_SLUG: Record<string, string> = {
   'skill.patterns.triangle-mirror': 'triangle-descendant',
   'skill.patterns.flag-mirror': 'drapeau-baissier',
   'skill.patterns.reversal-mirror': 'etei-inversee',
+  'skill.patterns.wedge': 'biseau-ascendant',
+  'skill.patterns.wedge-mirror': 'biseau-descendant',
+  'skill.patterns.no-direction': 'triangle-symetrique',
 };
 
 /** Cible pédagogique (conceptId + objectiveId) pour un `kind` d'objectif d'un concept réel. */
@@ -782,6 +799,298 @@ const REVERSAL_MIRROR_SCENARIOS: LearningScenario[] = [
   },
 ];
 
+// ── Compétence 9 — Quand la pente ment (biseau ascendant) ────────────────────────────────
+// LOT C7. Les huit compétences précédentes suivent toutes leur dessin. Ici le corpus dit
+// l'inverse : `visualSpec.direction = 'bearish'` pour une figure dont les DEUX droites MONTENT.
+// Sa `definitionShort` l'explique — « Deux droites montantes qui convergent : une hausse qui
+// s'essouffle » : ce n'est pas la pente qui parle, c'est la CONVERGENCE.
+//   `confirmationZone` : « Sous la droite basse cassée. »
+//   `invalidation`     : « Sortie par le haut du biseau. »  → setup baissier ⇒ invalidation en HAUT
+//   `falseSignals`     : « Fausse cassure suivie d'un retour dans le biseau. »
+const WEDGE_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.wedge.recognize',
+    skillId: 'skill.patterns.wedge',
+    target: target(RISING_WEDGE, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.rising-wedge.v1',
+    variant: 'rising-wedge',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un biseau ascendant (deux droites montantes qui CONVERGENT)',
+      'Un canal ascendant (deux droites montantes PARALLÈLES)',
+      'Un triangle ascendant (une résistance plate, des creux qui montent)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    a11y: 'Deux droites qui montent toutes les deux et se resserrent l’une vers l’autre, le mouvement gagnant de moins en moins à chaque poussée.',
+    rule: 'Ce qui distingue un biseau d’un canal n’est pas la pente — les deux montent — mais le fait que les droites SE RESSERRENT.',
+  },
+  {
+    id: 'ex.patterns.wedge.interpret',
+    skillId: 'skill.patterns.wedge',
+    target: target(RISING_WEDGE, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un biseau ascendant.',
+    steps: [
+      'Constate que les deux droites montent',
+      'Vérifie qu’elles CONVERGENT au lieu de rester parallèles',
+      'Lis ce que dit la convergence : chaque poussée gagne moins que la précédente',
+      'Conclus au sens BAISSIER, malgré la pente qui monte',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La pente se lit en premier, mais elle ne décide pas : c’est la convergence, lue ensuite, qui donne le sens.',
+  },
+  {
+    id: 'ex.patterns.wedge.confirm',
+    skillId: 'skill.patterns.wedge',
+    target: target(RISING_WEDGE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce biseau ascendant ?',
+    context:
+      'Le prix monte encore, mais les deux droites du biseau se resserrent : chaque nouvelle poussée gagne moins de terrain que la précédente.',
+    options: [
+      'Le prix casse la droite BASSE du biseau et clôture dessous.',
+      'La droite haute est franchie : la hausse reprend son cours.',
+      'La figure monte, donc la sortie attendue est par le haut.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'La confirmation se prend SOUS la droite basse cassée — à l’opposé de la pente, ce qui est exactement le piège de cette figure.',
+    whenItFails: 'Une fausse cassure suivie d’un retour dans le biseau annule la lecture.',
+    a11y:
+      'Contexte : le prix monte encore mais les deux droites du biseau se resserrent, chaque poussée gagnant moins. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.wedge.invalidate',
+    skillId: 'skill.patterns.wedge',
+    target: target(RISING_WEDGE, 'invalidate'),
+    // Setup BAISSIER ⇒ l'invalidation est un PLAFOND : mécanique `place-extreme` (plus haut réel),
+    // comme le double sommet et le triangle descendant. `place-invalidation` vise le plancher.
+    interaction: 'place-extreme',
+    chartSeed: 631,
+    prompt:
+      'Attention : malgré sa pente qui MONTE, ce setup est BAISSIER. Il s’invalide donc vers le HAUT. Place la ligne sur le plus haut atteint.',
+    difficulty: 'hard',
+    rule: 'Le biseau ascendant est invalidé par une sortie PAR LE HAUT : le setup étant baissier, l’invalidation se place en haut — dans le sens de la pente, justement.',
+    whenItFails:
+      'Se fier à la pente pour placer l’invalidation la met du mauvais côté : c’est le SENS du setup qui décide, jamais l’inclinaison du dessin.',
+  },
+  {
+    id: 'ex.patterns.wedge.avoid',
+    skillId: 'skill.patterns.wedge',
+    target: target(RISING_WEDGE, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le biseau ascendant.',
+    statements: [
+      'Une fausse cassure suivie d’un retour dans le biseau annule la lecture.',
+      'Puisque les deux droites montent, la figure est haussière.',
+      'C’est le resserrement des droites, et non leur pente, qui porte le sens.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 10 — La pente ment dans les deux sens (biseau descendant) ──────────────────
+// LOT C7. Le miroir n'est pas mécanique ici : il vérifie que l'apprenant a retenu la RÈGLE
+// (« la convergence prime la pente ») et non un cas particulier (« un biseau est baissier »).
+//   `confirmationZone` : « Au-dessus de la trendline supérieure du biseau (clôture, retest). »
+//   `invalidation`     : « Poursuite franche de la baisse sous le biseau. » → setup haussier ⇒ en BAS
+//   `falseSignals`     : « Sortie haute sans participation, aussitôt annulée. »
+const WEDGE_MIRROR_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.wedge-mirror.recognize',
+    skillId: 'skill.patterns.wedge-mirror',
+    target: target(FALLING_WEDGE, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.falling-wedge.v1',
+    variant: 'falling-wedge',
+    visualType: 'chart-pattern',
+    prompt: 'Cette figure DESCEND. Laquelle est-ce ?',
+    options: [
+      'Un biseau descendant (deux droites descendantes qui CONVERGENT)',
+      'Un canal descendant (deux droites descendantes PARALLÈLES)',
+      'Un drapeau baissier (un mât, puis un canal court à contre-sens)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    a11y: 'Deux droites qui descendent toutes les deux en se resserrant, la baisse perdant de la force à chaque vague.',
+    rule: 'Même critère que pour le biseau ascendant : ce sont les droites qui SE RESSERRENT qui font le biseau, pas leur inclinaison.',
+  },
+  {
+    id: 'ex.patterns.wedge-mirror.interpret',
+    skillId: 'skill.patterns.wedge-mirror',
+    target: target(FALLING_WEDGE, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un biseau descendant.',
+    steps: [
+      'Constate que les deux droites descendent',
+      'Vérifie qu’elles CONVERGENT au lieu de rester parallèles',
+      'Lis ce que dit la convergence : chaque vague de baisse perd de la force',
+      'Conclus au sens HAUSSIER, malgré la pente qui descend',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'La règle est la même dans les deux sens : la convergence prime la pente. Un biseau n’est pas « une figure baissière » — c’est une figure qui se lit à l’envers de sa pente.',
+  },
+  {
+    id: 'ex.patterns.wedge-mirror.confirm',
+    skillId: 'skill.patterns.wedge-mirror',
+    target: target(FALLING_WEDGE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme ce biseau descendant ?',
+    context:
+      'Le prix baisse encore, mais les deux droites se resserrent : chaque vague de baisse perd de l’ampleur.',
+    options: [
+      'Une clôture au-dessus de la droite haute du biseau, puis un retest tenu.',
+      'La cassure de la droite basse : la baisse se poursuit dans le sens de la pente.',
+      'Le simple resserrement des droites suffit à valider le retournement.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Le biseau descendant se confirme AU-DESSUS de sa droite haute, avec retest — exactement l’inverse du biseau ascendant.',
+    whenItFails: 'Une sortie haute sans participation, aussitôt annulée, ne confirme rien.',
+    a11y:
+      'Contexte : le prix baisse encore mais les deux droites se resserrent, chaque vague perdant de l’ampleur. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.wedge-mirror.invalidate',
+    skillId: 'skill.patterns.wedge-mirror',
+    target: target(FALLING_WEDGE, 'invalidate'),
+    interaction: 'place-invalidation',
+    chartSeed: 733,
+    prompt:
+      'Attention : malgré sa pente qui DESCEND, ce setup est HAUSSIER. Il s’invalide donc vers le BAS. Place la ligne sur le plus bas atteint.',
+    difficulty: 'hard',
+    rule: 'Le biseau descendant est invalidé par une poursuite franche de la baisse sous le biseau : le setup étant haussier, l’invalidation se place en bas.',
+    whenItFails:
+      'Deux biseaux de pentes opposées n’ont pas la même invalidation, et aucune des deux ne se déduit de la pente.',
+  },
+  {
+    id: 'ex.patterns.wedge-mirror.avoid',
+    skillId: 'skill.patterns.wedge-mirror',
+    target: target(FALLING_WEDGE, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur les biseaux.',
+    statements: [
+      'Une sortie haute sans participation, aussitôt annulée, ne confirme rien.',
+      'Un biseau est une figure baissière : c’est ce qui le distingue du canal.',
+      'Les deux biseaux se lisent à l’inverse de leur pente, chacun dans son sens.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
+// ── Compétence 11 — La figure sans direction (triangle symétrique) ────────────────────────
+// LOT C7. Les dix compétences précédentes annoncent toutes un sens. Celle-ci est la SEULE figure
+// `direction: 'neutral'` du monde (mesuré : 20 figures chart-pattern, 2 neutres, dont une seule
+// dans `world.patterns`). Sa `confirmationZone` le dit : « La sortie confirmée d'une des DEUX
+// trendlines ». Reconnaître ne suffit plus.
+//
+// Conséquence assumée sur la MÉCANIQUE : aucun `place-invalidation` ici. Son `invalidation` est
+// « Retour immédiat dans la figure après une sortie non tenue » — ce n'est ni un plancher ni un
+// plafond, c'est un RETOUR DEDANS. Il n'y a pas de côté à placer. Poser une ligne serait enseigner
+// une direction que la figure n'a pas ; l'objectif est donc couvert par un scénario conditionnel,
+// et c'est le choix de mécanique lui-même qui porte la leçon.
+const NO_DIRECTION_SCENARIOS: LearningScenario[] = [
+  {
+    id: 'ex.patterns.no-direction.recognize',
+    skillId: 'skill.patterns.no-direction',
+    target: target(SYM_TRIANGLE, 'recognize'),
+    interaction: 'identify-candle',
+    datasetKey: 'pattern.symmetrical-triangle.v1',
+    variant: 'symmetrical-triangle',
+    visualType: 'chart-pattern',
+    prompt: 'Quelle figure chartiste reconnais-tu ?',
+    options: [
+      'Un triangle symétrique (sommets descendants ET creux montants)',
+      'Un triangle ascendant (résistance PLATE, creux montants)',
+      'Un triangle descendant (support PLAT, sommets descendants)',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    a11y: 'Des sommets de plus en plus bas et des creux de plus en plus hauts qui convergent vers une pointe, sans qu’aucune des deux bornes ne soit horizontale.',
+    rule: 'Les triangles ascendant et descendant ont une borne PLATE — et cette borne donne le sens. Le symétrique n’en a aucune : ni l’un ni l’autre camp ne domine.',
+  },
+  {
+    id: 'ex.patterns.no-direction.interpret',
+    skillId: 'skill.patterns.no-direction',
+    target: target(SYM_TRIANGLE, 'interpret'),
+    interaction: 'read-order',
+    prompt: 'Remets dans l’ordre la lecture d’un triangle symétrique.',
+    steps: [
+      'Repère les sommets qui descendent',
+      'Repère les creux qui montent',
+      'Constate qu’AUCUNE des deux bornes n’est plate : la figure ne penche d’aucun côté',
+      'Attends la sortie confirmée d’une des deux droites — c’est elle qui donnera le sens',
+    ],
+    correctOrder: [0, 1, 2, 3],
+    difficulty: 'hard',
+    rule: 'Ici, reconnaître la figure ne suffit plus à savoir où ça va. C’est la seule figure du monde dont le sens n’est pas dans le dessin.',
+  },
+  {
+    id: 'ex.patterns.no-direction.confirm',
+    skillId: 'skill.patterns.no-direction',
+    target: target(SYM_TRIANGLE, 'confirm'),
+    interaction: 'read-scenario',
+    prompt: 'Qu’est-ce qui confirme un triangle symétrique ?',
+    context:
+      'Les sommets descendent, les creux montent, et l’amplitude se réduit à mesure que la figure approche de sa pointe.',
+    options: [
+      'La sortie confirmée d’une des DEUX trendlines, clôture puis retest.',
+      'La compression suffit : à la pointe, la sortie se fait forcément vers le haut.',
+      'Le nombre de touches sur chaque droite indique le camp qui l’emportera.',
+    ],
+    correctIndex: 0,
+    difficulty: 'medium',
+    rule: 'La figure ne donne pas le sens ; elle donne un NIVEAU de décision. La sortie confirmée le donne, dans un sens ou dans l’autre.',
+    whenItFails: 'Une sortie sans participation, suivie d’un retour dans le triangle, ne décide rien.',
+    a11y:
+      'Contexte : sommets descendants, creux montants, amplitude qui se réduit vers la pointe. Trois conclusions possibles à départager.',
+  },
+  {
+    // Pas de `place-invalidation` : voir le commentaire du bloc. L'invalidation de cette figure est
+    // un RETOUR DEDANS, pas un extrême — il n'y a aucun côté à placer.
+    id: 'ex.patterns.no-direction.invalidate',
+    skillId: 'skill.patterns.no-direction',
+    target: target(SYM_TRIANGLE, 'invalidate'),
+    interaction: 'read-scenario',
+    prompt: 'Le prix vient de sortir par le haut du triangle. Puis il revient dedans. Qu’est-ce que cela dit ?',
+    context:
+      'Sortie par le haut d’un triangle symétrique, sans participation notable. Deux séances plus tard, le prix a refermé la cassure et se retrouve à l’intérieur de la figure.',
+    options: [
+      'La sortie est invalidée : le retour dans la figure annule le sens qu’elle venait de donner.',
+      'La sortie reste valable : elle a bien eu lieu, un retour temporaire n’y change rien.',
+      'Le retour dedans confirme le sens inverse : la sortie sera donc par le bas.',
+    ],
+    correctIndex: 0,
+    difficulty: 'hard',
+    rule: 'Cette figure ne s’invalide ni en haut ni en bas — elle s’invalide par un RETOUR DEDANS. N’ayant pas de direction propre, elle n’a pas de côté d’invalidation.',
+    whenItFails:
+      'Le retour dedans n’annonce pas non plus la sortie opposée : la figure redevient simplement indécise, et il faut réattendre.',
+    a11y:
+      'Contexte : sortie par le haut sans participation, puis retour à l’intérieur du triangle deux séances plus tard. Trois conclusions possibles à départager.',
+  },
+  {
+    id: 'ex.patterns.no-direction.avoid',
+    skillId: 'skill.patterns.no-direction',
+    target: target(SYM_TRIANGLE, 'avoid-false-signal'),
+    interaction: 'spot-false-signal',
+    prompt: 'Repère l’affirmation FAUSSE sur le triangle symétrique.',
+    statements: [
+      'Une sortie sans participation, suivie d’un retour dans le triangle, ne décide rien.',
+      'Comme les autres triangles, il annonce un sens ; il faut simplement attendre plus longtemps.',
+      'C’est l’absence de borne plate qui le prive de direction propre.',
+    ],
+    errorIndex: 1,
+    difficulty: 'medium',
+  },
+];
+
 /** Scénarios par compétence (source unique du module). */
 export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario[]> = {
   'skill.patterns.double': DOUBLE_SCENARIOS,
@@ -792,6 +1101,9 @@ export const PATTERNS_MODULE_SCENARIOS_BY_SKILL: Record<string, LearningScenario
   'skill.patterns.triangle-mirror': TRIANGLE_MIRROR_SCENARIOS,
   'skill.patterns.flag-mirror': FLAG_MIRROR_SCENARIOS,
   'skill.patterns.reversal-mirror': REVERSAL_MIRROR_SCENARIOS,
+  'skill.patterns.wedge': WEDGE_SCENARIOS,
+  'skill.patterns.wedge-mirror': WEDGE_MIRROR_SCENARIOS,
+  'skill.patterns.no-direction': NO_DIRECTION_SCENARIOS,
 };
 
 /** Tous les scénarios du module, à plat (tests de diversité/couverture). */

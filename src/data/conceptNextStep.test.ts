@@ -75,7 +75,8 @@ describe('LOT C1 — la fiche dit pourquoi, et ce qu’il reste à faire', () =>
     // le corpus impose une compétence = UN concept (56/56 sans exception avant ce lot), donc les
     // deux figures MIROIR — étoile du soir, trois corbeaux — restent en bibliothèque. Elles sont
     // enseignées dans les leçons et les faux signaux, mais pas encore entraînées pour elles-mêmes.
-    expect(LIBRARY_ONLY.length).toBe(12);
+    // LOT C7 : 12 → 9 (biseau ascendant, biseau descendant, triangle symétrique).
+    expect(LIBRARY_ONLY.length).toBe(9);
     expect(V5_CONCEPTS.length).toBe(67);
   });
 
